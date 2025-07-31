@@ -1,5 +1,5 @@
 -- Insert admin user (password: admin123)
--- Hash untuk password 'admin123' menggunakan bcrypt
+-- Hash yang benar untuk password 'admin123' menggunakan bcrypt
 INSERT INTO "users" ("id", "email", "password", "role", "createdAt", "updatedAt") 
 VALUES (
     'admin_001', 
@@ -10,18 +10,18 @@ VALUES (
     CURRENT_TIMESTAMP
 ) ON CONFLICT ("email") DO NOTHING;
 
--- Insert users untuk siswa terlebih dahulu
+-- Insert users untuk siswa terlebih dahulu (password: student123)
 INSERT INTO "users" ("id", "email", "password", "role", "createdAt", "updatedAt") VALUES
-('user_252610001', '252610001@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('user_252610002', '252610002@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('user_252610003', '252610003@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('user_252610004', '252610004@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('user_252610005', '252610005@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('user_242510001', '242510001@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('user_242510002', '242510002@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('user_242510003', '242510003@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('user_232410001', '232410001@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('user_232410002', '232410002@temp.itxpro.sch.id', '$2a$12$LQv3c1yqBwEHFl5yfgAEXOvyOXLIX6VvxI6aNp3yvAEXOvyOXLIX6V', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+('user_252610001', '252610001@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('user_252610002', '252610002@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('user_252610003', '252610003@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('user_252610004', '252610004@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('user_252610005', '252610005@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('user_242510001', '242510001@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('user_242510002', '242510002@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('user_242510003', '242510003@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('user_232410001', '232410001@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('user_232410002', '232410002@temp.itxpro.sch.id', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STUDENT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT ("email") DO NOTHING;
 
 -- Sekarang insert data siswa

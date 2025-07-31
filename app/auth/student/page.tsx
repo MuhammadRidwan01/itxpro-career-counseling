@@ -3,11 +3,14 @@
 import type React from "react"
 
 import { useState } from "react"
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button"
 import { ArrowLeft, User, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 export default function StudentLogin() {
   const [showPassword, setShowPassword] = useState(false)
@@ -17,12 +20,30 @@ export default function StudentLogin() {
     password: "",
     remember: false,
   })
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    // TODO: Implement authentication
-    setTimeout(() => setLoading(false), 2000)
+
+    try {
+      const result = await signIn("credentials", {
+        identifier: formData.nisOrEmail,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        toast.error("Login gagal. Periksa kembali NIS/Email dan password Anda.")
+      } else {
+        toast.success("Login berhasil!")
+        router.push("/student/dashboard")
+      }
+    } catch (error) {
+      toast.error("Terjadi kesalahan. Silakan coba lagi.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -127,6 +148,13 @@ export default function StudentLogin() {
                   Daftar di sini
                 </Link>
               </p>
+            </div>
+
+            {/* Debug Info */}
+            <div className="mt-4 p-3 bg-white/20 rounded-lg text-xs text-nude-600">
+              <p className="font-semibold mb-1">Login Test:</p>
+              <p>Admin: admin@itxpro.sch.id / admin123</p>
+              <p>Siswa: 252610001 / student123</p>
             </div>
           </GlassCard>
         </motion.div>

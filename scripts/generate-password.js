@@ -1,13 +1,26 @@
 const bcrypt = require("bcryptjs")
 
-async function generatePassword(password) {
-  const salt = await bcrypt.genSalt(12)
-  const hash = await bcrypt.hash(password, salt)
-  console.log(`Password: ${password}`)
-  console.log(`Hash: ${hash}`)
-  return hash
+async function generatePasswords() {
+  console.log("Generating password hashes...\n")
+
+  // Password untuk admin: admin123
+  const adminPassword = await bcrypt.hash("admin123", 12)
+  console.log("Admin password hash (admin123):")
+  console.log(adminPassword)
+  console.log("")
+
+  // Password untuk student: student123
+  const studentPassword = await bcrypt.hash("student123", 12)
+  console.log("Student password hash (student123):")
+  console.log(studentPassword)
+  console.log("")
+
+  // Test verification
+  console.log("Testing admin password verification:")
+  console.log(await bcrypt.compare("admin123", adminPassword))
+
+  console.log("Testing student password verification:")
+  console.log(await bcrypt.compare("student123", studentPassword))
 }
 
-// Generate hash untuk password default
-generatePassword("admin123")
-generatePassword("student123")
+generatePasswords().catch(console.error)
