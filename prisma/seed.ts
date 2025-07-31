@@ -150,26 +150,18 @@ async function main() {
 
     for (const student of studentData) {
       try {
-        // Create user account
-        await prisma.user.upsert({
-          where: { email: `${student.nis}@temp.itxpro.sch.id` },
+        // Create only siswa record without user account
+        await prisma.siswa.upsert({
+          where: { nis: student.nis },
           update: {},
           create: {
-            id: `user_${student.nis}`,
-            email: `${student.nis}@temp.itxpro.sch.id`,
-            password: studentPassword,
-            role: 'STUDENT',
-            siswa: {
-              create: {
-                nis: student.nis,
-                nama: student.nama,
-                kelasSaatIni: student.kelas,
-                angkatan: student.angkatan,
-                jurusan: student.jurusan,
-                status: 'AKTIF',
-                tahunLulusTarget: student.tahunLulus,
-              },
-            },
+            nis: student.nis,
+            nama: student.nama,
+            kelasSaatIni: student.kelas,
+            angkatan: student.angkatan,
+            jurusan: student.jurusan,
+            status: 'AKTIF',
+            tahunLulusTarget: student.tahunLulus,
           },
         })
         console.log(`Created student: ${student.nama} (${student.nis})`)

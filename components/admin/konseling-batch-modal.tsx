@@ -19,6 +19,7 @@ interface Student {
   kelasSaatIni: string
   jurusan: string
   angkatan: number
+  status: string
 }
 
 interface KonselingBatchModalProps {
@@ -189,11 +190,13 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Semua Jurusan</SelectItem>
-                  {uniqueJurusan.map((jurusan) => (
-                    <SelectItem key={jurusan} value={jurusan}>
-                      {jurusan}
-                    </SelectItem>
-                  ))}
+                  {uniqueJurusan
+                    .filter(jurusan => jurusan && jurusan.trim() !== '')
+                    .map((jurusan) => (
+                      <SelectItem key={jurusan} value={jurusan}>
+                        {jurusan}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
 

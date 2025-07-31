@@ -4,14 +4,16 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
+import Link from "next/link"
 import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button"
 import { User, Target, FileText, Calendar, Star, Edit, CheckCircle, Clock, BookOpen } from "lucide-react"
+import type { StudentDashboardData } from "@/types/api"
 
 export default function StudentDashboard() {
   const { data: session, status } = useSession()
   const [activeTab, setActiveTab] = useState("profile")
-  const [studentData, setStudentData] = useState<any>(null)
+  const [studentData, setStudentData] = useState<StudentDashboardData | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -35,8 +37,21 @@ export default function StudentDashboard() {
   if (status === "loading") return <div>Loading...</div>
   if (!session || session.user.role !== "STUDENT") redirect("/auth/student")
 
-  const siswa = studentData?.siswa || {}
-  const stats = studentData?.stats || {}
+  const siswa = studentData?.siswa || {
+    nis: "",
+    nama: "",
+    email: "",
+    kelasSaatIni: "",
+    angkatan: 0,
+    jurusan: "",
+    status: "",
+    tujuanKarirSubmitted: false
+  }
+  const stats = studentData?.stats || {
+    totalKonseling: 0,
+    avgRating: 0,
+    tujuanKarirStatus: "Belum"
+  }
   const konselingHistory = studentData?.konselingHistory || []
 
   if (loading) {
@@ -164,7 +179,7 @@ export default function StudentDashboard() {
                   </div>
                   <h2 className="text-2xl font-bold text-nude-800 mb-2">{siswa.nama}</h2>
                   <p className="text-nude-600">
-                    {siswa.kelas} • {siswa.jurusan}
+                    {siswa.kelasSaatIni} • {siswa.jurusan}
                   </p>
                 </div>
 
@@ -209,9 +224,11 @@ export default function StudentDashboard() {
                       )}
                     </div>
                     {!siswa.tujuanKarirSubmitted && (
-                      <PremiumButton size="sm" className="mt-3">
-                        Isi Tujuan Karir
-                      </PremiumButton>
+                      <Link href="/student/tujuan-karir">
+                        <PremiumButton size="sm" className="mt-3">
+                          Isi Tujuan Karir
+                        </PremiumButton>
+                      </Link>
                     )}
                   </div>
 
@@ -251,34 +268,64 @@ export default function StudentDashboard() {
 
               {!siswa.tujuanKarirSubmitted ? (
                 <div className="max-w-md mx-auto">
-                  <PremiumButton className="w-full mb-4">
-                    <Target className="w-5 h-5" />
-                    Mulai Isi Tujuan Karir
-                  </PremiumButton>
+                  <Link href="/student/tujuan-karir">
+                    <PremiumButton className="w-full mb-4">
+                      <Target className="w-5 h-5" />
+                      Mulai Isi Tujuan Karir
+                    </PremiumButton>
+                  </Link>
                   <p className="text-sm text-nude-600 text-center">
                     Anda hanya dapat mengisi tujuan karir sekali. Pastikan pilihan Anda sudah tepat.
                   </p>
                 </div>
               ) : (
                 <div className="max-w-2xl mx-auto">
-                  {/* Display filled career goals */}
                   <div className="space-y-6">
                     <GlassCard className="p-6 bg-white/10">
-                      <h3 className="font-semibold text-nude-800 mb-4">Pilihan Utama: Kuliah</h3>
-                      <div className="space-y-3">
-                        <div>
-                          <span className="text-sm text-nude-600">Pilihan 1:</span>
-                          <p className="font-medium text-nude-800">Universitas Indonesia - Teknik Informatika</p>
+                      <h3 className="font-semibold text-nude-800 mb-4 capitalize">
+                        Pilihan Utama: {studentData?.tujuanKarir?.kategoriUtama}
+                      </h3>
+                      
+                      {studentData?.tujuanKarir?.kategoriUtama === "kuliah" && (
+                        <div className="space-y-3">
+                          {studentData?.tujuanKarir?.ptn1 && (
+                            <div>
+                              <span className="text-sm text-nude-600">Pilihan 1:</span>
+                              <p className="font-medium text-nude-800">
+                                {studentData.tujuanKarir.ptn1} - {studentData.tujuanKarir.jurusan1}
+                              </p>
+                            </div>
+                          )}
+                          {studentData?.tujuanKarir?.ptn2 && (
+                            <div>
+                              <span className="text-sm text-nude-600">Pilihan 2:</span>
+                              <p className="font-medium text-nude-800">
+                                {studentData.tujuanKarir.ptn2} - {studentData.tujuanKarir.jurusan2}
+                              </p>
+                            </div>
+                          )}
+                          {studentData?.tujuanKarir?.ptn3 && (
+                            <div>
+                              <span className="text-sm text-nude-600">Pilihan 3:</span>
+                              <p className="font-medium text-nude-800">
+                                {studentData.tujuanKarir.ptn3} - {studentData.tujuanKarir.jurusan3}
+                              </p>
+                            </div>
+                          )}
                         </div>
-                        <div>
-                          <span className="text-sm text-nude-600">Pilihan 2:</span>
-                          <p className="font-medium text-nude-800">Institut Teknologi Bandung - Sistem Informasi</p>
+                      )}
+
+                      {studentData?.tujuanKarir?.kategoriUtama === "bekerja" && (
+                        <div className="space-y-3">
+                          <p className="text-nude-700 leading-relaxed">{studentData.tujuanKarir.detailBekerja}</p>
                         </div>
-                        <div>
-                          <span className="text-sm text-nude-600">Pilihan 3:</span>
-                          <p className="font-medium text-nude-800">Universitas Gadjah Mada - Ilmu Komputer</p>
+                      )}
+
+                      {studentData?.tujuanKarir?.kategoriUtama === "wirausaha" && (
+                        <div className="space-y-3">
+                          <p className="text-nude-700 leading-relaxed">{studentData.tujuanKarir.detailWirausaha}</p>
                         </div>
-                      </div>
+                      )}
                     </GlassCard>
                   </div>
                 </div>
@@ -298,7 +345,7 @@ export default function StudentDashboard() {
 
               {konselingHistory.length > 0 ? (
                 <div className="space-y-4">
-                  {konselingHistory.map((konseling, index) => (
+                  {konselingHistory.map((konseling, index: number) => (
                     <motion.div
                       key={konseling.id}
                       initial={{ opacity: 0, y: 20 }}
