@@ -34,6 +34,7 @@ import {
   LineChart,
   Line,
 } from "recharts"
+import { KonselingBatchModal } from "@/components/admin/konseling-batch-modal"
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession()
@@ -42,6 +43,16 @@ export default function AdminDashboard() {
 
   const [dashboardData, setDashboardData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [showKonselingBatchModal, setShowKonselingBatchModal] = useState(false)
+
+  const handleKonselingAction = (action: string) => {
+    console.log("Konseling action:", action)
+  }
+
+  const handleKonselingSuccess = () => {
+    console.log("Konseling batch success")
+    setShowKonselingBatchModal(false)
+  }
 
   useEffect(() => {
     fetchDashboardData()
@@ -107,6 +118,10 @@ export default function AdminDashboard() {
             <PremiumButton size="sm">
               <Plus className="w-4 h-4" />
               Tambah Siswa
+            </PremiumButton>
+            <PremiumButton size="sm" onClick={() => setShowKonselingBatchModal(true)}>
+              <Users className="w-4 h-4" />
+              Konseling Batch
             </PremiumButton>
           </div>
         </motion.div>
@@ -372,7 +387,30 @@ export default function AdminDashboard() {
               </GlassCard>
             </div>
           )}
+
+          {activeTab === "konseling" && (
+            <GlassCard className="p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Manajemen Konseling</h2>
+                <div className="flex items-center gap-3">
+                  <PremiumButton size="sm" onClick={() => setShowKonselingBatchModal(true)}>
+                    <Users className="w-4 h-4" />
+                    Konseling Batch
+                  </PremiumButton>
+                  <PremiumButton size="sm" onClick={() => handleKonselingAction("create")}>
+                    <Plus className="w-4 h-4" />
+                    Tambah Konseling
+                  </PremiumButton>
+                </div>
+              </div>
+            </GlassCard>
+          )}
         </motion.div>
+        <KonselingBatchModal
+          isOpen={showKonselingBatchModal}
+          onClose={() => setShowKonselingBatchModal(false)}
+          onSuccess={handleKonselingSuccess}
+        />
       </div>
     </div>
   )
