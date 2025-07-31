@@ -13,8 +13,9 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url)
     const search = searchParams.get("search") || ""
-    const page = Number.parseInt(searchParams.get("page") || "1")
-    const limit = Number.parseInt(searchParams.get("limit") || "10")
+    const getAllData = searchParams.get("all") === "true"
+    const page = getAllData ? 1 : Number.parseInt(searchParams.get("page") || "1")
+    const limit = getAllData ? undefined : Number.parseInt(searchParams.get("limit") || "100") // Meningkatkan default limit
     const status = searchParams.get("status")
     const angkatan = searchParams.get("angkatan")
 
@@ -39,8 +40,10 @@ export async function GET(request: Request) {
     const [siswa, total] = await Promise.all([
       prisma.siswa.findMany({
         where,
-        skip: (page - 1) * limit,
-        take: limit,
+        ...(getAllData ? {} : {
+          skip: (page - 1) * (limit || 100),
+          take: limit,
+        }),
         orderBy: { createdAt: "desc" },
         include: {
           user: {
@@ -73,12 +76,14 @@ export async function GET(request: Request) {
       success: true,
       data: {
         siswa,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
+        ...(getAllData ? {} : {
+          pagination: {
+            page,
+            limit: limit || 100,
+            total,
+            totalPages: Math.ceil(total / (limit || 100)),
+          },
+        }),
       },
     })
   } catch (error) {

@@ -3,16 +3,33 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
+interface SessionUser {
+  id: string
+  email: string
+  role: "ADMIN" | "STUDENT"
+}
+
+interface ExtendedSession {
+  user: SessionUser
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions) as ExtendedSession | null
 
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
     }
 
     const body = await request.json()
-    const { siswaList, tanggalKonseling, hasilText, rekomendasi, rating, kategori } = body
+    const { siswaList, tanggalKonseling, hasilText, rekomendasi, rating, kategori } = body as {
+      siswaList: string[]
+      tanggalKonseling: string
+      hasilText: string
+      rekomendasi?: string
+      rating: string
+      kategori: string
+    }
 
     // Validasi input
     if (!siswaList || !Array.isArray(siswaList) || siswaList.length === 0) {
@@ -46,14 +63,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Buat data konseling untuk batch insert
-    const konselingData = siswaList.map((nis) => ({
+    const konselingData: Prisma.HasilKonselingCreateManyInput[] = siswaList.map((nis) => ({
       nisSiswa: nis,
       tanggalKonseling: new Date(tanggalKonseling),
       hasilText,
-      rekomendasi: rekomendasi || "",
-      rating: Number.parseInt(rating),
+      rating: Number.parseInt(rating as string),
       kategori,
       adminId: session.user.id,
+      ...(rekomendasi ? { rekomendasi } : {})
     }))
 
     // Insert batch konseling

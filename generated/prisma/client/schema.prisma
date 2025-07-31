@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  siswa     Siswa?
+
+  @@map("users")
+}
+
+model Siswa {
+  nis                  String           @id @db.VarChar(9)
+  nama                 String
+  email                String           @unique
+  kelasSaatIni         String?
+  angkatan             Int
+  jurusan              String?
+  status               Status           @default(AKTIF)
+  tahunLulusTarget     Int?
+  tujuanKarirSubmitted Boolean          @default(false)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  hasilKonseling       HasilKonseling[]
+  user                 User             @relation(fields: [email], references: [email])
+  tujuanKarir          TujuanKarir?
+
+  @@map("siswa")
+}
+
+model HasilKonseling {
+  id               String   @id @default(cuid())
+  nisSiswa         String   @db.VarChar(9)
+  tanggalKonseling DateTime
+  hasilText        String
+  rating           Int
+  kategori         String?
+  adminId          String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  rekomendasi      String?
+  siswa            Siswa    @relation(fields: [nisSiswa], references: [nis])
+
+  @@map("hasil_konseling")
+}
+
+model TujuanKarir {
+  id              String   @id @default(cuid())
+  nisSiswa        String   @unique @db.VarChar(9)
+  kategoriUtama   String
+  ptn1            String?
+  jurusan1        String?
+  ptn2            String?
+  jurusan2        String?
+  ptn3            String?
+  jurusan3        String?
+  detailBekerja   String?
+  detailWirausaha String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  siswa           Siswa    @relation(fields: [nisSiswa], references: [nis])
+
+  @@map("tujuan_karir")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum Status {
+  AKTIF
+  ALUMNI
+  PINDAH
+  TINGGAL_KELAS
+}
