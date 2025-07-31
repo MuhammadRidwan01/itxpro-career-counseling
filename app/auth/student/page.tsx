@@ -27,19 +27,25 @@ export default function StudentLogin() {
     setLoading(true)
 
     try {
+      console.log("Attempting login with:", formData.nisOrEmail)
+
       const result = await signIn("credentials", {
         identifier: formData.nisOrEmail,
         password: formData.password,
         redirect: false,
       })
 
+      console.log("Login result:", result)
+
       if (result?.error) {
         toast.error("Login gagal. Periksa kembali NIS/Email dan password Anda.")
+        console.log("Login error:", result.error)
       } else {
         toast.success("Login berhasil!")
         router.push("/student/dashboard")
       }
     } catch (error) {
+      console.error("Login exception:", error)
       toast.error("Terjadi kesalahan. Silakan coba lagi.")
     } finally {
       setLoading(false)
@@ -152,9 +158,29 @@ export default function StudentLogin() {
 
             {/* Debug Info */}
             <div className="mt-4 p-3 bg-white/20 rounded-lg text-xs text-nude-600">
-              <p className="font-semibold mb-1">Login Test:</p>
-              <p>Admin: admin@itxpro.sch.id / admin123</p>
-              <p>Siswa: 252610001 / student123</p>
+              <p className="font-semibold mb-2">🔧 Testing Login:</p>
+              <div className="space-y-1">
+                <p>
+                  <strong>Admin:</strong> admin@itxpro.sch.id
+                </p>
+                <p>
+                  <strong>Password:</strong> 123456
+                </p>
+                <hr className="my-2 border-nude-300" />
+                <p>
+                  <strong>Siswa NIS:</strong> 252610001
+                </p>
+                <p>
+                  <strong>Password:</strong> 123456
+                </p>
+                <hr className="my-2 border-nude-300" />
+                <p>
+                  <strong>Siswa Email:</strong> 252610001@temp.itxpro.sch.id
+                </p>
+                <p>
+                  <strong>Password:</strong> 123456
+                </p>
+              </div>
             </div>
           </GlassCard>
         </motion.div>
