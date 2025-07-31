@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relasi ke siswa jika role STUDENT
+  siswa Siswa?
+
+  @@map("users")
+}
+
+model Siswa {
+  nis               String  @id @db.VarChar(9)
+  nama              String
+  email             String  @unique
+  kelasSaatIni      String? // X1, XI-DKV-1, XII-RPL-2, dll
+  angkatan          Int     // auto-extract dari NIS: 2526xxx = 2025
+  jurusan           String? // NULL/DKV/TKJ/RPL
+  status            Status  @default(AKTIF)
+  tahunLulusTarget  Int?
+  tujuanKarirSubmitted Boolean @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relasi
+  user              User     @relation(fields: [email], references: [email])
+  hasilKonseling    HasilKonseling[]
+  tujuanKarir       TujuanKarir?
+
+  @@map("siswa")
+}
+
+model HasilKonseling {
+  id               String   @id @default(cuid())
+  nisSiswa         String   @db.VarChar(9)
+  tanggalKonseling DateTime
+  hasilText        String   @db.Text
+  rating           Int      // 1-5 atau 1-10
+  kategori         String?  // karir/akademik/pribadi
+  adminId          String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relasi
+  siswa            Siswa    @relation(fields: [nisSiswa], references: [nis])
+
+  @@map("hasil_konseling")
+}
+
+model TujuanKarir {
+  id               String  @id @default(cuid())
+  nisSiswa         String  @unique @db.VarChar(9)
+  kategoriUtama    String  // kuliah/bekerja/wirausaha
+  ptn1             String?
+  jurusan1         String?
+  ptn2             String?
+  jurusan2         String?
+  ptn3             String?
+  jurusan3         String?
+  detailBekerja    String? @db.Text
+  detailWirausaha  String? @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relasi
+  siswa            Siswa   @relation(fields: [nisSiswa], references: [nis])
+
+  @@map("tujuan_karir")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum Status {
+  AKTIF
+  ALUMNI
+  PINDAH
+  TINGGAL_KELAS
+}
