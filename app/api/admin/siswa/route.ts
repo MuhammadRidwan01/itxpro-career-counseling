@@ -110,11 +110,11 @@ export async function POST(request: Request) {
       data: {
         nis,
         nama,
-        email: email || `${nis}@temp.itxpro.sch.id`,
         kelasSaatIni,
         angkatan,
         jurusan,
         tahunLulusTarget: tahunLulusTarget || angkatan,
+        user: undefined // Make the user relation optional
       },
     })
 

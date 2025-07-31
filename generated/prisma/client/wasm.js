@@ -148,12 +148,12 @@ exports.Prisma.HasilKonselingScalarFieldEnum = {
   nisSiswa: 'nisSiswa',
   tanggalKonseling: 'tanggalKonseling',
   hasilText: 'hasilText',
+  rekomendasi: 'rekomendasi',
   rating: 'rating',
   kategori: 'kategori',
   adminId: 'adminId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  rekomendasi: 'rekomendasi'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.TujuanKarirScalarFieldEnum = {

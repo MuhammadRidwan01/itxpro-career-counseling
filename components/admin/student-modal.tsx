@@ -14,7 +14,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 interface Student {
   nis: string
   nama: string
-  email: string
   kelasSaatIni: string
   angkatan: number
   jurusan: string
@@ -32,7 +31,6 @@ export function StudentModal({ isOpen, onClose, onSuccess, student }: StudentMod
   const [formData, setFormData] = useState({
     nis: "",
     nama: "",
-    email: "",
     kelasSaatIni: "",
     angkatan: new Date().getFullYear(),
     jurusan: "",
@@ -48,7 +46,6 @@ export function StudentModal({ isOpen, onClose, onSuccess, student }: StudentMod
       setFormData({
         nis: student.nis,
         nama: student.nama,
-        email: student.email,
         kelasSaatIni: student.kelasSaatIni,
         angkatan: student.angkatan,
         jurusan: student.jurusan,
@@ -58,7 +55,6 @@ export function StudentModal({ isOpen, onClose, onSuccess, student }: StudentMod
       setFormData({
         nis: "",
         nama: "",
-        email: "",
         kelasSaatIni: "",
         angkatan: new Date().getFullYear(),
         jurusan: "",
@@ -104,7 +100,6 @@ export function StudentModal({ isOpen, onClose, onSuccess, student }: StudentMod
     setFormData({
       nis: "",
       nama: "",
-      email: "",
       kelasSaatIni: "",
       angkatan: new Date().getFullYear(),
       jurusan: "",
@@ -161,20 +156,6 @@ export function StudentModal({ isOpen, onClose, onSuccess, student }: StudentMod
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="Masukkan email"
-                required
-              />
-            </div>
 
             <div className="space-y-2">
               <Label htmlFor="kelasSaatIni" className="flex items-center gap-2">

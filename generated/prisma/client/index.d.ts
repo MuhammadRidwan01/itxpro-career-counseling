@@ -2500,7 +2500,7 @@ export namespace Prisma {
   export type SiswaGroupByOutputType = {
     nis: string
     nama: string
-    email: string
+    email: string | null
     kelasSaatIni: string | null
     angkatan: number
     jurusan: string | null
@@ -2543,7 +2543,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     hasilKonseling?: boolean | Siswa$hasilKonselingArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Siswa$userArgs<ExtArgs>
     tujuanKarir?: boolean | Siswa$tujuanKarirArgs<ExtArgs>
     _count?: boolean | SiswaCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["siswa"]>
@@ -2560,7 +2560,7 @@ export namespace Prisma {
     tujuanKarirSubmitted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Siswa$userArgs<ExtArgs>
   }, ExtArgs["result"]["siswa"]>
 
   export type SiswaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2575,7 +2575,7 @@ export namespace Prisma {
     tujuanKarirSubmitted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Siswa$userArgs<ExtArgs>
   }, ExtArgs["result"]["siswa"]>
 
   export type SiswaSelectScalar = {
@@ -2595,28 +2595,28 @@ export namespace Prisma {
   export type SiswaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"nis" | "nama" | "email" | "kelasSaatIni" | "angkatan" | "jurusan" | "status" | "tahunLulusTarget" | "tujuanKarirSubmitted" | "createdAt" | "updatedAt", ExtArgs["result"]["siswa"]>
   export type SiswaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     hasilKonseling?: boolean | Siswa$hasilKonselingArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Siswa$userArgs<ExtArgs>
     tujuanKarir?: boolean | Siswa$tujuanKarirArgs<ExtArgs>
     _count?: boolean | SiswaCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SiswaIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Siswa$userArgs<ExtArgs>
   }
   export type SiswaIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Siswa$userArgs<ExtArgs>
   }
 
   export type $SiswaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Siswa"
     objects: {
       hasilKonseling: Prisma.$HasilKonselingPayload<ExtArgs>[]
-      user: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
       tujuanKarir: Prisma.$TujuanKarirPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       nis: string
       nama: string
-      email: string
+      email: string | null
       kelasSaatIni: string | null
       angkatan: number
       jurusan: string | null
@@ -3020,7 +3020,7 @@ export namespace Prisma {
   export interface Prisma__SiswaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     hasilKonseling<T extends Siswa$hasilKonselingArgs<ExtArgs> = {}>(args?: Subset<T, Siswa$hasilKonselingArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HasilKonselingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends Siswa$userArgs<ExtArgs> = {}>(args?: Subset<T, Siswa$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     tujuanKarir<T extends Siswa$tujuanKarirArgs<ExtArgs> = {}>(args?: Subset<T, Siswa$tujuanKarirArgs<ExtArgs>>): Prisma__TujuanKarirClient<$Result.GetResult<Prisma.$TujuanKarirPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3482,6 +3482,25 @@ export namespace Prisma {
   }
 
   /**
+   * Siswa.user
+   */
+  export type Siswa$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
    * Siswa.tujuanKarir
    */
   export type Siswa$tujuanKarirArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3544,12 +3563,12 @@ export namespace Prisma {
     nisSiswa: string | null
     tanggalKonseling: Date | null
     hasilText: string | null
+    rekomendasi: string | null
     rating: number | null
     kategori: string | null
     adminId: string | null
     createdAt: Date | null
     updatedAt: Date | null
-    rekomendasi: string | null
   }
 
   export type HasilKonselingMaxAggregateOutputType = {
@@ -3557,12 +3576,12 @@ export namespace Prisma {
     nisSiswa: string | null
     tanggalKonseling: Date | null
     hasilText: string | null
+    rekomendasi: string | null
     rating: number | null
     kategori: string | null
     adminId: string | null
     createdAt: Date | null
     updatedAt: Date | null
-    rekomendasi: string | null
   }
 
   export type HasilKonselingCountAggregateOutputType = {
@@ -3570,12 +3589,12 @@ export namespace Prisma {
     nisSiswa: number
     tanggalKonseling: number
     hasilText: number
+    rekomendasi: number
     rating: number
     kategori: number
     adminId: number
     createdAt: number
     updatedAt: number
-    rekomendasi: number
     _all: number
   }
 
@@ -3593,12 +3612,12 @@ export namespace Prisma {
     nisSiswa?: true
     tanggalKonseling?: true
     hasilText?: true
+    rekomendasi?: true
     rating?: true
     kategori?: true
     adminId?: true
     createdAt?: true
     updatedAt?: true
-    rekomendasi?: true
   }
 
   export type HasilKonselingMaxAggregateInputType = {
@@ -3606,12 +3625,12 @@ export namespace Prisma {
     nisSiswa?: true
     tanggalKonseling?: true
     hasilText?: true
+    rekomendasi?: true
     rating?: true
     kategori?: true
     adminId?: true
     createdAt?: true
     updatedAt?: true
-    rekomendasi?: true
   }
 
   export type HasilKonselingCountAggregateInputType = {
@@ -3619,12 +3638,12 @@ export namespace Prisma {
     nisSiswa?: true
     tanggalKonseling?: true
     hasilText?: true
+    rekomendasi?: true
     rating?: true
     kategori?: true
     adminId?: true
     createdAt?: true
     updatedAt?: true
-    rekomendasi?: true
     _all?: true
   }
 
@@ -3719,12 +3738,12 @@ export namespace Prisma {
     nisSiswa: string
     tanggalKonseling: Date
     hasilText: string
+    rekomendasi: string | null
     rating: number
     kategori: string | null
     adminId: string
     createdAt: Date
     updatedAt: Date
-    rekomendasi: string | null
     _count: HasilKonselingCountAggregateOutputType | null
     _avg: HasilKonselingAvgAggregateOutputType | null
     _sum: HasilKonselingSumAggregateOutputType | null
@@ -3751,12 +3770,12 @@ export namespace Prisma {
     nisSiswa?: boolean
     tanggalKonseling?: boolean
     hasilText?: boolean
+    rekomendasi?: boolean
     rating?: boolean
     kategori?: boolean
     adminId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    rekomendasi?: boolean
     siswa?: boolean | SiswaDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["hasilKonseling"]>
 
@@ -3765,12 +3784,12 @@ export namespace Prisma {
     nisSiswa?: boolean
     tanggalKonseling?: boolean
     hasilText?: boolean
+    rekomendasi?: boolean
     rating?: boolean
     kategori?: boolean
     adminId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    rekomendasi?: boolean
     siswa?: boolean | SiswaDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["hasilKonseling"]>
 
@@ -3779,12 +3798,12 @@ export namespace Prisma {
     nisSiswa?: boolean
     tanggalKonseling?: boolean
     hasilText?: boolean
+    rekomendasi?: boolean
     rating?: boolean
     kategori?: boolean
     adminId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    rekomendasi?: boolean
     siswa?: boolean | SiswaDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["hasilKonseling"]>
 
@@ -3793,15 +3812,15 @@ export namespace Prisma {
     nisSiswa?: boolean
     tanggalKonseling?: boolean
     hasilText?: boolean
+    rekomendasi?: boolean
     rating?: boolean
     kategori?: boolean
     adminId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    rekomendasi?: boolean
   }
 
-  export type HasilKonselingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nisSiswa" | "tanggalKonseling" | "hasilText" | "rating" | "kategori" | "adminId" | "createdAt" | "updatedAt" | "rekomendasi", ExtArgs["result"]["hasilKonseling"]>
+  export type HasilKonselingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nisSiswa" | "tanggalKonseling" | "hasilText" | "rekomendasi" | "rating" | "kategori" | "adminId" | "createdAt" | "updatedAt", ExtArgs["result"]["hasilKonseling"]>
   export type HasilKonselingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     siswa?: boolean | SiswaDefaultArgs<ExtArgs>
   }
@@ -3822,12 +3841,12 @@ export namespace Prisma {
       nisSiswa: string
       tanggalKonseling: Date
       hasilText: string
+      rekomendasi: string | null
       rating: number
       kategori: string | null
       adminId: string
       createdAt: Date
       updatedAt: Date
-      rekomendasi: string | null
     }, ExtArgs["result"]["hasilKonseling"]>
     composites: {}
   }
@@ -4256,12 +4275,12 @@ export namespace Prisma {
     readonly nisSiswa: FieldRef<"HasilKonseling", 'String'>
     readonly tanggalKonseling: FieldRef<"HasilKonseling", 'DateTime'>
     readonly hasilText: FieldRef<"HasilKonseling", 'String'>
+    readonly rekomendasi: FieldRef<"HasilKonseling", 'String'>
     readonly rating: FieldRef<"HasilKonseling", 'Int'>
     readonly kategori: FieldRef<"HasilKonseling", 'String'>
     readonly adminId: FieldRef<"HasilKonseling", 'String'>
     readonly createdAt: FieldRef<"HasilKonseling", 'DateTime'>
     readonly updatedAt: FieldRef<"HasilKonseling", 'DateTime'>
-    readonly rekomendasi: FieldRef<"HasilKonseling", 'String'>
   }
     
 
@@ -5886,12 +5905,12 @@ export namespace Prisma {
     nisSiswa: 'nisSiswa',
     tanggalKonseling: 'tanggalKonseling',
     hasilText: 'hasilText',
+    rekomendasi: 'rekomendasi',
     rating: 'rating',
     kategori: 'kategori',
     adminId: 'adminId',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    rekomendasi: 'rekomendasi'
+    updatedAt: 'updatedAt'
   };
 
   export type HasilKonselingScalarFieldEnum = (typeof HasilKonselingScalarFieldEnum)[keyof typeof HasilKonselingScalarFieldEnum]
@@ -6105,7 +6124,7 @@ export namespace Prisma {
     NOT?: SiswaWhereInput | SiswaWhereInput[]
     nis?: StringFilter<"Siswa"> | string
     nama?: StringFilter<"Siswa"> | string
-    email?: StringFilter<"Siswa"> | string
+    email?: StringNullableFilter<"Siswa"> | string | null
     kelasSaatIni?: StringNullableFilter<"Siswa"> | string | null
     angkatan?: IntFilter<"Siswa"> | number
     jurusan?: StringNullableFilter<"Siswa"> | string | null
@@ -6115,14 +6134,14 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Siswa"> | Date | string
     updatedAt?: DateTimeFilter<"Siswa"> | Date | string
     hasilKonseling?: HasilKonselingListRelationFilter
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     tujuanKarir?: XOR<TujuanKarirNullableScalarRelationFilter, TujuanKarirWhereInput> | null
   }
 
   export type SiswaOrderByWithRelationInput = {
     nis?: SortOrder
     nama?: SortOrder
-    email?: SortOrder
+    email?: SortOrderInput | SortOrder
     kelasSaatIni?: SortOrderInput | SortOrder
     angkatan?: SortOrder
     jurusan?: SortOrderInput | SortOrder
@@ -6152,14 +6171,14 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Siswa"> | Date | string
     updatedAt?: DateTimeFilter<"Siswa"> | Date | string
     hasilKonseling?: HasilKonselingListRelationFilter
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     tujuanKarir?: XOR<TujuanKarirNullableScalarRelationFilter, TujuanKarirWhereInput> | null
   }, "nis" | "email">
 
   export type SiswaOrderByWithAggregationInput = {
     nis?: SortOrder
     nama?: SortOrder
-    email?: SortOrder
+    email?: SortOrderInput | SortOrder
     kelasSaatIni?: SortOrderInput | SortOrder
     angkatan?: SortOrder
     jurusan?: SortOrderInput | SortOrder
@@ -6181,7 +6200,7 @@ export namespace Prisma {
     NOT?: SiswaScalarWhereWithAggregatesInput | SiswaScalarWhereWithAggregatesInput[]
     nis?: StringWithAggregatesFilter<"Siswa"> | string
     nama?: StringWithAggregatesFilter<"Siswa"> | string
-    email?: StringWithAggregatesFilter<"Siswa"> | string
+    email?: StringNullableWithAggregatesFilter<"Siswa"> | string | null
     kelasSaatIni?: StringNullableWithAggregatesFilter<"Siswa"> | string | null
     angkatan?: IntWithAggregatesFilter<"Siswa"> | number
     jurusan?: StringNullableWithAggregatesFilter<"Siswa"> | string | null
@@ -6200,12 +6219,12 @@ export namespace Prisma {
     nisSiswa?: StringFilter<"HasilKonseling"> | string
     tanggalKonseling?: DateTimeFilter<"HasilKonseling"> | Date | string
     hasilText?: StringFilter<"HasilKonseling"> | string
+    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
     rating?: IntFilter<"HasilKonseling"> | number
     kategori?: StringNullableFilter<"HasilKonseling"> | string | null
     adminId?: StringFilter<"HasilKonseling"> | string
     createdAt?: DateTimeFilter<"HasilKonseling"> | Date | string
     updatedAt?: DateTimeFilter<"HasilKonseling"> | Date | string
-    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
     siswa?: XOR<SiswaScalarRelationFilter, SiswaWhereInput>
   }
 
@@ -6214,12 +6233,12 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
+    rekomendasi?: SortOrderInput | SortOrder
     rating?: SortOrder
     kategori?: SortOrderInput | SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    rekomendasi?: SortOrderInput | SortOrder
     siswa?: SiswaOrderByWithRelationInput
   }
 
@@ -6231,12 +6250,12 @@ export namespace Prisma {
     nisSiswa?: StringFilter<"HasilKonseling"> | string
     tanggalKonseling?: DateTimeFilter<"HasilKonseling"> | Date | string
     hasilText?: StringFilter<"HasilKonseling"> | string
+    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
     rating?: IntFilter<"HasilKonseling"> | number
     kategori?: StringNullableFilter<"HasilKonseling"> | string | null
     adminId?: StringFilter<"HasilKonseling"> | string
     createdAt?: DateTimeFilter<"HasilKonseling"> | Date | string
     updatedAt?: DateTimeFilter<"HasilKonseling"> | Date | string
-    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
     siswa?: XOR<SiswaScalarRelationFilter, SiswaWhereInput>
   }, "id">
 
@@ -6245,12 +6264,12 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
+    rekomendasi?: SortOrderInput | SortOrder
     rating?: SortOrder
     kategori?: SortOrderInput | SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    rekomendasi?: SortOrderInput | SortOrder
     _count?: HasilKonselingCountOrderByAggregateInput
     _avg?: HasilKonselingAvgOrderByAggregateInput
     _max?: HasilKonselingMaxOrderByAggregateInput
@@ -6266,12 +6285,12 @@ export namespace Prisma {
     nisSiswa?: StringWithAggregatesFilter<"HasilKonseling"> | string
     tanggalKonseling?: DateTimeWithAggregatesFilter<"HasilKonseling"> | Date | string
     hasilText?: StringWithAggregatesFilter<"HasilKonseling"> | string
+    rekomendasi?: StringNullableWithAggregatesFilter<"HasilKonseling"> | string | null
     rating?: IntWithAggregatesFilter<"HasilKonseling"> | number
     kategori?: StringNullableWithAggregatesFilter<"HasilKonseling"> | string | null
     adminId?: StringWithAggregatesFilter<"HasilKonseling"> | string
     createdAt?: DateTimeWithAggregatesFilter<"HasilKonseling"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"HasilKonseling"> | Date | string
-    rekomendasi?: StringNullableWithAggregatesFilter<"HasilKonseling"> | string | null
   }
 
   export type TujuanKarirWhereInput = {
@@ -6448,14 +6467,14 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     hasilKonseling?: HasilKonselingCreateNestedManyWithoutSiswaInput
-    user: UserCreateNestedOneWithoutSiswaInput
+    user?: UserCreateNestedOneWithoutSiswaInput
     tujuanKarir?: TujuanKarirCreateNestedOneWithoutSiswaInput
   }
 
   export type SiswaUncheckedCreateInput = {
     nis: string
     nama: string
-    email: string
+    email?: string | null
     kelasSaatIni?: string | null
     angkatan: number
     jurusan?: string | null
@@ -6480,14 +6499,14 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilKonseling?: HasilKonselingUpdateManyWithoutSiswaNestedInput
-    user?: UserUpdateOneRequiredWithoutSiswaNestedInput
+    user?: UserUpdateOneWithoutSiswaNestedInput
     tujuanKarir?: TujuanKarirUpdateOneWithoutSiswaNestedInput
   }
 
   export type SiswaUncheckedUpdateInput = {
     nis?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     kelasSaatIni?: NullableStringFieldUpdateOperationsInput | string | null
     angkatan?: IntFieldUpdateOperationsInput | number
     jurusan?: NullableStringFieldUpdateOperationsInput | string | null
@@ -6503,7 +6522,7 @@ export namespace Prisma {
   export type SiswaCreateManyInput = {
     nis: string
     nama: string
-    email: string
+    email?: string | null
     kelasSaatIni?: string | null
     angkatan: number
     jurusan?: string | null
@@ -6530,7 +6549,7 @@ export namespace Prisma {
   export type SiswaUncheckedUpdateManyInput = {
     nis?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     kelasSaatIni?: NullableStringFieldUpdateOperationsInput | string | null
     angkatan?: IntFieldUpdateOperationsInput | number
     jurusan?: NullableStringFieldUpdateOperationsInput | string | null
@@ -6545,12 +6564,12 @@ export namespace Prisma {
     id?: string
     tanggalKonseling: Date | string
     hasilText: string
+    rekomendasi?: string | null
     rating: number
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasi?: string | null
     siswa: SiswaCreateNestedOneWithoutHasilKonselingInput
   }
 
@@ -6559,24 +6578,24 @@ export namespace Prisma {
     nisSiswa: string
     tanggalKonseling: Date | string
     hasilText: string
+    rekomendasi?: string | null
     rating: number
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasi?: string | null
   }
 
   export type HasilKonselingUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: IntFieldUpdateOperationsInput | number
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
     siswa?: SiswaUpdateOneRequiredWithoutHasilKonselingNestedInput
   }
 
@@ -6585,12 +6604,12 @@ export namespace Prisma {
     nisSiswa?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: IntFieldUpdateOperationsInput | number
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type HasilKonselingCreateManyInput = {
@@ -6598,24 +6617,24 @@ export namespace Prisma {
     nisSiswa: string
     tanggalKonseling: Date | string
     hasilText: string
+    rekomendasi?: string | null
     rating: number
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasi?: string | null
   }
 
   export type HasilKonselingUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: IntFieldUpdateOperationsInput | number
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type HasilKonselingUncheckedUpdateManyInput = {
@@ -6623,12 +6642,12 @@ export namespace Prisma {
     nisSiswa?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: IntFieldUpdateOperationsInput | number
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TujuanKarirCreateInput = {
@@ -6904,9 +6923,9 @@ export namespace Prisma {
     none?: HasilKonselingWhereInput
   }
 
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
   }
 
   export type TujuanKarirNullableScalarRelationFilter = {
@@ -7053,12 +7072,12 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
+    rekomendasi?: SortOrder
     rating?: SortOrder
     kategori?: SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    rekomendasi?: SortOrder
   }
 
   export type HasilKonselingAvgOrderByAggregateInput = {
@@ -7070,12 +7089,12 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
+    rekomendasi?: SortOrder
     rating?: SortOrder
     kategori?: SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    rekomendasi?: SortOrder
   }
 
   export type HasilKonselingMinOrderByAggregateInput = {
@@ -7083,12 +7102,12 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
+    rekomendasi?: SortOrder
     rating?: SortOrder
     kategori?: SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    rekomendasi?: SortOrder
   }
 
   export type HasilKonselingSumOrderByAggregateInput = {
@@ -7261,10 +7280,12 @@ export namespace Prisma {
     deleteMany?: HasilKonselingScalarWhereInput | HasilKonselingScalarWhereInput[]
   }
 
-  export type UserUpdateOneRequiredWithoutSiswaNestedInput = {
+  export type UserUpdateOneWithoutSiswaNestedInput = {
     create?: XOR<UserCreateWithoutSiswaInput, UserUncheckedCreateWithoutSiswaInput>
     connectOrCreate?: UserCreateOrConnectWithoutSiswaInput
     upsert?: UserUpsertWithoutSiswaInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSiswaInput, UserUpdateWithoutSiswaInput>, UserUncheckedUpdateWithoutSiswaInput>
   }
@@ -7621,24 +7642,24 @@ export namespace Prisma {
     id?: string
     tanggalKonseling: Date | string
     hasilText: string
+    rekomendasi?: string | null
     rating: number
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasi?: string | null
   }
 
   export type HasilKonselingUncheckedCreateWithoutSiswaInput = {
     id?: string
     tanggalKonseling: Date | string
     hasilText: string
+    rekomendasi?: string | null
     rating: number
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasi?: string | null
   }
 
   export type HasilKonselingCreateOrConnectWithoutSiswaInput = {
@@ -7733,12 +7754,12 @@ export namespace Prisma {
     nisSiswa?: StringFilter<"HasilKonseling"> | string
     tanggalKonseling?: DateTimeFilter<"HasilKonseling"> | Date | string
     hasilText?: StringFilter<"HasilKonseling"> | string
+    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
     rating?: IntFilter<"HasilKonseling"> | number
     kategori?: StringNullableFilter<"HasilKonseling"> | string | null
     adminId?: StringFilter<"HasilKonseling"> | string
     createdAt?: DateTimeFilter<"HasilKonseling"> | Date | string
     updatedAt?: DateTimeFilter<"HasilKonseling"> | Date | string
-    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
   }
 
   export type UserUpsertWithoutSiswaInput = {
@@ -7822,14 +7843,14 @@ export namespace Prisma {
     tujuanKarirSubmitted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutSiswaInput
+    user?: UserCreateNestedOneWithoutSiswaInput
     tujuanKarir?: TujuanKarirCreateNestedOneWithoutSiswaInput
   }
 
   export type SiswaUncheckedCreateWithoutHasilKonselingInput = {
     nis: string
     nama: string
-    email: string
+    email?: string | null
     kelasSaatIni?: string | null
     angkatan: number
     jurusan?: string | null
@@ -7868,14 +7889,14 @@ export namespace Prisma {
     tujuanKarirSubmitted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutSiswaNestedInput
+    user?: UserUpdateOneWithoutSiswaNestedInput
     tujuanKarir?: TujuanKarirUpdateOneWithoutSiswaNestedInput
   }
 
   export type SiswaUncheckedUpdateWithoutHasilKonselingInput = {
     nis?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     kelasSaatIni?: NullableStringFieldUpdateOperationsInput | string | null
     angkatan?: IntFieldUpdateOperationsInput | number
     jurusan?: NullableStringFieldUpdateOperationsInput | string | null
@@ -7899,13 +7920,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     hasilKonseling?: HasilKonselingCreateNestedManyWithoutSiswaInput
-    user: UserCreateNestedOneWithoutSiswaInput
+    user?: UserCreateNestedOneWithoutSiswaInput
   }
 
   export type SiswaUncheckedCreateWithoutTujuanKarirInput = {
     nis: string
     nama: string
-    email: string
+    email?: string | null
     kelasSaatIni?: string | null
     angkatan: number
     jurusan?: string | null
@@ -7945,13 +7966,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilKonseling?: HasilKonselingUpdateManyWithoutSiswaNestedInput
-    user?: UserUpdateOneRequiredWithoutSiswaNestedInput
+    user?: UserUpdateOneWithoutSiswaNestedInput
   }
 
   export type SiswaUncheckedUpdateWithoutTujuanKarirInput = {
     nis?: StringFieldUpdateOperationsInput | string
     nama?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     kelasSaatIni?: NullableStringFieldUpdateOperationsInput | string | null
     angkatan?: IntFieldUpdateOperationsInput | number
     jurusan?: NullableStringFieldUpdateOperationsInput | string | null
@@ -7967,48 +7988,48 @@ export namespace Prisma {
     id?: string
     tanggalKonseling: Date | string
     hasilText: string
+    rekomendasi?: string | null
     rating: number
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    rekomendasi?: string | null
   }
 
   export type HasilKonselingUpdateWithoutSiswaInput = {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: IntFieldUpdateOperationsInput | number
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type HasilKonselingUncheckedUpdateWithoutSiswaInput = {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: IntFieldUpdateOperationsInput | number
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type HasilKonselingUncheckedUpdateManyWithoutSiswaInput = {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
     rating?: IntFieldUpdateOperationsInput | number
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
 

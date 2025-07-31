@@ -1,8 +1,7 @@
 generator client {
   provider = "prisma-client-js"
-   output   = "../generated/prisma/client"
+  output   = "../generated/prisma/client"
 }
-
 
 datasource db {
   provider = "postgresql"
@@ -24,7 +23,7 @@ model User {
 model Siswa {
   nis                  String           @id @db.VarChar(9)
   nama                 String
-  email                String           @unique
+  email                String?          @unique
   kelasSaatIni         String?
   angkatan             Int
   jurusan              String?
@@ -34,7 +33,7 @@ model Siswa {
   createdAt            DateTime         @default(now())
   updatedAt            DateTime         @updatedAt
   hasilKonseling       HasilKonseling[]
-  user                 User             @relation(fields: [email], references: [email])
+  user                 User?            @relation(fields: [email], references: [email])
   tujuanKarir          TujuanKarir?
 
   @@map("siswa")
@@ -45,6 +44,7 @@ model HasilKonseling {
   nisSiswa         String   @db.VarChar(9)
   tanggalKonseling DateTime
   hasilText        String
+  rekomendasi      String?
   rating           Int
   kategori         String?
   adminId          String
