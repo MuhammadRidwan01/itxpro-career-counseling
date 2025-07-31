@@ -3,15 +3,21 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { X, Calendar, Star, Plus, Trash2, Search } from "lucide-react"
-import { PremiumButton } from "@/components/ui/premium-button"
-import { GlassCard } from "@/components/ui/glass-card"
+import { Users, Search, X, Calendar, Star, FileText, Target, Check } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface Student {
   nis: string
   nama: string
   kelasSaatIni: string
+  jurusan: string
   angkatan: number
 }
 
@@ -22,61 +28,95 @@ interface KonselingBatchModalProps {
 }
 
 export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBatchModalProps) {
-  const [selectedStudents, setSelectedStudents] = useState<Student[]>([])
-  const [availableStudents, setAvailableStudents] = useState<Student[]>([])
+  const [students, setStudents] = useState<Student[]>([])
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [filterJurusan, setFilterJurusan] = useState("all")
+  const [filterAngkatan, setFilterAngkatan] = useState("all")
+
   const [formData, setFormData] = useState({
-    tanggalKonseling: "",
-    kategori: "akademik",
+    tanggalKonseling: new Date().toISOString().split("T")[0],
     hasilText: "",
     rekomendasi: "",
     rating: 5,
+    kategori: "akademik",
   })
+
+  const [loading, setLoading] = useState(false)
+  const [loadingStudents, setLoadingStudents] = useState(false)
+  const [error, setError] = useState("")
+  const [step, setStep] = useState<"select" | "form" | "processing">("select")
 
   useEffect(() => {
     if (isOpen) {
       fetchStudents()
+      setStep("select")
+      setSelectedStudents([])
+      setSearchTerm("")
+      setFilterJurusan("all")
+      setFilterAngkatan("all")
+      setFormData({
+        tanggalKonseling: new Date().toISOString().split("T")[0],
+        hasilText: "",
+        rekomendasi: "",
+        rating: 5,
+        kategori: "akademik",
+      })
+      setError("")
     }
   }, [isOpen])
 
   const fetchStudents = async () => {
+    setLoadingStudents(true)
     try {
       const response = await fetch("/api/admin/siswa")
       const data = await response.json()
       if (data.success) {
-        setAvailableStudents(data.data.siswa)
+        setStudents(data.data.siswa.filter((s: Student) => s.status === "AKTIF"))
       }
     } catch (error) {
       console.error("Error fetching students:", error)
+      setError("Gagal memuat data siswa")
+    } finally {
+      setLoadingStudents(false)
     }
   }
 
-  const filteredStudents = availableStudents.filter(
-    (student) =>
+  const filteredStudents = students.filter((student) => {
+    const matchesSearch =
       student.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.nis.includes(searchTerm) ||
-      student.kelasSaatIni?.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      student.kelasSaatIni.toLowerCase().includes(searchTerm.toLowerCase())
 
-  const handleStudentSelect = (student: Student) => {
-    if (!selectedStudents.find((s) => s.nis === student.nis)) {
-      setSelectedStudents([...selectedStudents, student])
-    }
+    const matchesJurusan = filterJurusan === "all" || student.jurusan === filterJurusan
+    const matchesAngkatan = filterAngkatan === "all" || student.angkatan.toString() === filterAngkatan
+
+    return matchesSearch && matchesJurusan && matchesAngkatan
+  })
+
+  const handleStudentToggle = (nis: string) => {
+    setSelectedStudents((prev) => (prev.includes(nis) ? prev.filter((id) => id !== nis) : [...prev, nis]))
   }
 
-  const handleStudentRemove = (nis: string) => {
-    setSelectedStudents(selectedStudents.filter((s) => s.nis !== nis))
+  const handleSelectAll = () => {
+    if (selectedStudents.length === filteredStudents.length) {
+      setSelectedStudents([])
+    } else {
+      setSelectedStudents(filteredStudents.map((s) => s.nis))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (selectedStudents.length === 0) {
-      alert("Pilih minimal satu siswa")
+      setError("Pilih minimal satu siswa")
       return
     }
 
     setLoading(true)
+    setError("")
+    setStep("processing")
+
     try {
       const response = await fetch("/api/admin/konseling/batch", {
         method: "POST",
@@ -84,221 +124,313 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          students: selectedStudents.map((s) => s.nis),
+          siswaList: selectedStudents,
           ...formData,
         }),
       })
 
       const data = await response.json()
+
       if (data.success) {
-        onSuccess()
-        onClose()
-        resetForm()
+        setTimeout(() => {
+          onSuccess()
+          onClose()
+        }, 2000)
       } else {
-        alert(data.message || "Gagal menambahkan konseling")
+        setError(data.message || "Gagal menambahkan konseling batch")
+        setStep("form")
       }
     } catch (error) {
-      console.error("Error:", error)
-      alert("Terjadi kesalahan")
+      setError("Terjadi kesalahan saat menambahkan konseling batch")
+      setStep("form")
     } finally {
       setLoading(false)
     }
   }
 
-  const resetForm = () => {
+  const handleClose = () => {
+    setStep("select")
     setSelectedStudents([])
-    setSearchTerm("")
-    setFormData({
-      tanggalKonseling: "",
-      kategori: "akademik",
-      hasilText: "",
-      rekomendasi: "",
-      rating: 5,
-    })
+    setError("")
+    onClose()
   }
 
-  if (!isOpen) return null
+  const selectedStudentDetails = students.filter((s) => selectedStudents.includes(s.nis))
+  const uniqueJurusan = [...new Set(students.map((s) => s.jurusan))]
+  const uniqueAngkatan = [...new Set(students.map((s) => s.angkatan))].sort((a, b) => b - a)
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="w-full max-w-4xl max-h-[90vh] overflow-hidden"
-        >
-          <GlassCard className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-nude-800">Konseling Batch</h2>
-              <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
-                <X className="w-5 h-5 text-nude-600" />
-              </button>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Konseling Batch - {step === "select" ? "Pilih Siswa" : step === "form" ? "Form Konseling" : "Memproses"}
+          </DialogTitle>
+        </DialogHeader>
+
+        {step === "select" && (
+          <div className="space-y-6">
+            {/* Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Input
+                  placeholder="Cari siswa..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <Select value={filterJurusan} onValueChange={setFilterJurusan}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Semua Jurusan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Jurusan</SelectItem>
+                  {uniqueJurusan.map((jurusan) => (
+                    <SelectItem key={jurusan} value={jurusan}>
+                      {jurusan}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={filterAngkatan} onValueChange={setFilterAngkatan}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Semua Angkatan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Angkatan</SelectItem>
+                  {uniqueAngkatan.map((angkatan) => (
+                    <SelectItem key={angkatan} value={angkatan.toString()}>
+                      {angkatan}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button variant="outline" onClick={handleSelectAll} disabled={filteredStudents.length === 0}>
+                {selectedStudents.length === filteredStudents.length ? "Batal Pilih Semua" : "Pilih Semua"}
+              </Button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left Column - Student Selection */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-nude-800">Pilih Siswa</h3>
+            {/* Selected Students Summary */}
+            {selectedStudents.length > 0 && (
+              <Alert>
+                <Check className="h-4 w-4" />
+                <AlertDescription>{selectedStudents.length} siswa dipilih untuk konseling batch</AlertDescription>
+              </Alert>
+            )}
 
-                  {/* Search */}
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-nude-500" />
-                    <input
-                      type="text"
-                      placeholder="Cari siswa..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800"
-                    />
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Students List */}
+            <div className="border rounded-lg">
+              <div className="max-h-96 overflow-y-auto">
+                {loadingStudents ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold-600 mx-auto mb-2"></div>
+                    <p>Memuat data siswa...</p>
                   </div>
-
-                  {/* Available Students */}
-                  <div className="bg-white/30 rounded-lg p-4 max-h-60 overflow-y-auto">
-                    <h4 className="text-sm font-medium text-nude-700 mb-2">Siswa Tersedia</h4>
-                    <div className="space-y-2">
-                      {filteredStudents.map((student) => (
-                        <div
-                          key={student.nis}
-                          onClick={() => handleStudentSelect(student)}
-                          className="flex items-center justify-between p-2 bg-white/20 rounded-lg cursor-pointer hover:bg-white/30 transition-colors"
-                        >
-                          <div>
-                            <p className="font-medium text-nude-800">{student.nama}</p>
-                            <p className="text-sm text-nude-600">
-                              {student.nis} - {student.kelasSaatIni}
-                            </p>
-                          </div>
-                          <Plus className="w-4 h-4 text-nude-600" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Selected Students */}
-                  <div className="bg-white/30 rounded-lg p-4 max-h-60 overflow-y-auto">
-                    <h4 className="text-sm font-medium text-nude-700 mb-2">
-                      Siswa Dipilih ({selectedStudents.length})
-                    </h4>
-                    <div className="space-y-2">
-                      {selectedStudents.map((student) => (
-                        <div key={student.nis} className="flex items-center justify-between p-2 bg-gold-100 rounded-lg">
-                          <div>
-                            <p className="font-medium text-nude-800">{student.nama}</p>
-                            <p className="text-sm text-nude-600">
-                              {student.nis} - {student.kelasSaatIni}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleStudentRemove(student.nis)}
-                            className="p-1 hover:bg-red-100 rounded transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column - Konseling Details */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-nude-800">Detail Konseling</h3>
-
-                  {/* Tanggal */}
-                  <div>
-                    <label className="block text-sm font-medium text-nude-700 mb-2">Tanggal Konseling</label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-nude-500" />
-                      <input
-                        type="date"
-                        value={formData.tanggalKonseling}
-                        onChange={(e) => setFormData({ ...formData, tanggalKonseling: e.target.value })}
-                        className="w-full pl-10 pr-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Kategori */}
-                  <div>
-                    <label className="block text-sm font-medium text-nude-700 mb-2">Kategori</label>
-                    <select
-                      value={formData.kategori}
-                      onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
-                      className="w-full px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800"
-                    >
-                      <option value="akademik">Akademik</option>
-                      <option value="karir">Karir</option>
-                      <option value="pribadi">Pribadi</option>
-                      <option value="sosial">Sosial</option>
-                      <option value="belajar">Belajar</option>
-                    </select>
-                  </div>
-
-                  {/* Rating */}
-                  <div>
-                    <label className="block text-sm font-medium text-nude-700 mb-2">Rating (1-5)</label>
-                    <div className="flex items-center gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, rating: star })}
-                          className="p-1"
-                        >
-                          <Star
-                            className={`w-6 h-6 ${
-                              star <= formData.rating ? "text-gold-500 fill-current" : "text-gray-300"
-                            }`}
+                ) : (
+                  <table className="w-full">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="px-4 py-2 text-left">
+                          <Checkbox
+                            checked={selectedStudents.length === filteredStudents.length && filteredStudents.length > 0}
+                            onCheckedChange={handleSelectAll}
                           />
-                        </button>
+                        </th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">NIS</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Nama</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Kelas</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Jurusan</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Angkatan</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredStudents.map((student) => (
+                        <tr key={student.nis} className="border-t hover:bg-gray-50">
+                          <td className="px-4 py-2">
+                            <Checkbox
+                              checked={selectedStudents.includes(student.nis)}
+                              onCheckedChange={() => handleStudentToggle(student.nis)}
+                            />
+                          </td>
+                          <td className="px-4 py-2 text-sm">{student.nis}</td>
+                          <td className="px-4 py-2 text-sm font-medium">{student.nama}</td>
+                          <td className="px-4 py-2 text-sm">{student.kelasSaatIni}</td>
+                          <td className="px-4 py-2 text-sm">{student.jurusan}</td>
+                          <td className="px-4 py-2 text-sm">{student.angkatan}</td>
+                        </tr>
                       ))}
-                    </div>
-                  </div>
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
 
-                  {/* Hasil Konseling */}
-                  <div>
-                    <label className="block text-sm font-medium text-nude-700 mb-2">Hasil Konseling</label>
-                    <textarea
-                      value={formData.hasilText}
-                      onChange={(e) => setFormData({ ...formData, hasilText: e.target.value })}
-                      rows={4}
-                      className="w-full px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800 resize-none"
-                      placeholder="Masukkan hasil konseling..."
-                      required
-                    />
-                  </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={handleClose}>
+                Batal
+              </Button>
+              <Button
+                onClick={() => setStep("form")}
+                disabled={selectedStudents.length === 0}
+                className="bg-gold-600 hover:bg-gold-700"
+              >
+                Lanjut ke Form ({selectedStudents.length} siswa)
+              </Button>
+            </div>
+          </div>
+        )}
 
-                  {/* Rekomendasi */}
-                  <div>
-                    <label className="block text-sm font-medium text-nude-700 mb-2">Rekomendasi</label>
-                    <textarea
-                      value={formData.rekomendasi}
-                      onChange={(e) => setFormData({ ...formData, rekomendasi: e.target.value })}
-                      rows={3}
-                      className="w-full px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800 resize-none"
-                      placeholder="Masukkan rekomendasi..."
-                    />
-                  </div>
-                </div>
+        {step === "form" && (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Selected Students Preview */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium mb-2">Siswa yang dipilih ({selectedStudentDetails.length}):</h4>
+              <div className="flex flex-wrap gap-2">
+                {selectedStudentDetails.map((student) => (
+                  <span key={student.nis} className="bg-gold-100 text-gold-800 px-2 py-1 rounded text-sm">
+                    {student.nama} ({student.nis})
+                    <button
+                      type="button"
+                      onClick={() => handleStudentToggle(student.nis)}
+                      className="ml-2 text-gold-600 hover:text-gold-800"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="tanggalKonseling" className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Tanggal Konseling
+                </Label>
+                <Input
+                  id="tanggalKonseling"
+                  type="date"
+                  value={formData.tanggalKonseling}
+                  onChange={(e) => setFormData({ ...formData, tanggalKonseling: e.target.value })}
+                  required
+                />
               </div>
 
-              {/* Submit Button */}
-              <div className="flex items-center justify-end gap-4 pt-4 border-t border-white/20">
-                <PremiumButton type="button" variant="secondary" onClick={onClose} disabled={loading}>
-                  Batal
-                </PremiumButton>
-                <PremiumButton type="submit" disabled={loading || selectedStudents.length === 0}>
-                  {loading ? "Menyimpan..." : `Simpan Konseling (${selectedStudents.length} siswa)`}
-                </PremiumButton>
+              <div className="space-y-2">
+                <Label htmlFor="kategori">Kategori Konseling</Label>
+                <Select
+                  value={formData.kategori}
+                  onValueChange={(value) => setFormData({ ...formData, kategori: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="akademik">Akademik</SelectItem>
+                    <SelectItem value="karir">Karir</SelectItem>
+                    <SelectItem value="pribadi">Pribadi</SelectItem>
+                    <SelectItem value="sosial">Sosial</SelectItem>
+                    <SelectItem value="belajar">Belajar</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </form>
-          </GlassCard>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+
+              <div className="space-y-2">
+                <Label htmlFor="rating" className="flex items-center gap-2">
+                  <Star className="w-4 h-4" />
+                  Rating (1-5)
+                </Label>
+                <Select
+                  value={formData.rating.toString()}
+                  onValueChange={(value) => setFormData({ ...formData, rating: Number.parseInt(value) })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih rating" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 - Sangat Kurang</SelectItem>
+                    <SelectItem value="2">2 - Kurang</SelectItem>
+                    <SelectItem value="3">3 - Cukup</SelectItem>
+                    <SelectItem value="4">4 - Baik</SelectItem>
+                    <SelectItem value="5">5 - Sangat Baik</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="hasilText" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Hasil Konseling
+              </Label>
+              <Textarea
+                id="hasilText"
+                value={formData.hasilText}
+                onChange={(e) => setFormData({ ...formData, hasilText: e.target.value })}
+                placeholder="Tuliskan hasil konseling yang akan diterapkan untuk semua siswa yang dipilih..."
+                rows={4}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="rekomendasi" className="flex items-center gap-2">
+                <Target className="w-4 h-4" />
+                Rekomendasi
+              </Label>
+              <Textarea
+                id="rekomendasi"
+                value={formData.rekomendasi}
+                onChange={(e) => setFormData({ ...formData, rekomendasi: e.target.value })}
+                placeholder="Tuliskan rekomendasi yang akan diterapkan untuk semua siswa yang dipilih..."
+                rows={3}
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <Button type="button" variant="outline" onClick={() => setStep("select")}>
+                Kembali
+              </Button>
+              <Button type="submit" disabled={loading} className="bg-green-600 hover:bg-green-700">
+                {loading ? "Memproses..." : `Buat Konseling untuk ${selectedStudents.length} Siswa`}
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {step === "processing" && (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-600 mx-auto mb-4"></div>
+            <p className="text-lg font-medium">Membuat konseling batch...</p>
+            <p className="text-sm text-gray-500">Sedang memproses {selectedStudents.length} siswa</p>
+
+            {!loading && (
+              <Alert className="mt-4">
+                <Check className="h-4 w-4" />
+                <AlertDescription>Berhasil membuat konseling untuk {selectedStudents.length} siswa!</AlertDescription>
+              </Alert>
+            )}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -1,9 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,94 +12,66 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { students, tanggalKonseling, kategori, hasilText, rekomendasi, rating } = body
+    const { siswaList, tanggalKonseling, hasilText, rekomendasi, rating, kategori } = body
 
     // Validasi input
-    if (!students || !Array.isArray(students) || students.length === 0) {
-      return NextResponse.json({ success: false, message: "Pilih minimal satu siswa" }, { status: 400 })
+    if (!siswaList || !Array.isArray(siswaList) || siswaList.length === 0) {
+      return NextResponse.json({ success: false, message: "Daftar siswa tidak boleh kosong" }, { status: 400 })
     }
 
-    if (!tanggalKonseling || !kategori || !hasilText) {
+    if (!tanggalKonseling || !hasilText || !kategori || !rating) {
       return NextResponse.json({ success: false, message: "Semua field wajib diisi" }, { status: 400 })
     }
 
-    // Validasi rating
-    if (rating < 1 || rating > 5) {
-      return NextResponse.json({ success: false, message: "Rating harus antara 1-5" }, { status: 400 })
-    }
-
     // Validasi siswa exists
-    const existingStudents = await prisma.siswa.findMany({
+    const existingSiswa = await prisma.siswa.findMany({
       where: {
         nis: {
-          in: students,
+          in: siswaList,
         },
       },
       select: {
         nis: true,
-        nama: true,
       },
     })
 
-    if (existingStudents.length !== students.length) {
-      return NextResponse.json({ success: false, message: "Beberapa siswa tidak ditemukan" }, { status: 400 })
+    const existingNis = existingSiswa.map((s) => s.nis)
+    const notFoundNis = siswaList.filter((nis) => !existingNis.includes(nis))
+
+    if (notFoundNis.length > 0) {
+      return NextResponse.json(
+        { success: false, message: `Siswa dengan NIS ${notFoundNis.join(", ")} tidak ditemukan` },
+        { status: 400 },
+      )
     }
 
-    // Buat konseling untuk setiap siswa
-    const konselingData = students.map((nis: string) => ({
+    // Buat data konseling untuk batch insert
+    const konselingData = siswaList.map((nis) => ({
       nisSiswa: nis,
       tanggalKonseling: new Date(tanggalKonseling),
       hasilText,
-      rekomendasi: rekomendasi || null,
-      rating: Number.parseInt(rating.toString()),
+      rekomendasi: rekomendasi || "",
+      rating: Number.parseInt(rating),
       kategori,
       adminId: session.user.id,
     }))
 
+    // Insert batch konseling
     const result = await prisma.hasilKonseling.createMany({
       data: konselingData,
-    })
-
-    // Ambil data konseling yang baru dibuat untuk response
-    const createdKonseling = await prisma.hasilKonseling.findMany({
-      where: {
-        nisSiswa: {
-          in: students,
-        },
-        tanggalKonseling: new Date(tanggalKonseling),
-        adminId: session.user.id,
-      },
-      include: {
-        siswa: {
-          select: {
-            nis: true,
-            nama: true,
-            kelasSaatIni: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+      skipDuplicates: true,
     })
 
     return NextResponse.json({
       success: true,
-      message: `Berhasil menambahkan konseling untuk ${result.count} siswa`,
+      message: `Berhasil membuat ${result.count} konseling`,
       data: {
-        count: result.count,
-        konseling: createdKonseling,
+        created: result.count,
+        siswaCount: siswaList.length,
       },
     })
   } catch (error) {
     console.error("Error creating batch konseling:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Terjadi kesalahan server",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
-    )
+    return NextResponse.json({ success: false, message: "Terjadi kesalahan server" }, { status: 500 })
   }
 }

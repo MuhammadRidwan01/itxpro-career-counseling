@@ -3,16 +3,14 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { X, Calendar, Star, User } from "lucide-react"
-import { PremiumButton } from "@/components/ui/premium-button"
-import { GlassCard } from "@/components/ui/glass-card"
-
-interface Student {
-  nis: string
-  nama: string
-  kelasSaatIni: string
-}
+import { MessageSquare, User, Calendar, Star, FileText, Target } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface Konseling {
   id: string
@@ -35,37 +33,59 @@ interface KonselingModalProps {
   konseling?: Konseling | null
 }
 
+interface Student {
+  nis: string
+  nama: string
+  kelasSaatIni: string
+}
+
 export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: KonselingModalProps) {
-  const [students, setStudents] = useState<Student[]>([])
-  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     nisSiswa: "",
     tanggalKonseling: "",
-    kategori: "akademik",
     hasilText: "",
     rekomendasi: "",
     rating: 5,
+    kategori: "akademik",
   })
+  const [students, setStudents] = useState<Student[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [loadingStudents, setLoadingStudents] = useState(false)
+
+  const isEdit = !!konseling
 
   useEffect(() => {
     if (isOpen) {
       fetchStudents()
-      if (konseling) {
-        setFormData({
-          nisSiswa: konseling.nisSiswa,
-          tanggalKonseling: konseling.tanggalKonseling.split("T")[0],
-          kategori: konseling.kategori,
-          hasilText: konseling.hasilText,
-          rekomendasi: konseling.rekomendasi || "",
-          rating: konseling.rating,
-        })
-      } else {
-        resetForm()
-      }
     }
-  }, [isOpen, konseling])
+  }, [isOpen])
+
+  useEffect(() => {
+    if (konseling) {
+      setFormData({
+        nisSiswa: konseling.nisSiswa,
+        tanggalKonseling: konseling.tanggalKonseling.split("T")[0],
+        hasilText: konseling.hasilText,
+        rekomendasi: konseling.rekomendasi || "",
+        rating: konseling.rating,
+        kategori: konseling.kategori,
+      })
+    } else {
+      setFormData({
+        nisSiswa: "",
+        tanggalKonseling: new Date().toISOString().split("T")[0],
+        hasilText: "",
+        rekomendasi: "",
+        rating: 5,
+        kategori: "akademik",
+      })
+    }
+    setError("")
+  }, [konseling, isOpen])
 
   const fetchStudents = async () => {
+    setLoadingStudents(true)
     try {
       const response = await fetch("/api/admin/siswa")
       const data = await response.json()
@@ -74,16 +94,19 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
       }
     } catch (error) {
       console.error("Error fetching students:", error)
+    } finally {
+      setLoadingStudents(false)
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError("")
 
     try {
-      const url = konseling ? `/api/admin/konseling/${konseling.id}` : "/api/admin/konseling"
-      const method = konseling ? "PUT" : "POST"
+      const url = isEdit ? `/api/admin/konseling/${konseling.id}` : "/api/admin/konseling"
+      const method = isEdit ? "PUT" : "POST"
 
       const response = await fetch(url, {
         method,
@@ -94,164 +117,176 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
       })
 
       const data = await response.json()
+
       if (data.success) {
         onSuccess()
         onClose()
-        resetForm()
       } else {
-        alert(data.message || "Gagal menyimpan konseling")
+        setError(data.message || `Gagal ${isEdit ? "mengupdate" : "menambahkan"} konseling`)
       }
     } catch (error) {
-      console.error("Error:", error)
-      alert("Terjadi kesalahan")
+      setError(`Terjadi kesalahan saat ${isEdit ? "mengupdate" : "menambahkan"} konseling`)
     } finally {
       setLoading(false)
     }
   }
 
-  const resetForm = () => {
+  const handleClose = () => {
     setFormData({
       nisSiswa: "",
-      tanggalKonseling: "",
-      kategori: "akademik",
+      tanggalKonseling: new Date().toISOString().split("T")[0],
       hasilText: "",
       rekomendasi: "",
       rating: 5,
+      kategori: "akademik",
     })
+    setError("")
+    onClose()
   }
 
-  if (!isOpen) return null
+  const selectedStudent = students.find((s) => s.nis === formData.nisSiswa)
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="w-full max-w-2xl max-h-[90vh] overflow-hidden"
-        >
-          <GlassCard className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-nude-800">{konseling ? "Edit Konseling" : "Tambah Konseling"}</h2>
-              <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
-                <X className="w-5 h-5 text-nude-600" />
-              </button>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <MessageSquare className="w-5 h-5" />
+            {isEdit ? "Edit Hasil Konseling" : "Tambah Hasil Konseling"}
+          </DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="nisSiswa" className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Siswa
+              </Label>
+              <Select
+                value={formData.nisSiswa}
+                onValueChange={(value) => setFormData({ ...formData, nisSiswa: value })}
+                disabled={isEdit || loadingStudents}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={loadingStudents ? "Loading..." : "Pilih siswa"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {students.map((student) => (
+                    <SelectItem key={student.nis} value={student.nis}>
+                      {student.nama} - {student.nis} ({student.kelasSaatIni})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedStudent && (
+                <p className="text-sm text-gray-500">
+                  {selectedStudent.nama} - {selectedStudent.kelasSaatIni}
+                </p>
+              )}
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Siswa Selection */}
-              <div>
-                <label className="block text-sm font-medium text-nude-700 mb-2">Siswa</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-nude-500" />
-                  <select
-                    value={formData.nisSiswa}
-                    onChange={(e) => setFormData({ ...formData, nisSiswa: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800"
-                    required
-                    disabled={!!konseling}
-                  >
-                    <option value="">Pilih Siswa</option>
-                    {students.map((student) => (
-                      <option key={student.nis} value={student.nis}>
-                        {student.nama} - {student.nis} ({student.kelasSaatIni})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="tanggalKonseling" className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Tanggal Konseling
+              </Label>
+              <Input
+                id="tanggalKonseling"
+                type="date"
+                value={formData.tanggalKonseling}
+                onChange={(e) => setFormData({ ...formData, tanggalKonseling: e.target.value })}
+                required
+              />
+            </div>
 
-              {/* Tanggal */}
-              <div>
-                <label className="block text-sm font-medium text-nude-700 mb-2">Tanggal Konseling</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-nude-500" />
-                  <input
-                    type="date"
-                    value={formData.tanggalKonseling}
-                    onChange={(e) => setFormData({ ...formData, tanggalKonseling: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800"
-                    required
-                  />
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="kategori">Kategori Konseling</Label>
+              <Select
+                value={formData.kategori}
+                onValueChange={(value) => setFormData({ ...formData, kategori: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="akademik">Akademik</SelectItem>
+                  <SelectItem value="karir">Karir</SelectItem>
+                  <SelectItem value="pribadi">Pribadi</SelectItem>
+                  <SelectItem value="sosial">Sosial</SelectItem>
+                  <SelectItem value="belajar">Belajar</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              {/* Kategori */}
-              <div>
-                <label className="block text-sm font-medium text-nude-700 mb-2">Kategori</label>
-                <select
-                  value={formData.kategori}
-                  onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
-                  className="w-full px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800"
-                >
-                  <option value="akademik">Akademik</option>
-                  <option value="karir">Karir</option>
-                  <option value="pribadi">Pribadi</option>
-                  <option value="sosial">Sosial</option>
-                  <option value="belajar">Belajar</option>
-                </select>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="rating" className="flex items-center gap-2">
+                <Star className="w-4 h-4" />
+                Rating (1-5)
+              </Label>
+              <Select
+                value={formData.rating.toString()}
+                onValueChange={(value) => setFormData({ ...formData, rating: Number.parseInt(value) })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih rating" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 - Sangat Kurang</SelectItem>
+                  <SelectItem value="2">2 - Kurang</SelectItem>
+                  <SelectItem value="3">3 - Cukup</SelectItem>
+                  <SelectItem value="4">4 - Baik</SelectItem>
+                  <SelectItem value="5">5 - Sangat Baik</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-              {/* Rating */}
-              <div>
-                <label className="block text-sm font-medium text-nude-700 mb-2">Rating (1-5)</label>
-                <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, rating: star })}
-                      className="p-1"
-                    >
-                      <Star
-                        className={`w-6 h-6 ${
-                          star <= formData.rating ? "text-gold-500 fill-current" : "text-gray-300"
-                        }`}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="hasilText" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Hasil Konseling
+            </Label>
+            <Textarea
+              id="hasilText"
+              value={formData.hasilText}
+              onChange={(e) => setFormData({ ...formData, hasilText: e.target.value })}
+              placeholder="Tuliskan hasil konseling secara detail..."
+              rows={4}
+              required
+            />
+          </div>
 
-              {/* Hasil Konseling */}
-              <div>
-                <label className="block text-sm font-medium text-nude-700 mb-2">Hasil Konseling</label>
-                <textarea
-                  value={formData.hasilText}
-                  onChange={(e) => setFormData({ ...formData, hasilText: e.target.value })}
-                  rows={4}
-                  className="w-full px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800 resize-none"
-                  placeholder="Masukkan hasil konseling..."
-                  required
-                />
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="rekomendasi" className="flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              Rekomendasi
+            </Label>
+            <Textarea
+              id="rekomendasi"
+              value={formData.rekomendasi}
+              onChange={(e) => setFormData({ ...formData, rekomendasi: e.target.value })}
+              placeholder="Tuliskan rekomendasi untuk siswa..."
+              rows={3}
+            />
+          </div>
 
-              {/* Rekomendasi */}
-              <div>
-                <label className="block text-sm font-medium text-nude-700 mb-2">Rekomendasi</label>
-                <textarea
-                  value={formData.rekomendasi}
-                  onChange={(e) => setFormData({ ...formData, rekomendasi: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-nude-800 resize-none"
-                  placeholder="Masukkan rekomendasi..."
-                />
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex items-center justify-end gap-4 pt-4 border-t border-white/20">
-                <PremiumButton type="button" variant="secondary" onClick={onClose} disabled={loading}>
-                  Batal
-                </PremiumButton>
-                <PremiumButton type="submit" disabled={loading}>
-                  {loading ? "Menyimpan..." : konseling ? "Update Konseling" : "Simpan Konseling"}
-                </PremiumButton>
-              </div>
-            </form>
-          </GlassCard>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={handleClose}>
+              Batal
+            </Button>
+            <Button type="submit" disabled={loading || !formData.nisSiswa} className="bg-gold-600 hover:bg-gold-700">
+              {loading ? "Menyimpan..." : isEdit ? "Update Konseling" : "Tambah Konseling"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

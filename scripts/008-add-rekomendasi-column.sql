@@ -1,18 +1,19 @@
 -- Add rekomendasi column to hasil_konseling table
 ALTER TABLE hasil_konseling 
-ADD COLUMN rekomendasi TEXT;
+ADD COLUMN IF NOT EXISTS rekomendasi TEXT;
 
--- Update existing records with sample rekomendasi
+-- Update existing records with empty rekomendasi
 UPDATE hasil_konseling 
-SET rekomendasi = CASE 
-    WHEN kategori = 'akademik' THEN 'Tingkatkan fokus belajar dan manajemen waktu'
-    WHEN kategori = 'karir' THEN 'Eksplorasi lebih lanjut tentang pilihan karir yang sesuai'
-    WHEN kategori = 'pribadi' THEN 'Kembangkan kepercayaan diri dan komunikasi'
-    ELSE 'Lanjutkan konseling berkala untuk monitoring progress'
-END
+SET rekomendasi = '' 
 WHERE rekomendasi IS NULL;
 
+-- Add index for better performance
+CREATE INDEX IF NOT EXISTS idx_hasil_konseling_kategori ON hasil_konseling(kategori);
+CREATE INDEX IF NOT EXISTS idx_hasil_konseling_rating ON hasil_konseling(rating);
+CREATE INDEX IF NOT EXISTS idx_hasil_konseling_tanggal ON hasil_konseling(tanggal_konseling);
+
 -- Verify the changes
-SELECT id, "nisSiswa", kategori, rekomendasi 
-FROM hasil_konseling 
-LIMIT 5;
+SELECT column_name, data_type, is_nullable 
+FROM information_schema.columns 
+WHERE table_name = 'hasil_konseling' 
+ORDER BY ordinal_position;
