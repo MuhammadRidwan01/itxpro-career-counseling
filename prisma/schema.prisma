@@ -50,6 +50,7 @@ model HasilKonseling {
   nisSiswa         String   @db.VarChar(9)
   tanggalKonseling DateTime
   hasilText        String   @db.Text
+  rekomendasi      String?  @db.Text
   rating           Int      // 1-5 atau 1-10
   kategori         String?  // karir/akademik/pribadi
   adminId          String

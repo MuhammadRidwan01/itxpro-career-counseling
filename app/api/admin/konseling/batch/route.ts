@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       tanggalKonseling: new Date(tanggalKonseling),
       hasilText,
       rekomendasi: rekomendasi || null,
-      rating: Number.parseInt(rating),
+      rating: Number.parseInt(rating.toString()),
       kategori,
       adminId: session.user.id,
     }))
@@ -95,6 +95,13 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("Error creating batch konseling:", error)
-    return NextResponse.json({ success: false, message: "Terjadi kesalahan server" }, { status: 500 })
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Terjadi kesalahan server",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }

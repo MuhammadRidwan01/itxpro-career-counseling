@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
     const limit = Number.parseInt(searchParams.get("limit") || "10")
     const search = searchParams.get("search") || ""
     const kategori = searchParams.get("kategori") || ""
-    const startDate = searchParams.get("startDate") || ""
-    const endDate = searchParams.get("endDate") || ""
+    const startDate = searchParams.get("startDate")
+    const endDate = searchParams.get("endDate")
 
     const skip = (page - 1) * limit
 
@@ -37,10 +37,14 @@ export async function GET(request: NextRequest) {
           },
         },
         {
-          siswa: {
-            nis: {
-              contains: search,
-            },
+          nisSiswa: {
+            contains: search,
+          },
+        },
+        {
+          hasilText: {
+            contains: search,
+            mode: "insensitive",
           },
         },
       ]
@@ -113,6 +117,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: "Semua field wajib diisi" }, { status: 400 })
     }
 
+    // Validasi rating
+    if (rating < 1 || rating > 5) {
+      return NextResponse.json({ success: false, message: "Rating harus antara 1-5" }, { status: 400 })
+    }
+
     // Validasi siswa exists
     const siswa = await prisma.siswa.findUnique({
       where: { nis: nisSiswa },
@@ -122,18 +131,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: "Siswa tidak ditemukan" }, { status: 404 })
     }
 
-    // Validasi rating
-    if (rating < 1 || rating > 5) {
-      return NextResponse.json({ success: false, message: "Rating harus antara 1-5" }, { status: 400 })
-    }
-
     const konseling = await prisma.hasilKonseling.create({
       data: {
         nisSiswa,
         tanggalKonseling: new Date(tanggalKonseling),
         hasilText,
         rekomendasi: rekomendasi || null,
-        rating: Number.parseInt(rating),
+        rating: Number.parseInt(rating.toString()),
         kategori,
         adminId: session.user.id,
       },
@@ -155,6 +159,13 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("Error creating konseling:", error)
-    return NextResponse.json({ success: false, message: "Terjadi kesalahan server" }, { status: 500 })
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Terjadi kesalahan server",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }
