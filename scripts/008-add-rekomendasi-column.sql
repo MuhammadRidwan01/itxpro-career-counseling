@@ -10,7 +10,7 @@ WHERE rekomendasi IS NULL;
 -- Add index for better performance
 CREATE INDEX IF NOT EXISTS idx_hasil_konseling_kategori ON hasil_konseling(kategori);
 CREATE INDEX IF NOT EXISTS idx_hasil_konseling_rating ON hasil_konseling(rating);
-CREATE INDEX IF NOT EXISTS idx_hasil_konseling_tanggal ON hasil_konseling(tanggal_konseling);
+CREATE INDEX IF NOT EXISTS idx_hasil_konseling_tanggal ON hasil_konseling("tanggalKonseling");
 
 -- Verify the changes
 SELECT column_name, data_type, is_nullable 
