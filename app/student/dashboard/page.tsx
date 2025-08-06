@@ -9,6 +9,10 @@ import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button"
 import { User, Target, FileText, Calendar, Star, Edit, CheckCircle, Clock, BookOpen } from "lucide-react"
 import type { StudentDashboardData } from "@/types/api"
+import { LogOut } from "lucide-react"
+import { signOut } from "next-auth/react"
+
+
 
 export default function StudentDashboard() {
   const { data: session, status } = useSession()
@@ -75,7 +79,24 @@ export default function StudentDashboard() {
             <h1 className="text-3xl font-bold text-white mb-2">Dashboard Siswa</h1>
             <p className="text-white/80">Selamat datang, {siswa.nama}</p>
           </div>
+          <div className="flex items-end gap-4">
+           
+          </div>
           <div className="flex items-center gap-4">
+            <PremiumButton
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  const confirmLogout = window.confirm("Apakah Anda yakin ingin logout?");
+                  if (confirmLogout) {
+                    signOut({ callbackUrl: "/auth/student" })
+                  }
+                }}
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+            </PremiumButton>
+
             <PremiumButton variant="secondary" size="sm">
               <Edit className="w-4 h-4" />
               Edit Profile
