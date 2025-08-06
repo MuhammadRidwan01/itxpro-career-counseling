@@ -177,8 +177,10 @@ async function main() {
         id: 'konseling_001',
         nisSiswa: '232410005', // ALHIKAM DIRGA RAMADHAN - XII RPL 1
         tanggalKonseling: new Date('2024-01-15T10:00:00Z'),
-        hasilText: 'Siswa menunjukkan minat yang besar terhadap bidang programming dan teknologi. Memiliki kemampuan logika yang baik dan cocok untuk melanjutkan ke perguruan tinggi jurusan Teknik Informatika atau langsung bekerja sebagai Software Developer.',
-        rating: 5,
+        hasilText: 'Siswa menunjukkan minat yang besar terhadap bidang programming dan teknologi.',
+        deskripsi: 'Memiliki kemampuan logika yang baik dan kemampuan analisis yang kuat.',
+        tindakLanjut: 'Direkomendasikan untuk melanjutkan ke perguruan tinggi jurusan Teknik Informatika atau langsung bekerja sebagai Software Developer.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -186,8 +188,10 @@ async function main() {
         id: 'konseling_002',
         nisSiswa: '232410010', // CITRA ANNISA TOURSINA TRIWIJAYA - XII RPL 1
         tanggalKonseling: new Date('2024-01-18T09:30:00Z'),
-        hasilText: 'Siswa perempuan dengan kemampuan programming yang sangat baik. Direkomendasikan untuk melanjutkan kuliah di bidang Teknik Informatika atau Systems Information. Memiliki potensi untuk menjadi System Analyst.',
-        rating: 5,
+        hasilText: 'Siswa perempuan dengan kemampuan programming yang sangat baik.',
+        deskripsi: 'Menunjukkan pemahaman mendalam tentang konsep pemrograman dan analisis sistem.',
+        tindakLanjut: 'Direkomendasikan untuk melanjutkan kuliah di bidang Teknik Informatika atau Systems Information. Memiliki potensi untuk menjadi System Analyst.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -195,8 +199,10 @@ async function main() {
         id: 'konseling_003',
         nisSiswa: '232410048', // MUHAMMAD ARIFKY WILDAN - XII RPL 1
         tanggalKonseling: new Date('2024-01-22T14:00:00Z'),
-        hasilText: 'Siswa memiliki minat tinggi terhadap mobile development. Cocok untuk mengembangkan karir di bidang Mobile App Developer atau melanjutkan kuliah dengan fokus Mobile Computing.',
-        rating: 4,
+        hasilText: 'Siswa memiliki minat tinggi terhadap mobile development.',
+        deskripsi: 'Menunjukkan kemampuan dan dedikasi dalam pengembangan aplikasi mobile.',
+        tindakLanjut: 'Cocok untuk mengembangkan karir di bidang Mobile App Developer atau melanjutkan kuliah dengan fokus Mobile Computing.',
+        status: 'BELUM' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -204,8 +210,10 @@ async function main() {
         id: 'konseling_004',
         nisSiswa: '232410007', // ARDHIKA RADITYA MUHAMMAD AL-AZIZI TUMANGGOR - XII RPL 2
         tanggalKonseling: new Date('2024-01-25T11:15:00Z'),
-        hasilText: 'Siswa menunjukkan kemampuan leadership yang baik dalam tim programming. Direkomendasikan untuk mengambil peran Project Manager atau melanjutkan kuliah dengan minor di bidang manajemen.',
-        rating: 4,
+        hasilText: 'Siswa menunjukkan kemampuan leadership yang baik dalam tim programming.',
+        deskripsi: 'Memiliki kemampuan komunikasi dan manajemen tim yang baik.',
+        tindakLanjut: 'Direkomendasikan untuk mengambil peran Project Manager atau melanjutkan kuliah dengan minor di bidang manajemen.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -213,8 +221,10 @@ async function main() {
         id: 'konseling_005',
         nisSiswa: '232410025', // GEVIRA NURFATIMAH - XII RPL 2
         tanggalKonseling: new Date('2024-01-28T13:45:00Z'),
-        hasilText: 'Siswa perempuan dengan kemampuan UI/UX Design yang menonjol selain programming. Cocok untuk Frontend Developer atau UI/UX Designer. Direkomendasikan kuliah Desain Komunikasi Visual atau Informatika.',
-        rating: 5,
+        hasilText: 'Siswa perempuan dengan kemampuan UI/UX Design yang menonjol selain programming.',
+        deskripsi: 'Menunjukkan pemahaman yang baik tentang prinsip desain dan pengalaman pengguna.',
+        tindakLanjut: 'Cocok untuk Frontend Developer atau UI/UX Designer. Direkomendasikan kuliah Desain Komunikasi Visual atau Informatika.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -224,8 +234,10 @@ async function main() {
         id: 'konseling_006',
         nisSiswa: '232410020', // FAUZIYAH NUR ROSIDAH - XII DKV
         tanggalKonseling: new Date('2024-01-20T09:15:00Z'),
-        hasilText: 'Siswa memiliki bakat seni yang menonjol, terutama dalam desain grafis dan ilustrasi. Direkomendasikan untuk melanjutkan studi di bidang Desain Komunikasi Visual atau Seni Rupa dengan fokus pada digital art.',
-        rating: 5,
+        hasilText: 'Siswa memiliki bakat seni yang menonjol, terutama dalam desain grafis dan ilustrasi.',
+        deskripsi: 'Menunjukkan kreativitas tinggi dan pemahaman mendalam tentang prinsip desain.',
+        tindakLanjut: 'Direkomendasikan untuk melanjutkan studi di bidang Desain Komunikasi Visual atau Seni Rupa dengan fokus pada digital art.',
+        status: 'BELUM' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -233,8 +245,10 @@ async function main() {
         id: 'konseling_007',
         nisSiswa: '232410032', // KAYLA SABRINA KURNIAWAN - XII DKV
         tanggalKonseling: new Date('2024-02-01T10:30:00Z'),
-        hasilText: 'Siswa menunjukkan kemampuan yang sangat baik dalam motion graphics dan video editing. Cocok untuk berkarir sebagai Motion Graphics Designer atau Video Editor. Disarankan kuliah di bidang Broadcasting atau DKV.',
-        rating: 5,
+        hasilText: 'Siswa menunjukkan kemampuan yang sangat baik dalam motion graphics dan video editing.',
+        deskripsi: 'Memiliki pemahaman yang kuat tentang pergerakan visual dan storytelling.',
+        tindakLanjut: 'Cocok untuk berkarir sebagai Motion Graphics Designer atau Video Editor. Disarankan kuliah di bidang Broadcasting atau DKV.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -242,8 +256,10 @@ async function main() {
         id: 'konseling_008',
         nisSiswa: '232410047', // MUHAMMAD AQMAL ZAFRIAN NADZARI - XII DKV
         tanggalKonseling: new Date('2024-02-03T14:20:00Z'),
-        hasilText: 'Siswa memiliki minat dan bakat dalam bidang fotografi dan desain visual. Potensi untuk menjadi Creative Director atau Photographer. Direkomendasikan kuliah DKV atau Fotografi.',
-        rating: 4,
+        hasilText: 'Siswa memiliki minat dan bakat dalam bidang fotografi dan desain visual.',
+        deskripsi: 'Menunjukkan kreativitas dan pemahaman yang baik tentang komposisi visual.',
+        tindakLanjut: 'Potensi untuk menjadi Creative Director atau Photographer. Direkomendasikan kuliah DKV atau Fotografi.',
+        status: 'BELUM' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -253,8 +269,10 @@ async function main() {
         id: 'konseling_009',
         nisSiswa: '232410001', // ABDUL HAKAM SYAKUR - XII TKJ
         tanggalKonseling: new Date('2024-01-25T14:30:00Z'),
-        hasilText: 'Siswa menunjukkan minat terhadap networking dan sistem komputer. Memiliki kemampuan troubleshooting yang baik. Cocok untuk melanjutkan ke jurusan Teknik Komputer atau langsung bekerja di bidang IT Support/Network Administrator.',
-        rating: 4,
+        hasilText: 'Siswa menunjukkan minat terhadap networking dan sistem komputer.',
+        deskripsi: 'Memiliki kemampuan troubleshooting yang baik dan pemahaman mendalam tentang infrastruktur jaringan.',
+        tindakLanjut: 'Cocok untuk melanjutkan ke jurusan Teknik Komputer atau langsung bekerja di bidang IT Support/Network Administrator.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -262,8 +280,10 @@ async function main() {
         id: 'konseling_010',
         nisSiswa: '232410026', // GIRINDRA BAYU MAULANA - XII TKJ
         tanggalKonseling: new Date('2024-02-05T09:00:00Z'),
-        hasilText: 'Siswa memiliki ketertarikan tinggi terhadap cybersecurity dan network security. Direkomendasikan untuk melanjutkan kuliah di bidang Keamanan Siber atau Teknik Informatika dengan fokus security.',
-        rating: 5,
+        hasilText: 'Siswa memiliki ketertarikan tinggi terhadap cybersecurity dan network security.',
+        deskripsi: 'Menunjukkan pemahaman yang baik tentang konsep keamanan sistem dan jaringan.',
+        tindakLanjut: 'Direkomendasikan untuk melanjutkan kuliah di bidang Keamanan Siber atau Teknik Informatika dengan fokus security.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -271,8 +291,10 @@ async function main() {
         id: 'konseling_011',
         nisSiswa: '232410054', // MUHAMMAD FAHRI AQBAR - XII TKJ
         tanggalKonseling: new Date('2024-02-07T11:30:00Z'),
-        hasilText: 'Siswa menunjukkan kemampuan yang baik dalam server administration dan cloud computing. Cocok untuk berkarir sebagai System Administrator atau Cloud Engineer.',
-        rating: 4,
+        hasilText: 'Siswa menunjukkan kemampuan yang baik dalam server administration dan cloud computing.',
+        deskripsi: 'Memiliki pemahaman yang kuat tentang manajemen sistem dan infrastruktur cloud.',
+        tindakLanjut: 'Cocok untuk berkarir sebagai System Administrator atau Cloud Engineer.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -282,8 +304,10 @@ async function main() {
         id: 'konseling_012',
         nisSiswa: '242510005', // AKSAJRENO FATHUKHOTIR HAYU - XI 1
         tanggalKonseling: new Date('2024-02-01T11:00:00Z'),
-        hasilText: 'Siswa kelas XI masih dalam tahap eksplorasi minat. Menunjukkan ketertarikan terhadap bidang teknologi. Perlu bimbingan lebih lanjut untuk menentukan pilihan jurusan yang sesuai dengan bakat dan minatnya.',
-        rating: 3,
+        hasilText: 'Siswa kelas XI masih dalam tahap eksplorasi minat.',
+        deskripsi: 'Menunjukkan ketertarikan terhadap bidang teknologi tetapi masih mencari fokus spesifik.',
+        tindakLanjut: 'Perlu bimbingan lebih lanjut untuk menentukan pilihan jurusan yang sesuai dengan bakat dan minatnya.',
+        status: 'BELUM' as const,
         kategori: 'akademik',
         adminId: 'admin_001',
       },
@@ -291,8 +315,10 @@ async function main() {
         id: 'konseling_013',
         nisSiswa: '252610002', // ABYAKTA DIMAS MAHARDIKA - X 1
         tanggalKonseling: new Date('2024-02-05T08:45:00Z'),
-        hasilText: 'Siswa baru kelas X menunjukkan adaptasi yang baik. Memiliki minat terhadap bidang teknologi. Direkomendasikan untuk mengikuti kegiatan ekstrakurikuler coding atau robotika untuk mengembangkan minat dan bakat.',
-        rating: 4,
+        hasilText: 'Siswa baru kelas X menunjukkan adaptasi yang baik.',
+        deskripsi: 'Memiliki minat terhadap bidang teknologi dan menunjukkan kemampuan adaptasi yang baik.',
+        tindakLanjut: 'Direkomendasikan untuk mengikuti kegiatan ekstrakurikuler coding atau robotika untuk mengembangkan minat dan bakat.',
+        status: 'BELUM' as const,
         kategori: 'sosial',
         adminId: 'admin_001',
       },
@@ -300,8 +326,10 @@ async function main() {
         id: 'konseling_014',
         nisSiswa: '232410076', // NUR FAUZIAH - XII RPL 2
         tanggalKonseling: new Date('2024-02-10T10:15:00Z'),
-        hasilText: 'Siswa perempuan dengan kemampuan database management yang sangat baik. Cocok untuk berkarir sebagai Database Administrator atau Data Analyst. Direkomendasikan kuliah Sistem Informasi.',
-        rating: 5,
+        hasilText: 'Siswa perempuan dengan kemampuan database management yang sangat baik.',
+        deskripsi: 'Menunjukkan pemahaman yang kuat tentang manajemen basis data dan analisis data.',
+        tindakLanjut: 'Cocok untuk berkarir sebagai Database Administrator atau Data Analyst. Direkomendasikan kuliah Sistem Informasi.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -309,8 +337,10 @@ async function main() {
         id: 'konseling_015',
         nisSiswa: '232410069', // NABIL AL MUCHRIS - XII DKV
         tanggalKonseling: new Date('2024-02-12T13:30:00Z'),
-        hasilText: 'Siswa memiliki kemampuan 3D modeling yang menonjol. Potensi besar untuk berkarir di industri game development atau animation. Disarankan kuliah Game Development atau Animation.',
-        rating: 5,
+        hasilText: 'Siswa memiliki kemampuan 3D modeling yang menonjol.',
+        deskripsi: 'Menunjukkan kreativitas dan pemahaman teknis yang baik dalam pemodelan 3D.',
+        tindakLanjut: 'Potensi besar untuk berkarir di industri game development atau animation. Disarankan kuliah Game Development atau Animation.',
+        status: 'SUDAH' as const,
         kategori: 'karir',
         adminId: 'admin_001',
       },
@@ -322,8 +352,12 @@ async function main() {
         data: counselingData,
       })
       console.log('Created sample counseling data')
-    } catch (error) {
-      console.error('Error creating counseling data:', error.message)
+    } catch (error: any) {
+      if (error instanceof Error) {
+        console.error('Error creating counseling data:', error.message)
+      } else {
+        console.error('Error creating counseling data:', error)
+      }
     }
 
     // Comprehensive career goals for XII students (graduating class) - FIXED to match your model
@@ -571,8 +605,12 @@ async function main() {
         })
         
         console.log(`Created career goal for student: ${goal.nisSiswa}`)
-      } catch (error) {
-        console.error(`Error creating career goal for ${goal.nisSiswa}:`, error.message)
+      } catch (error: any) {
+        if (error instanceof Error) {
+          console.error(`Error creating career goal for ${goal.nisSiswa}:`, error.message)
+        } else {
+          console.error(`Error creating career goal for ${goal.nisSiswa}:`, error)
+        }
       }
     }
   }

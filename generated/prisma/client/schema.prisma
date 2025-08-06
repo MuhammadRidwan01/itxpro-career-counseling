@@ -40,17 +40,18 @@ model Siswa {
 }
 
 model HasilKonseling {
-  id               String   @id @default(cuid())
-  nisSiswa         String   @db.VarChar(9)
+  id               String          @id @default(cuid())
+  nisSiswa         String          @db.VarChar(9)
   tanggalKonseling DateTime
   hasilText        String
-  rekomendasi      String?
-  rating           Int
+  deskripsi        String?
+  tindakLanjut     String?
+  status           StatusKonseling @default(BELUM)
   kategori         String?
   adminId          String
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  siswa            Siswa    @relation(fields: [nisSiswa], references: [nis])
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  siswa            Siswa           @relation(fields: [nisSiswa], references: [nis])
 
   @@map("hasil_konseling")
 }
@@ -84,4 +85,9 @@ enum Status {
   ALUMNI
   PINDAH
   TINGGAL_KELAS
+}
+
+enum StatusKonseling {
+  SUDAH
+  BELUM
 }

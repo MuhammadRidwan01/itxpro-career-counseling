@@ -17,8 +17,9 @@ interface Konseling {
   nisSiswa: string
   tanggalKonseling: string
   hasilText: string
-  rekomendasi: string
-  rating: number
+  deskripsi: string
+  tindakLanjut: string
+  status: 'SUDAH' | 'BELUM'
   kategori: string
   siswa: {
     nama: string
@@ -43,12 +44,21 @@ interface Student {
 }
 
 export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: KonselingModalProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    nisSiswa: string
+    tanggalKonseling: string
+    hasilText: string
+    deskripsi: string
+    tindakLanjut: string
+    status: "SUDAH" | "BELUM"
+    kategori: string
+  }>({
     nisSiswa: "",
     tanggalKonseling: "",
     hasilText: "",
-    rekomendasi: "",
-    rating: 5,
+    deskripsi: "",
+    tindakLanjut: "",
+    status: "BELUM" as const,
     kategori: "akademik",
   })
   const [students, setStudents] = useState<Student[]>([])
@@ -76,8 +86,9 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
         nisSiswa: konseling.nisSiswa,
         tanggalKonseling: konseling.tanggalKonseling.split("T")[0],
         hasilText: konseling.hasilText,
-        rekomendasi: konseling.rekomendasi || "",
-        rating: konseling.rating,
+        deskripsi: konseling.deskripsi || "",
+        tindakLanjut: konseling.tindakLanjut || "",
+        status: konseling.status,
         kategori: konseling.kategori,
       })
     } else {
@@ -85,8 +96,9 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
         nisSiswa: "",
         tanggalKonseling: new Date().toISOString().split("T")[0],
         hasilText: "",
-        rekomendasi: "",
-        rating: 5,
+        deskripsi: "",
+        tindakLanjut: "",
+        status: "BELUM",
         kategori: "akademik",
       })
     }
@@ -145,8 +157,9 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
       nisSiswa: "",
       tanggalKonseling: new Date().toISOString().split("T")[0],
       hasilText: "",
-      rekomendasi: "",
-      rating: 5,
+      deskripsi: "",
+      tindakLanjut: "",
+      status: "BELUM",
       kategori: "akademik",
     })
     setError("")
@@ -315,22 +328,19 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="rating" className="text-gray-700">
-                  Rating Konseling
+                <Label htmlFor="status" className="text-gray-700">
+                  Status Konseling
                 </Label>
                 <Select
-                  value={formData.rating.toString()}
-                  onValueChange={(value) => setFormData({ ...formData, rating: Number.parseInt(value) })}
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value as "SUDAH" | "BELUM" })}
                 >
                   <SelectTrigger className="bg-white border-gray-200">
-                    <SelectValue placeholder="Pilih rating" />
+                    <SelectValue placeholder="Pilih status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">⭐ Sangat Kurang</SelectItem>
-                    <SelectItem value="2">⭐⭐ Kurang</SelectItem>
-                    <SelectItem value="3">⭐⭐⭐ Cukup</SelectItem>
-                    <SelectItem value="4">⭐⭐⭐⭐ Baik</SelectItem>
-                    <SelectItem value="5">⭐⭐⭐⭐⭐ Sangat Baik</SelectItem>
+                    <SelectItem value="BELUM">⏳ Belum Selesai</SelectItem>
+                    <SelectItem value="SUDAH">✅ Sudah Selesai</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -362,7 +372,7 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
           <div className="bg-gray-50/50 p-6 rounded-lg border border-gray-100 space-y-6">
             <h3 className="font-medium text-lg text-gray-800 flex items-center gap-2">
               <Target className="w-5 h-5 text-gold-600" />
-              Hasil dan Rekomendasi
+              Hasil, Deskripsi, dan Tindak Lanjut
             </h3>
 
             <div className="space-y-4">
@@ -381,14 +391,27 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="rekomendasi" className="text-gray-700">
-                  Rekomendasi
+                <Label htmlFor="deskripsi" className="text-gray-700">
+                  Deskripsi
                 </Label>
                 <Textarea
-                  id="rekomendasi"
-                  value={formData.rekomendasi}
-                  onChange={(e) => setFormData({ ...formData, rekomendasi: e.target.value })}
-                  placeholder="Tuliskan rekomendasi untuk siswa..."
+                  id="deskripsi"
+                  value={formData.deskripsi}
+                  onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
+                  placeholder="Tuliskan deskripsi detail konseling..."
+                  className="bg-white border-gray-200 min-h-[100px] text-nude-700"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tindakLanjut" className="text-gray-700">
+                  Tindak Lanjut
+                </Label>
+                <Textarea
+                  id="tindakLanjut"
+                  value={formData.tindakLanjut}
+                  onChange={(e) => setFormData({ ...formData, tindakLanjut: e.target.value })}
+                  placeholder="Tuliskan tindak lanjut yang direncanakan..."
                   className="bg-white border-gray-200 min-h-[100px] text-nude-700"
                 />
               </div>

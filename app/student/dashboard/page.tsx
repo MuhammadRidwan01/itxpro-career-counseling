@@ -7,7 +7,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button"
-import { User, Target, FileText, Calendar, Star, Edit, CheckCircle, Clock, BookOpen } from "lucide-react"
+import { User, Target, FileText, Calendar, Check, Edit, CheckCircle, Clock, BookOpen } from "lucide-react"
 import type { StudentDashboardData } from "@/types/api"
 
 export default function StudentDashboard() {
@@ -119,15 +119,13 @@ export default function StudentDashboard() {
           <GlassCard hover className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-nude-600 text-sm font-medium">Rating Rata-rata</p>
+                <p className="text-nude-600 text-sm font-medium">Konseling Selesai</p>
                 <p className="text-2xl font-bold text-nude-800 mt-1">
-                  {konselingHistory.length > 0
-                    ? (konselingHistory.reduce((acc, k) => acc + k.rating, 0) / konselingHistory.length).toFixed(1)
-                    : "0"}
+                  {konselingHistory.filter(k => k.status === "SUDAH").length}/{konselingHistory.length}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                <Check className="w-6 h-6 text-white" />
               </div>
             </div>
           </GlassCard>
@@ -177,7 +175,9 @@ export default function StudentDashboard() {
                   <div className="w-24 h-24 bg-gradient-button rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <User className="w-12 h-12 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-nude-800 mb-2">{siswa.nama}</h2>
+                  <Link href={`/student/${siswa.nis}`} className="hover:underline">
+                    <h2 className="text-2xl font-bold text-nude-800 mb-2">{siswa.nama}</h2>
+                  </Link>
                   <p className="text-nude-600">
                     {siswa.kelasSaatIni} • {siswa.jurusan}
                   </p>
@@ -370,14 +370,6 @@ export default function StudentDashboard() {
                             <p className="text-nude-800 leading-relaxed">{konseling.hasil}</p>
                           </div>
                           <div className="flex items-center gap-1 ml-4">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < konseling.rating ? "text-gold-500 fill-current" : "text-gray-300"
-                                }`}
-                              />
-                            ))}
                           </div>
                         </div>
                       </GlassCard>

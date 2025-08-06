@@ -55,6 +55,14 @@ export const Status: {
 
 export type Status = (typeof Status)[keyof typeof Status]
 
+
+export const StatusKonseling: {
+  SUDAH: 'SUDAH',
+  BELUM: 'BELUM'
+};
+
+export type StatusKonseling = (typeof StatusKonseling)[keyof typeof StatusKonseling]
+
 }
 
 export type Role = $Enums.Role
@@ -64,6 +72,10 @@ export const Role: typeof $Enums.Role
 export type Status = $Enums.Status
 
 export const Status: typeof $Enums.Status
+
+export type StatusKonseling = $Enums.StatusKonseling
+
+export const StatusKonseling: typeof $Enums.StatusKonseling
 
 /**
  * ##  Prisma Client ʲˢ
@@ -3544,18 +3556,8 @@ export namespace Prisma {
 
   export type AggregateHasilKonseling = {
     _count: HasilKonselingCountAggregateOutputType | null
-    _avg: HasilKonselingAvgAggregateOutputType | null
-    _sum: HasilKonselingSumAggregateOutputType | null
     _min: HasilKonselingMinAggregateOutputType | null
     _max: HasilKonselingMaxAggregateOutputType | null
-  }
-
-  export type HasilKonselingAvgAggregateOutputType = {
-    rating: number | null
-  }
-
-  export type HasilKonselingSumAggregateOutputType = {
-    rating: number | null
   }
 
   export type HasilKonselingMinAggregateOutputType = {
@@ -3563,8 +3565,9 @@ export namespace Prisma {
     nisSiswa: string | null
     tanggalKonseling: Date | null
     hasilText: string | null
-    rekomendasi: string | null
-    rating: number | null
+    deskripsi: string | null
+    tindakLanjut: string | null
+    status: $Enums.StatusKonseling | null
     kategori: string | null
     adminId: string | null
     createdAt: Date | null
@@ -3576,8 +3579,9 @@ export namespace Prisma {
     nisSiswa: string | null
     tanggalKonseling: Date | null
     hasilText: string | null
-    rekomendasi: string | null
-    rating: number | null
+    deskripsi: string | null
+    tindakLanjut: string | null
+    status: $Enums.StatusKonseling | null
     kategori: string | null
     adminId: string | null
     createdAt: Date | null
@@ -3589,8 +3593,9 @@ export namespace Prisma {
     nisSiswa: number
     tanggalKonseling: number
     hasilText: number
-    rekomendasi: number
-    rating: number
+    deskripsi: number
+    tindakLanjut: number
+    status: number
     kategori: number
     adminId: number
     createdAt: number
@@ -3599,21 +3604,14 @@ export namespace Prisma {
   }
 
 
-  export type HasilKonselingAvgAggregateInputType = {
-    rating?: true
-  }
-
-  export type HasilKonselingSumAggregateInputType = {
-    rating?: true
-  }
-
   export type HasilKonselingMinAggregateInputType = {
     id?: true
     nisSiswa?: true
     tanggalKonseling?: true
     hasilText?: true
-    rekomendasi?: true
-    rating?: true
+    deskripsi?: true
+    tindakLanjut?: true
+    status?: true
     kategori?: true
     adminId?: true
     createdAt?: true
@@ -3625,8 +3623,9 @@ export namespace Prisma {
     nisSiswa?: true
     tanggalKonseling?: true
     hasilText?: true
-    rekomendasi?: true
-    rating?: true
+    deskripsi?: true
+    tindakLanjut?: true
+    status?: true
     kategori?: true
     adminId?: true
     createdAt?: true
@@ -3638,8 +3637,9 @@ export namespace Prisma {
     nisSiswa?: true
     tanggalKonseling?: true
     hasilText?: true
-    rekomendasi?: true
-    rating?: true
+    deskripsi?: true
+    tindakLanjut?: true
+    status?: true
     kategori?: true
     adminId?: true
     createdAt?: true
@@ -3685,18 +3685,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: HasilKonselingAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: HasilKonselingSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: HasilKonselingMinAggregateInputType
@@ -3727,8 +3715,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: HasilKonselingCountAggregateInputType | true
-    _avg?: HasilKonselingAvgAggregateInputType
-    _sum?: HasilKonselingSumAggregateInputType
     _min?: HasilKonselingMinAggregateInputType
     _max?: HasilKonselingMaxAggregateInputType
   }
@@ -3738,15 +3724,14 @@ export namespace Prisma {
     nisSiswa: string
     tanggalKonseling: Date
     hasilText: string
-    rekomendasi: string | null
-    rating: number
+    deskripsi: string | null
+    tindakLanjut: string | null
+    status: $Enums.StatusKonseling
     kategori: string | null
     adminId: string
     createdAt: Date
     updatedAt: Date
     _count: HasilKonselingCountAggregateOutputType | null
-    _avg: HasilKonselingAvgAggregateOutputType | null
-    _sum: HasilKonselingSumAggregateOutputType | null
     _min: HasilKonselingMinAggregateOutputType | null
     _max: HasilKonselingMaxAggregateOutputType | null
   }
@@ -3770,8 +3755,9 @@ export namespace Prisma {
     nisSiswa?: boolean
     tanggalKonseling?: boolean
     hasilText?: boolean
-    rekomendasi?: boolean
-    rating?: boolean
+    deskripsi?: boolean
+    tindakLanjut?: boolean
+    status?: boolean
     kategori?: boolean
     adminId?: boolean
     createdAt?: boolean
@@ -3784,8 +3770,9 @@ export namespace Prisma {
     nisSiswa?: boolean
     tanggalKonseling?: boolean
     hasilText?: boolean
-    rekomendasi?: boolean
-    rating?: boolean
+    deskripsi?: boolean
+    tindakLanjut?: boolean
+    status?: boolean
     kategori?: boolean
     adminId?: boolean
     createdAt?: boolean
@@ -3798,8 +3785,9 @@ export namespace Prisma {
     nisSiswa?: boolean
     tanggalKonseling?: boolean
     hasilText?: boolean
-    rekomendasi?: boolean
-    rating?: boolean
+    deskripsi?: boolean
+    tindakLanjut?: boolean
+    status?: boolean
     kategori?: boolean
     adminId?: boolean
     createdAt?: boolean
@@ -3812,15 +3800,16 @@ export namespace Prisma {
     nisSiswa?: boolean
     tanggalKonseling?: boolean
     hasilText?: boolean
-    rekomendasi?: boolean
-    rating?: boolean
+    deskripsi?: boolean
+    tindakLanjut?: boolean
+    status?: boolean
     kategori?: boolean
     adminId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type HasilKonselingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nisSiswa" | "tanggalKonseling" | "hasilText" | "rekomendasi" | "rating" | "kategori" | "adminId" | "createdAt" | "updatedAt", ExtArgs["result"]["hasilKonseling"]>
+  export type HasilKonselingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nisSiswa" | "tanggalKonseling" | "hasilText" | "deskripsi" | "tindakLanjut" | "status" | "kategori" | "adminId" | "createdAt" | "updatedAt", ExtArgs["result"]["hasilKonseling"]>
   export type HasilKonselingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     siswa?: boolean | SiswaDefaultArgs<ExtArgs>
   }
@@ -3841,8 +3830,9 @@ export namespace Prisma {
       nisSiswa: string
       tanggalKonseling: Date
       hasilText: string
-      rekomendasi: string | null
-      rating: number
+      deskripsi: string | null
+      tindakLanjut: string | null
+      status: $Enums.StatusKonseling
       kategori: string | null
       adminId: string
       createdAt: Date
@@ -4275,8 +4265,9 @@ export namespace Prisma {
     readonly nisSiswa: FieldRef<"HasilKonseling", 'String'>
     readonly tanggalKonseling: FieldRef<"HasilKonseling", 'DateTime'>
     readonly hasilText: FieldRef<"HasilKonseling", 'String'>
-    readonly rekomendasi: FieldRef<"HasilKonseling", 'String'>
-    readonly rating: FieldRef<"HasilKonseling", 'Int'>
+    readonly deskripsi: FieldRef<"HasilKonseling", 'String'>
+    readonly tindakLanjut: FieldRef<"HasilKonseling", 'String'>
+    readonly status: FieldRef<"HasilKonseling", 'StatusKonseling'>
     readonly kategori: FieldRef<"HasilKonseling", 'String'>
     readonly adminId: FieldRef<"HasilKonseling", 'String'>
     readonly createdAt: FieldRef<"HasilKonseling", 'DateTime'>
@@ -5905,8 +5896,9 @@ export namespace Prisma {
     nisSiswa: 'nisSiswa',
     tanggalKonseling: 'tanggalKonseling',
     hasilText: 'hasilText',
-    rekomendasi: 'rekomendasi',
-    rating: 'rating',
+    deskripsi: 'deskripsi',
+    tindakLanjut: 'tindakLanjut',
+    status: 'status',
     kategori: 'kategori',
     adminId: 'adminId',
     createdAt: 'createdAt',
@@ -6038,6 +6030,20 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'StatusKonseling'
+   */
+  export type EnumStatusKonselingFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusKonseling'>
+    
+
+
+  /**
+   * Reference to a field of type 'StatusKonseling[]'
+   */
+  export type ListEnumStatusKonselingFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusKonseling[]'>
     
 
 
@@ -6219,8 +6225,9 @@ export namespace Prisma {
     nisSiswa?: StringFilter<"HasilKonseling"> | string
     tanggalKonseling?: DateTimeFilter<"HasilKonseling"> | Date | string
     hasilText?: StringFilter<"HasilKonseling"> | string
-    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
-    rating?: IntFilter<"HasilKonseling"> | number
+    deskripsi?: StringNullableFilter<"HasilKonseling"> | string | null
+    tindakLanjut?: StringNullableFilter<"HasilKonseling"> | string | null
+    status?: EnumStatusKonselingFilter<"HasilKonseling"> | $Enums.StatusKonseling
     kategori?: StringNullableFilter<"HasilKonseling"> | string | null
     adminId?: StringFilter<"HasilKonseling"> | string
     createdAt?: DateTimeFilter<"HasilKonseling"> | Date | string
@@ -6233,8 +6240,9 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
-    rekomendasi?: SortOrderInput | SortOrder
-    rating?: SortOrder
+    deskripsi?: SortOrderInput | SortOrder
+    tindakLanjut?: SortOrderInput | SortOrder
+    status?: SortOrder
     kategori?: SortOrderInput | SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
@@ -6250,8 +6258,9 @@ export namespace Prisma {
     nisSiswa?: StringFilter<"HasilKonseling"> | string
     tanggalKonseling?: DateTimeFilter<"HasilKonseling"> | Date | string
     hasilText?: StringFilter<"HasilKonseling"> | string
-    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
-    rating?: IntFilter<"HasilKonseling"> | number
+    deskripsi?: StringNullableFilter<"HasilKonseling"> | string | null
+    tindakLanjut?: StringNullableFilter<"HasilKonseling"> | string | null
+    status?: EnumStatusKonselingFilter<"HasilKonseling"> | $Enums.StatusKonseling
     kategori?: StringNullableFilter<"HasilKonseling"> | string | null
     adminId?: StringFilter<"HasilKonseling"> | string
     createdAt?: DateTimeFilter<"HasilKonseling"> | Date | string
@@ -6264,17 +6273,16 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
-    rekomendasi?: SortOrderInput | SortOrder
-    rating?: SortOrder
+    deskripsi?: SortOrderInput | SortOrder
+    tindakLanjut?: SortOrderInput | SortOrder
+    status?: SortOrder
     kategori?: SortOrderInput | SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: HasilKonselingCountOrderByAggregateInput
-    _avg?: HasilKonselingAvgOrderByAggregateInput
     _max?: HasilKonselingMaxOrderByAggregateInput
     _min?: HasilKonselingMinOrderByAggregateInput
-    _sum?: HasilKonselingSumOrderByAggregateInput
   }
 
   export type HasilKonselingScalarWhereWithAggregatesInput = {
@@ -6285,8 +6293,9 @@ export namespace Prisma {
     nisSiswa?: StringWithAggregatesFilter<"HasilKonseling"> | string
     tanggalKonseling?: DateTimeWithAggregatesFilter<"HasilKonseling"> | Date | string
     hasilText?: StringWithAggregatesFilter<"HasilKonseling"> | string
-    rekomendasi?: StringNullableWithAggregatesFilter<"HasilKonseling"> | string | null
-    rating?: IntWithAggregatesFilter<"HasilKonseling"> | number
+    deskripsi?: StringNullableWithAggregatesFilter<"HasilKonseling"> | string | null
+    tindakLanjut?: StringNullableWithAggregatesFilter<"HasilKonseling"> | string | null
+    status?: EnumStatusKonselingWithAggregatesFilter<"HasilKonseling"> | $Enums.StatusKonseling
     kategori?: StringNullableWithAggregatesFilter<"HasilKonseling"> | string | null
     adminId?: StringWithAggregatesFilter<"HasilKonseling"> | string
     createdAt?: DateTimeWithAggregatesFilter<"HasilKonseling"> | Date | string
@@ -6564,8 +6573,9 @@ export namespace Prisma {
     id?: string
     tanggalKonseling: Date | string
     hasilText: string
-    rekomendasi?: string | null
-    rating: number
+    deskripsi?: string | null
+    tindakLanjut?: string | null
+    status?: $Enums.StatusKonseling
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
@@ -6578,8 +6588,9 @@ export namespace Prisma {
     nisSiswa: string
     tanggalKonseling: Date | string
     hasilText: string
-    rekomendasi?: string | null
-    rating: number
+    deskripsi?: string | null
+    tindakLanjut?: string | null
+    status?: $Enums.StatusKonseling
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
@@ -6590,8 +6601,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
-    rating?: IntFieldUpdateOperationsInput | number
+    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
+    tindakLanjut?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumStatusKonselingFieldUpdateOperationsInput | $Enums.StatusKonseling
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6604,8 +6616,9 @@ export namespace Prisma {
     nisSiswa?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
-    rating?: IntFieldUpdateOperationsInput | number
+    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
+    tindakLanjut?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumStatusKonselingFieldUpdateOperationsInput | $Enums.StatusKonseling
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6617,8 +6630,9 @@ export namespace Prisma {
     nisSiswa: string
     tanggalKonseling: Date | string
     hasilText: string
-    rekomendasi?: string | null
-    rating: number
+    deskripsi?: string | null
+    tindakLanjut?: string | null
+    status?: $Enums.StatusKonseling
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
@@ -6629,8 +6643,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
-    rating?: IntFieldUpdateOperationsInput | number
+    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
+    tindakLanjut?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumStatusKonselingFieldUpdateOperationsInput | $Enums.StatusKonseling
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6642,8 +6657,9 @@ export namespace Prisma {
     nisSiswa?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
-    rating?: IntFieldUpdateOperationsInput | number
+    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
+    tindakLanjut?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumStatusKonselingFieldUpdateOperationsInput | $Enums.StatusKonseling
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -7062,6 +7078,13 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type EnumStatusKonselingFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusKonseling | EnumStatusKonselingFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusKonseling[] | ListEnumStatusKonselingFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusKonseling[] | ListEnumStatusKonselingFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusKonselingFilter<$PrismaModel> | $Enums.StatusKonseling
+  }
+
   export type SiswaScalarRelationFilter = {
     is?: SiswaWhereInput
     isNot?: SiswaWhereInput
@@ -7072,16 +7095,13 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
-    rekomendasi?: SortOrder
-    rating?: SortOrder
+    deskripsi?: SortOrder
+    tindakLanjut?: SortOrder
+    status?: SortOrder
     kategori?: SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-  }
-
-  export type HasilKonselingAvgOrderByAggregateInput = {
-    rating?: SortOrder
   }
 
   export type HasilKonselingMaxOrderByAggregateInput = {
@@ -7089,8 +7109,9 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
-    rekomendasi?: SortOrder
-    rating?: SortOrder
+    deskripsi?: SortOrder
+    tindakLanjut?: SortOrder
+    status?: SortOrder
     kategori?: SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
@@ -7102,16 +7123,23 @@ export namespace Prisma {
     nisSiswa?: SortOrder
     tanggalKonseling?: SortOrder
     hasilText?: SortOrder
-    rekomendasi?: SortOrder
-    rating?: SortOrder
+    deskripsi?: SortOrder
+    tindakLanjut?: SortOrder
+    status?: SortOrder
     kategori?: SortOrder
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
-  export type HasilKonselingSumOrderByAggregateInput = {
-    rating?: SortOrder
+  export type EnumStatusKonselingWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusKonseling | EnumStatusKonselingFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusKonseling[] | ListEnumStatusKonselingFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusKonseling[] | ListEnumStatusKonselingFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusKonselingWithAggregatesFilter<$PrismaModel> | $Enums.StatusKonseling
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStatusKonselingFilter<$PrismaModel>
+    _max?: NestedEnumStatusKonselingFilter<$PrismaModel>
   }
 
   export type TujuanKarirCountOrderByAggregateInput = {
@@ -7328,6 +7356,10 @@ export namespace Prisma {
     create?: XOR<SiswaCreateWithoutHasilKonselingInput, SiswaUncheckedCreateWithoutHasilKonselingInput>
     connectOrCreate?: SiswaCreateOrConnectWithoutHasilKonselingInput
     connect?: SiswaWhereUniqueInput
+  }
+
+  export type EnumStatusKonselingFieldUpdateOperationsInput = {
+    set?: $Enums.StatusKonseling
   }
 
   export type SiswaUpdateOneRequiredWithoutHasilKonselingNestedInput = {
@@ -7562,6 +7594,23 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type NestedEnumStatusKonselingFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusKonseling | EnumStatusKonselingFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusKonseling[] | ListEnumStatusKonselingFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusKonseling[] | ListEnumStatusKonselingFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusKonselingFilter<$PrismaModel> | $Enums.StatusKonseling
+  }
+
+  export type NestedEnumStatusKonselingWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StatusKonseling | EnumStatusKonselingFieldRefInput<$PrismaModel>
+    in?: $Enums.StatusKonseling[] | ListEnumStatusKonselingFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StatusKonseling[] | ListEnumStatusKonselingFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusKonselingWithAggregatesFilter<$PrismaModel> | $Enums.StatusKonseling
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStatusKonselingFilter<$PrismaModel>
+    _max?: NestedEnumStatusKonselingFilter<$PrismaModel>
+  }
+
   export type SiswaCreateWithoutUserInput = {
     nis: string
     nama: string
@@ -7642,8 +7691,9 @@ export namespace Prisma {
     id?: string
     tanggalKonseling: Date | string
     hasilText: string
-    rekomendasi?: string | null
-    rating: number
+    deskripsi?: string | null
+    tindakLanjut?: string | null
+    status?: $Enums.StatusKonseling
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
@@ -7654,8 +7704,9 @@ export namespace Prisma {
     id?: string
     tanggalKonseling: Date | string
     hasilText: string
-    rekomendasi?: string | null
-    rating: number
+    deskripsi?: string | null
+    tindakLanjut?: string | null
+    status?: $Enums.StatusKonseling
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
@@ -7754,8 +7805,9 @@ export namespace Prisma {
     nisSiswa?: StringFilter<"HasilKonseling"> | string
     tanggalKonseling?: DateTimeFilter<"HasilKonseling"> | Date | string
     hasilText?: StringFilter<"HasilKonseling"> | string
-    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
-    rating?: IntFilter<"HasilKonseling"> | number
+    deskripsi?: StringNullableFilter<"HasilKonseling"> | string | null
+    tindakLanjut?: StringNullableFilter<"HasilKonseling"> | string | null
+    status?: EnumStatusKonselingFilter<"HasilKonseling"> | $Enums.StatusKonseling
     kategori?: StringNullableFilter<"HasilKonseling"> | string | null
     adminId?: StringFilter<"HasilKonseling"> | string
     createdAt?: DateTimeFilter<"HasilKonseling"> | Date | string
@@ -7988,8 +8040,9 @@ export namespace Prisma {
     id?: string
     tanggalKonseling: Date | string
     hasilText: string
-    rekomendasi?: string | null
-    rating: number
+    deskripsi?: string | null
+    tindakLanjut?: string | null
+    status?: $Enums.StatusKonseling
     kategori?: string | null
     adminId: string
     createdAt?: Date | string
@@ -8000,8 +8053,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
-    rating?: IntFieldUpdateOperationsInput | number
+    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
+    tindakLanjut?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumStatusKonselingFieldUpdateOperationsInput | $Enums.StatusKonseling
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8012,8 +8066,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
-    rating?: IntFieldUpdateOperationsInput | number
+    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
+    tindakLanjut?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumStatusKonselingFieldUpdateOperationsInput | $Enums.StatusKonseling
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8024,8 +8079,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tanggalKonseling?: DateTimeFieldUpdateOperationsInput | Date | string
     hasilText?: StringFieldUpdateOperationsInput | string
-    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
-    rating?: IntFieldUpdateOperationsInput | number
+    deskripsi?: NullableStringFieldUpdateOperationsInput | string | null
+    tindakLanjut?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumStatusKonselingFieldUpdateOperationsInput | $Enums.StatusKonseling
     kategori?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

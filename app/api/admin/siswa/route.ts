@@ -62,7 +62,6 @@ export async function GET(request: Request) {
             select: {
               id: true,
               tanggalKonseling: true,
-              rating: true,
             },
             orderBy: { tanggalKonseling: "desc" },
             take: 1,

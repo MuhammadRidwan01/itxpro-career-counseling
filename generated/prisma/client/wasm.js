@@ -148,8 +148,9 @@ exports.Prisma.HasilKonselingScalarFieldEnum = {
   nisSiswa: 'nisSiswa',
   tanggalKonseling: 'tanggalKonseling',
   hasilText: 'hasilText',
-  rekomendasi: 'rekomendasi',
-  rating: 'rating',
+  deskripsi: 'deskripsi',
+  tindakLanjut: 'tindakLanjut',
+  status: 'status',
   kategori: 'kategori',
   adminId: 'adminId',
   createdAt: 'createdAt',
@@ -196,6 +197,11 @@ exports.Status = exports.$Enums.Status = {
   ALUMNI: 'ALUMNI',
   PINDAH: 'PINDAH',
   TINGGAL_KELAS: 'TINGGAL_KELAS'
+};
+
+exports.StatusKonseling = exports.$Enums.StatusKonseling = {
+  SUDAH: 'SUDAH',
+  BELUM: 'BELUM'
 };
 
 exports.Prisma.ModelName = {

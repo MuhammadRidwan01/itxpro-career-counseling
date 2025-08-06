@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import {
   Users,
@@ -54,9 +55,11 @@ interface Konseling {
   nisSiswa: string
   tanggalKonseling: string
   hasilText: string
-  rekomendasi: string
-  rating: number
+  deskripsi: string
+  tindakLanjut: string
+  status: "SUDAH" | "BELUM"
   kategori: string
+  rating: number // Assuming rating is a number between 0 and 5
   siswa: {
     nama: string
     kelasSaatIni: string
@@ -178,20 +181,34 @@ export default function AdminDashboard() {
       item.kategori.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
-  const renderStarRating = (rating: number) => {
+  const renderStatusBadge = (status: "SUDAH" | "BELUM") => {
     return (
-      <div className="flex items-center gap-0.5">
-        {Array.from({ length: 5 }).map((_, i) => (
-          i < rating ? (
-            <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-          ) : (
-            <StarOff key={i} className="w-3 h-3 text-gray-300" />
-          )
-        ))}
+      <div
+        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+          status === "SUDAH"
+            ? "bg-green-100 text-green-800 border border-green-200"
+            : "bg-yellow-100 text-yellow-800 border border-yellow-200"
+        }`}
+      >
+        {status === "SUDAH" ? "✓ Selesai" : "⏳ Belum Selesai"}
       </div>
     )
   }
 
+  const renderStarRating = (rating: number) => {
+    const stars = []
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        i <= rating ? (
+          <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+        ) : (
+          <StarOff key={i} className="w-4 h-4 text-gray-300" />
+        ),
+      )
+    }
+    return <div className="flex">{stars}</div>
+  }
+ 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center px-4">
@@ -445,7 +462,9 @@ export default function AdminDashboard() {
                 <div key={student.nis} className="p-4 border-b border-white/30 last:border-b-0">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-slate-800 truncate">{student.nama}</h4>
+                      <Link href={`/admin/student/${student.nis}`} className="hover:underline">
+                        <h4 className="font-medium text-slate-800 truncate">{student.nama}</h4>
+                      </Link>
                       <p className="text-sm text-slate-600">{student.nis}</p>
                     </div>
                     <div className="flex items-center gap-1 ml-3">
@@ -518,7 +537,11 @@ export default function AdminDashboard() {
                   {filteredStudents.map((student) => (
                     <tr key={student.nis} className="border-b border-white/30 hover:bg-white/30 transition-colors">
                       <td className="py-3 px-4 text-sm text-slate-800 font-mono">{student.nis}</td>
-                      <td className="py-3 px-4 text-sm text-slate-800 font-medium">{student.nama}</td>
+                      <td className="py-3 px-4 text-sm text-slate-800 font-medium">
+                        <Link href={`/admin/student/${student.nis}`} className="hover:underline">
+                          {student.nama}
+                        </Link>
+                      </td>
                       <td className="py-3 px-4 text-sm text-slate-600">{student.kelasSaatIni}</td>
                       <td className="py-3 px-4 text-sm text-slate-600">{student.jurusan}</td>
                       <td className="py-3 px-4">
@@ -661,8 +684,8 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-500">Rating:</span>
-                        {renderStarRating(item.rating)}
+                        <span className="text-xs text-slate-500">Status:</span>
+                        {renderStatusBadge(item.status)}
                       </div>
                     </div>
                     <p className="text-sm text-slate-600 line-clamp-2">{item.hasilText}</p>
@@ -676,7 +699,7 @@ export default function AdminDashboard() {
               <table className="w-full">
                 <thead className="bg-slate-50/50">
                   <tr>
-                    {["Siswa", "Tanggal", "Kategori", "Rating", "Hasil", "Aksi"].map((header) => (
+                    {["Siswa", "Tanggal", "Kategori", "Status", "Hasil", "Aksi"].map((header) => (
                       <th key={header} className="text-left py-3 px-4 font-medium text-slate-700 text-sm">
                         {header}
                       </th>
@@ -701,7 +724,7 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        {renderStarRating(item.rating)}
+                        {renderStatusBadge(item.status)}
                       </td>
                       <td className="py-3 px-4 text-sm text-slate-600 max-w-xs">
                         <p className="truncate">{item.hasilText}</p>

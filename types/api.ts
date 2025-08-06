@@ -17,9 +17,11 @@ export interface TujuanKarir {
 export interface HasilKonseling {
   id: string;
   tanggal: Date;
-  kategori: string;
-  hasil: string;
-  rating: number;
+  kategori: string | null;
+  hasil: string | null;
+  deskripsi: string;
+  tindakLanjut: string;
+  status: "SUDAH" | "BELUM";
 }
 
 export interface StudentDashboardData {
@@ -29,13 +31,13 @@ export interface StudentDashboardData {
     email: string;
     kelasSaatIni: string;
     angkatan: number;
-    jurusan: string;
+    jurusan: string | null;
     status: string;
     tujuanKarirSubmitted: boolean;
   };
   stats: {
     totalKonseling: number;
-    avgRating: number;
+    konselingSelesai: number;
     tujuanKarirStatus: string;
   };
   tujuanKarir: TujuanKarir | null;
