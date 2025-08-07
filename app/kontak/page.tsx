@@ -3,8 +3,9 @@
 import { GlassCard } from "@/components/ui/glass-card";
 import { PremiumButton } from "@/components/ui/premium-button";
 import { motion } from "framer-motion";
-import { ChevronRight, Users } from "lucide-react";
+import { ArrowLeft, ChevronRight, Users } from "lucide-react";
 import { FaWhatsapp } from 'react-icons/fa';
+import Link from "next/link"
 
 
 export default function TentangPage() {
@@ -16,17 +17,22 @@ export default function TentangPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
+           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-8">
+          <Link href="/">
+            <PremiumButton variant="ghost" size="sm">
+              <ArrowLeft className="w-4 h-4" />
+              Kembali
+            </PremiumButton>
+          </Link>
+        </motion.div>
             <div className="text-center max-w-4xl mx-auto">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
               <h3 className="text-5xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                Sistem Konseling Karir
-                <span className="block bg-gradient-to-r from-gold-400 to-gold-600 bg-clip-text text-transparent">
-                  SMK ITXPRO 2026
-                </span>
+                Kontak BK SMK ITXPRO
+               
               </h3>
-              <p className="text-xl text-white/90 mb-12 leading-relaxed">
-                Platform modern untuk mengelola konseling karir siswa dengan teknologi terdepan. Wujudkan masa depan
-                cemerlang bersama sistem yang dirancang khusus untuk SMK Informatika.
+              <p className="text-lg text-white/90 mb-12 leading-relaxed">
+                Jika kamu memiliki pertanyaan, butuh konsultasi, atau ingin membuat janji bimbingan konseling, silakan hubungi kami melalui informasi di bawah ini.
               </p>
             </motion.div>
             </div>
@@ -44,13 +50,19 @@ export default function TentangPage() {
               {/* <p className="text-nude-600 mb-6">
                 Jika kamu memiliki pertanyaan, butuh konsultasi, atau ingin membuat janji bimbingan konseling, silakan hubungi kami melalui informasi di bawah ini.
               </p> */}
-              <PremiumButton
-                className="w-full"
-                onClick={() => (window.location.href = "/auth/student")}
-              >
-                Hubungi 
+            <PremiumButton
+                type="button"
+                className="w-full flex items-center justify-center"
+                onClick={() => {
+                    window.open(
+                    "https://wa.me/6289611508411?text=Halo%20Bu%20Shildi%2C%20saya%20ingin%20bertanya%20tentang%20konseling%20karir.",
+                    "_blank"
+                    );
+                }}
+                >
                 <FaWhatsapp className="w-4 h-4 mr-2" />
-              </PremiumButton>
+                Hubungi
+            </PremiumButton>
             </GlassCard>
             <GlassCard
               hover
@@ -65,13 +77,19 @@ export default function TentangPage() {
               {/* <p className="text-nude-600 mb-6">
                 Jika kamu memiliki pertanyaan, butuh konsultasi, atau ingin membuat janji bimbingan konseling, silakan hubungi kami melalui informasi di bawah ini.
               </p> */}
-              <PremiumButton
-                className="w-full"
-                onClick={() => (window.location.href = "/auth/student")}
-              >
-                Hubungi 
+               <PremiumButton
+                type="button"
+                className="w-full flex items-center justify-center"
+                onClick={() => {
+                    window.open(
+                    "https://wa.me/6281316251307?text=Halo%20Pak%20Dede%2C%20saya%20ingin%20bertanya%20tentang%20konseling%20karir.",
+                    "_blank"
+                    );
+                }}
+                >
                 <FaWhatsapp className="w-4 h-4 mr-2" />
-              </PremiumButton>
+                Hubungi
+            </PremiumButton>
             </GlassCard>
           </div>
         </motion.div>
