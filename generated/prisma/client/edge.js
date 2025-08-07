@@ -126,7 +126,8 @@ exports.Prisma.HasilKonselingScalarFieldEnum = {
   kategori: 'kategori',
   adminId: 'adminId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  rekomendasi: 'rekomendasi'
 };
 
 exports.Prisma.TujuanKarirScalarFieldEnum = {
@@ -221,6 +222,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "postinstall": false,
   "inlineDatasources": {
     "db": {

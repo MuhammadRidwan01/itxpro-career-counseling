@@ -3572,6 +3572,7 @@ export namespace Prisma {
     adminId: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    rekomendasi: string | null
   }
 
   export type HasilKonselingMaxAggregateOutputType = {
@@ -3586,6 +3587,7 @@ export namespace Prisma {
     adminId: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    rekomendasi: string | null
   }
 
   export type HasilKonselingCountAggregateOutputType = {
@@ -3600,6 +3602,7 @@ export namespace Prisma {
     adminId: number
     createdAt: number
     updatedAt: number
+    rekomendasi: number
     _all: number
   }
 
@@ -3616,6 +3619,7 @@ export namespace Prisma {
     adminId?: true
     createdAt?: true
     updatedAt?: true
+    rekomendasi?: true
   }
 
   export type HasilKonselingMaxAggregateInputType = {
@@ -3630,6 +3634,7 @@ export namespace Prisma {
     adminId?: true
     createdAt?: true
     updatedAt?: true
+    rekomendasi?: true
   }
 
   export type HasilKonselingCountAggregateInputType = {
@@ -3644,6 +3649,7 @@ export namespace Prisma {
     adminId?: true
     createdAt?: true
     updatedAt?: true
+    rekomendasi?: true
     _all?: true
   }
 
@@ -3731,6 +3737,7 @@ export namespace Prisma {
     adminId: string
     createdAt: Date
     updatedAt: Date
+    rekomendasi: string | null
     _count: HasilKonselingCountAggregateOutputType | null
     _min: HasilKonselingMinAggregateOutputType | null
     _max: HasilKonselingMaxAggregateOutputType | null
@@ -3762,6 +3769,7 @@ export namespace Prisma {
     adminId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    rekomendasi?: boolean
     siswa?: boolean | SiswaDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["hasilKonseling"]>
 
@@ -3777,6 +3785,7 @@ export namespace Prisma {
     adminId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    rekomendasi?: boolean
     siswa?: boolean | SiswaDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["hasilKonseling"]>
 
@@ -3792,6 +3801,7 @@ export namespace Prisma {
     adminId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    rekomendasi?: boolean
     siswa?: boolean | SiswaDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["hasilKonseling"]>
 
@@ -3807,6 +3817,7 @@ export namespace Prisma {
     adminId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    rekomendasi?: boolean
   }
 
   export type HasilKonselingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nisSiswa" | "tanggalKonseling" | "hasilText" | "deskripsi" | "tindakLanjut" | "status" | "kategori" | "adminId" | "createdAt" | "updatedAt", ExtArgs["result"]["hasilKonseling"]>
@@ -3837,6 +3848,7 @@ export namespace Prisma {
       adminId: string
       createdAt: Date
       updatedAt: Date
+      rekomendasi: string | null
     }, ExtArgs["result"]["hasilKonseling"]>
     composites: {}
   }
@@ -4272,6 +4284,7 @@ export namespace Prisma {
     readonly adminId: FieldRef<"HasilKonseling", 'String'>
     readonly createdAt: FieldRef<"HasilKonseling", 'DateTime'>
     readonly updatedAt: FieldRef<"HasilKonseling", 'DateTime'>
+    readonly rekomendasi: FieldRef<"HasilKonseling", 'String'>
   }
     
 
@@ -5902,7 +5915,8 @@ export namespace Prisma {
     kategori: 'kategori',
     adminId: 'adminId',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    rekomendasi: 'rekomendasi'
   };
 
   export type HasilKonselingScalarFieldEnum = (typeof HasilKonselingScalarFieldEnum)[keyof typeof HasilKonselingScalarFieldEnum]
@@ -6232,6 +6246,7 @@ export namespace Prisma {
     adminId?: StringFilter<"HasilKonseling"> | string
     createdAt?: DateTimeFilter<"HasilKonseling"> | Date | string
     updatedAt?: DateTimeFilter<"HasilKonseling"> | Date | string
+    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
     siswa?: XOR<SiswaScalarRelationFilter, SiswaWhereInput>
   }
 
@@ -6247,6 +6262,7 @@ export namespace Prisma {
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    rekomendasi?: SortOrderInput | SortOrder
     siswa?: SiswaOrderByWithRelationInput
   }
 
@@ -6265,6 +6281,7 @@ export namespace Prisma {
     adminId?: StringFilter<"HasilKonseling"> | string
     createdAt?: DateTimeFilter<"HasilKonseling"> | Date | string
     updatedAt?: DateTimeFilter<"HasilKonseling"> | Date | string
+    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
     siswa?: XOR<SiswaScalarRelationFilter, SiswaWhereInput>
   }, "id">
 
@@ -6280,6 +6297,7 @@ export namespace Prisma {
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    rekomendasi?: SortOrderInput | SortOrder
     _count?: HasilKonselingCountOrderByAggregateInput
     _max?: HasilKonselingMaxOrderByAggregateInput
     _min?: HasilKonselingMinOrderByAggregateInput
@@ -6300,6 +6318,7 @@ export namespace Prisma {
     adminId?: StringWithAggregatesFilter<"HasilKonseling"> | string
     createdAt?: DateTimeWithAggregatesFilter<"HasilKonseling"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"HasilKonseling"> | Date | string
+    rekomendasi?: StringNullableWithAggregatesFilter<"HasilKonseling"> | string | null
   }
 
   export type TujuanKarirWhereInput = {
@@ -6580,6 +6599,7 @@ export namespace Prisma {
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    rekomendasi?: string | null
     siswa: SiswaCreateNestedOneWithoutHasilKonselingInput
   }
 
@@ -6595,6 +6615,7 @@ export namespace Prisma {
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    rekomendasi?: string | null
   }
 
   export type HasilKonselingUpdateInput = {
@@ -6608,6 +6629,7 @@ export namespace Prisma {
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
     siswa?: SiswaUpdateOneRequiredWithoutHasilKonselingNestedInput
   }
 
@@ -6623,6 +6645,7 @@ export namespace Prisma {
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type HasilKonselingCreateManyInput = {
@@ -6637,6 +6660,7 @@ export namespace Prisma {
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    rekomendasi?: string | null
   }
 
   export type HasilKonselingUpdateManyMutationInput = {
@@ -6650,6 +6674,7 @@ export namespace Prisma {
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type HasilKonselingUncheckedUpdateManyInput = {
@@ -6664,6 +6689,7 @@ export namespace Prisma {
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TujuanKarirCreateInput = {
@@ -7102,6 +7128,7 @@ export namespace Prisma {
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    rekomendasi?: SortOrder
   }
 
   export type HasilKonselingMaxOrderByAggregateInput = {
@@ -7116,6 +7143,7 @@ export namespace Prisma {
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    rekomendasi?: SortOrder
   }
 
   export type HasilKonselingMinOrderByAggregateInput = {
@@ -7130,6 +7158,7 @@ export namespace Prisma {
     adminId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    rekomendasi?: SortOrder
   }
 
   export type EnumStatusKonselingWithAggregatesFilter<$PrismaModel = never> = {
@@ -7698,6 +7727,7 @@ export namespace Prisma {
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    rekomendasi?: string | null
   }
 
   export type HasilKonselingUncheckedCreateWithoutSiswaInput = {
@@ -7711,6 +7741,7 @@ export namespace Prisma {
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    rekomendasi?: string | null
   }
 
   export type HasilKonselingCreateOrConnectWithoutSiswaInput = {
@@ -7812,6 +7843,7 @@ export namespace Prisma {
     adminId?: StringFilter<"HasilKonseling"> | string
     createdAt?: DateTimeFilter<"HasilKonseling"> | Date | string
     updatedAt?: DateTimeFilter<"HasilKonseling"> | Date | string
+    rekomendasi?: StringNullableFilter<"HasilKonseling"> | string | null
   }
 
   export type UserUpsertWithoutSiswaInput = {
@@ -8047,6 +8079,7 @@ export namespace Prisma {
     adminId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    rekomendasi?: string | null
   }
 
   export type HasilKonselingUpdateWithoutSiswaInput = {
@@ -8060,6 +8093,7 @@ export namespace Prisma {
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type HasilKonselingUncheckedUpdateWithoutSiswaInput = {
@@ -8073,6 +8107,7 @@ export namespace Prisma {
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type HasilKonselingUncheckedUpdateManyWithoutSiswaInput = {
@@ -8086,6 +8121,7 @@ export namespace Prisma {
     adminId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rekomendasi?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
 

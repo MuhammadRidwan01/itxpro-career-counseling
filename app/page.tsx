@@ -5,6 +5,8 @@ import { motion } from "framer-motion"
 import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button"
 import { BookOpen, Users, TrendingUp, Award, ChevronRight, Sparkles } from "lucide-react"
+import Link from 'next/link';
+
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<"admin" | "student">("student")
@@ -70,12 +72,16 @@ export default function LandingPage() {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-4"
             >
-              <PremiumButton variant="ghost" size="sm">
-                Tentang
-              </PremiumButton>
-              <PremiumButton variant="secondary" size="sm">
-                Kontak
-              </PremiumButton>
+              <Link href="/tentang">
+                <PremiumButton variant="ghost" size="sm">
+                  Tentang
+                </PremiumButton>
+              </Link>
+              <Link href="/kontak">
+                <PremiumButton variant="ghost" size="sm">
+                  Kontak
+                </PremiumButton>
+              </Link>
             </motion.div>
           </nav>
         </header>

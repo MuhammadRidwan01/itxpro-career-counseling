@@ -9,6 +9,10 @@ import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button"
 import { User, Target, FileText, Calendar, Check, Edit, CheckCircle, Clock, BookOpen, ArrowLeft, LogOut } from "lucide-react" // Tambahkan ArrowLeft dan LogOut
 import type { StudentDashboardData } from "@/types/api"
+import { LogOut } from "lucide-react"
+import { signOut } from "next-auth/react"
+
+
 
 export default function StudentDashboard() {
   const { data: session, status } = useSession()
@@ -16,6 +20,16 @@ export default function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("profile")
   const [studentData, setStudentData] = useState<StudentDashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showEditPassword, setShowEditPassword] = useState(false)
+  const [oldPassword, setOldPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [showOld, setShowOld] = useState(false)
+  const [showNew, setShowNew] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [passwordError, setPasswordError] = useState("")
+  const [passwordSuccess, setPasswordSuccess] = useState("")
+  const [passwordLoading, setPasswordLoading] = useState(false)
 
   useEffect(() => {
     fetchStudentData()
@@ -76,6 +90,9 @@ export default function StudentDashboard() {
             <h1 className="text-3xl font-bold text-white mb-2">Dashboard Siswa</h1>
             <p className="text-white/80">Selamat datang, {siswa.nama}</p>
           </div>
+          <div className="flex items-end gap-4">
+           
+          </div>
           <div className="flex items-center gap-4">
             <PremiumButton onClick={() => router.replace('/')} variant="secondary" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -85,6 +102,119 @@ export default function StudentDashboard() {
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </PremiumButton>
+      {/* Modal Edit Password */}
+      {showEditPassword && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+              onClick={() => {
+                setShowEditPassword(false)
+                setOldPassword("")
+                setNewPassword("")
+                setConfirmPassword("")
+                setPasswordError("")
+                setPasswordSuccess("")
+              }}
+              aria-label="Tutup"
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-bold mb-4 text-nude-800">Edit Password</h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault()
+                setPasswordError("")
+                setPasswordSuccess("")
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                  setPasswordError("Semua field wajib diisi.")
+                  return
+                }
+                if (newPassword !== confirmPassword) {
+                  setPasswordError("Password baru dan konfirmasi tidak sama.")
+                  return
+                }
+                setPasswordLoading(true)
+                try {
+                  const res = await fetch("/api/student/update-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ oldPassword, newPassword })
+                  })
+                  const data = await res.json()
+                  if (data.success) {
+                    setPasswordSuccess("Password berhasil diubah.")
+                    setOldPassword("")
+                    setNewPassword("")
+                    setConfirmPassword("")
+                  } else {
+                    setPasswordError(data.message || "Gagal mengubah password.")
+                  }
+                } catch (err) {
+                  setPasswordError("Terjadi kesalahan. Coba lagi nanti.")
+                } finally {
+                  setPasswordLoading(false)
+                }
+              }}
+            >
+              <div className="mb-4">
+                <label className="block text-nude-700 font-medium mb-1">Password Lama</label>
+                <div className="relative">
+                  <input
+                    type={showOld ? "text" : "password"}
+                    className="w-full border rounded px-3 py-2 pr-10"
+                    value={oldPassword}
+                    onChange={e => setOldPassword(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                  <button type="button" className="absolute right-2 top-2 text-gray-400" onClick={() => setShowOld(v => !v)}>
+                    {showOld ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-nude-700 font-medium mb-1">Password Baru</label>
+                <div className="relative">
+                  <input
+                    type={showNew ? "text" : "password"}
+                    className="w-full border rounded px-3 py-2 pr-10"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    autoComplete="new-password"
+                  />
+                  <button type="button" className="absolute right-2 top-2 text-gray-400" onClick={() => setShowNew(v => !v)}>
+                    {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-nude-700 font-medium mb-1">Konfirmasi Password Baru</label>
+                <div className="relative">
+                  <input
+                    type={showConfirm ? "text" : "password"}
+                    className="w-full border rounded px-3 py-2 pr-10"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                  />
+                  <button type="button" className="absolute right-2 top-2 text-gray-400" onClick={() => setShowConfirm(v => !v)}>
+                    {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              {passwordError && <div className="text-red-600 mb-2 text-sm">{passwordError}</div>}
+              {passwordSuccess && <div className="text-green-600 mb-2 text-sm">{passwordSuccess}</div>}
+              <button
+                type="submit"
+                className="w-full bg-gradient-button text-white py-2 rounded font-semibold mt-2 disabled:opacity-60"
+                disabled={passwordLoading}
+              >
+                {passwordLoading ? "Menyimpan..." : "Simpan Password"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
           </div>
         </motion.div>
 
