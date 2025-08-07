@@ -2,16 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { useSession } from "next-auth/react"
-import { redirect } from "next/navigation"
+import { useSession, signOut } from "next-auth/react" // Tambahkan signOut
+import { redirect, useRouter } from "next/navigation" // Tambahkan useRouter
 import Link from "next/link"
 import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button"
-import { User, Target, FileText, Calendar, Check, Edit, CheckCircle, Clock, BookOpen } from "lucide-react"
+import { User, Target, FileText, Calendar, Check, Edit, CheckCircle, Clock, BookOpen, ArrowLeft, LogOut } from "lucide-react" // Tambahkan ArrowLeft dan LogOut
 import type { StudentDashboardData } from "@/types/api"
 
 export default function StudentDashboard() {
   const { data: session, status } = useSession()
+  const router = useRouter() // Inisialisasi useRouter
   const [activeTab, setActiveTab] = useState("profile")
   const [studentData, setStudentData] = useState<StudentDashboardData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -76,9 +77,13 @@ export default function StudentDashboard() {
             <p className="text-white/80">Selamat datang, {siswa.nama}</p>
           </div>
           <div className="flex items-center gap-4">
-            <PremiumButton variant="secondary" size="sm">
-              <Edit className="w-4 h-4" />
-              Edit Profile
+            <PremiumButton onClick={() => router.replace('/')} variant="secondary" size="sm">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Kembali
+            </PremiumButton>
+            <PremiumButton onClick={() => signOut({ callbackUrl: "/auth/student" })} variant="secondary" size="sm">
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
             </PremiumButton>
           </div>
         </motion.div>

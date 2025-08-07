@@ -1,17 +1,32 @@
 import { withAuth } from "next-auth/middleware"
+import { NextResponse } from "next/server"
 
 export default withAuth(
-  function middleware(req) {
-    // Add any additional middleware logic here
+  async function middleware(req) {
+    const { pathname } = req.nextUrl
+    const token = req.nextauth.token
+
+    // Redirect authenticated users from auth/root pages to their dashboard
+    if (token && pathname.startsWith("/auth")) { // Hapus "|| pathname === "/""
+      if (token.role === "ADMIN") {
+        return NextResponse.redirect(new URL("/admin/dashboard", req.url))
+      }
+      if (token.role === "STUDENT") {
+        return NextResponse.redirect(new URL("/student/dashboard", req.url))
+      }
+    }
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl
 
-        // Public routes
-        if (pathname.startsWith("/auth") || pathname === "/") {
+        // Public routes (handled by middleware function directly for redirects)
+        if (pathname.startsWith("/auth")) { // Hapus "|| pathname === "/""
           return true
+        }
+        if (pathname === "/") { // Tambahkan kondisi terpisah untuk "/"
+          return true;
         }
 
         // Admin routes

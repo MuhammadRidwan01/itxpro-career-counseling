@@ -1,9 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { PrismaClient } from '@/generated/prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma' // Import prisma singleton
 
 export async function GET(request: NextRequest) {
   try {
@@ -110,16 +108,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { nisSiswa, tanggalKonseling, hasilText, rekomendasi, rating, kategori } = body
+    const { nisSiswa, tanggalKonseling, hasilText, kategori } = body
 
     // Validasi input
-    if (!nisSiswa || !tanggalKonseling || !hasilText || !rating || !kategori) {
+    if (!nisSiswa || !tanggalKonseling || !hasilText || !kategori) {
       return NextResponse.json({ success: false, message: "Semua field wajib diisi" }, { status: 400 })
-    }
-
-    // Validasi rating
-    if (rating < 1 || rating > 5) {
-      return NextResponse.json({ success: false, message: "Rating harus antara 1-5" }, { status: 400 })
     }
 
     // Validasi siswa exists
@@ -136,8 +129,6 @@ export async function POST(request: NextRequest) {
         nisSiswa,
         tanggalKonseling: new Date(tanggalKonseling),
         hasilText,
-        rekomendasi: rekomendasi || null,
-        rating: Number.parseInt(rating.toString()),
         kategori,
         adminId: session.user.id,
       },

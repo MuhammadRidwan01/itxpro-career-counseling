@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useSession } from "next-auth/react"
-import { redirect, useParams } from "next/navigation"
+import { redirect, useParams, useRouter } from "next/navigation" // Tambahkan useRouter
 import { GlassCard } from "@/components/ui/glass-card"
-import { User, Target, FileText, Calendar, Check, Edit, BookOpen } from "lucide-react"
+import { PremiumButton } from "@/components/ui/premium-button" // Tambahkan PremiumButton
+import { User, Target, FileText, Calendar, Check, Edit, BookOpen, ArrowLeft } from "lucide-react" // Tambahkan ArrowLeft
 import { StudentDashboardData } from "@/types/api"
 
 export default function AdminStudentDetailPage() {
   const { data: session, status } = useSession()
   const params = useParams()
+  const router = useRouter() // Inisialisasi useRouter
   const studentId = params.id as string
 
   const [studentData, setStudentData] = useState<StudentDashboardData | null>(null)
@@ -69,6 +71,12 @@ export default function AdminStudentDetailPage() {
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Detail Siswa (Admin View)</h1>
             <p className="text-white/80">Informasi lengkap tentang {siswa.nama}</p>
+          </div>
+          <div>
+            <PremiumButton onClick={() => router.back()} variant="secondary" size="sm">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Kembali
+            </PremiumButton>
           </div>
         </motion.div>
 

@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { useState, useEffect } from "react" // Tambahkan useEffect
+import { signIn, useSession } from "next-auth/react" // Tambahkan useSession
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { GlassCard } from "@/components/ui/glass-card"
@@ -21,7 +21,14 @@ export default function StudentLogin() {
     remember: false,
   })
   const router = useRouter()
+  const { data: session, status } = useSession() // Dapatkan sesi
 
+  useEffect(() => {
+    if (status === "authenticated" && session.user.role === "STUDENT") {
+      router.push("/student/dashboard") // Alihkan jika sudah login sebagai siswa
+    }
+  }, [session, status, router])
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -33,6 +40,7 @@ export default function StudentLogin() {
         identifier: formData.nisOrEmail,
         password: formData.password,
         redirect: false,
+        revalidate: true, // Tambahkan ini
       })
 
       console.log("Login result:", result)
@@ -42,7 +50,8 @@ export default function StudentLogin() {
         console.log("Login error:", result.error)
       } else {
         toast.success("Login berhasil!")
-        router.push("/student/dashboard")
+        // Pengalihan dilakukan oleh useEffect di atas, atau biarkan NextAuth.js yang menanganinya
+        // router.push("/student/dashboard") // Hapus baris ini
       }
     } catch (error) {
       console.error("Login exception:", error)
