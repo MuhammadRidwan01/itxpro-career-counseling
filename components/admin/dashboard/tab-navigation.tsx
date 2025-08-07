@@ -12,7 +12,7 @@ export function TabNavigation({ activeTab, setActiveTab }: TabNavigationProps) {
   return (
     <div className="mb-6">
       <GlassCard className="p-2">
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hidden">
           {[
             { id: "overview", label: "Overview", icon: BarChart3 },
             { id: "students", label: "Siswa", icon: Users },

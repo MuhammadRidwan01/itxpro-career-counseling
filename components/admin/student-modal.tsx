@@ -111,7 +111,7 @@ export function StudentModal({ isOpen, onClose, onSuccess, student }: StudentMod
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] w-[95%] overflow-y-auto bg-white/95 backdrop-blur-lg sm:w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="w-5 h-5" />

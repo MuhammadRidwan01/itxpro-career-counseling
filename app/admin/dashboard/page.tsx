@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSession, signOut } from "next-auth/react" // Tambahkan signOut
-import { redirect, useRouter } from "next/navigation" // Tambahkan useRouter
+import { useSession, signOut } from "next-auth/react"
+import { redirect, useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
-ArrowLeft, // Tambahkan ArrowLeft
-LogOut, // Tambahkan LogOut
-BarChart3, // Untuk ikon di header
+  ArrowLeft,
+  LogOut,
+  BarChart3,
 } from "lucide-react"
 import { PremiumButton } from "@/components/ui/premium-button"
 import { StatsCards } from "@/components/admin/dashboard/stats-cards"
@@ -19,12 +19,15 @@ import { StudentList } from "@/components/admin/dashboard/student-list"
 import { KonselingList } from "@/components/admin/dashboard/konseling-list"
 import { CareerManagement } from "@/components/admin/dashboard/career-management"
 import { StatisticsView } from "@/components/admin/dashboard/statistics-view"
+import { useToast } from "@/components/ui/use-toast"
 
 interface DashboardStats {
   totalSiswa: number
   totalKonseling: number
   totalTujuanKarir: number
   siswaAktif: number
+  totalKonselingBelumSelesai: number
+  konselingStatsByClass: { [key: string]: { totalStudents: number } } // New
 }
 
 interface Student {
@@ -39,17 +42,17 @@ interface Student {
   createdAt: string
 }
 
+
 interface Konseling {
   id: string
   nisSiswa: string
   tanggalKonseling: string
   hasilText: string
-  deskripsi: string
-  tindakLanjut: string
+  deskripsi?: string
+  tindakLanjut?: string
   status: "SUDAH" | "BELUM"
   kategori: string
-  // kategoriUtama: string; // Hapus ini jika tidak diperlukan di sini
-  // rating: number // Hapus ini jika tidak ada di skema
+  createdAt: string // Add createdAt
   siswa: {
     nama: string
     kelasSaatIni: string
@@ -77,16 +80,20 @@ interface TujuanKarir {
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession()
-  const router = useRouter() // Inisialisasi useRouter
+  const router = useRouter()
+  const { toast } = useToast()
   const [stats, setStats] = useState<DashboardStats>({
     totalSiswa: 0,
     totalKonseling: 0,
     totalTujuanKarir: 0,
     siswaAktif: 0,
+    totalKonselingBelumSelesai: 0,
+    konselingStatsByClass: {}, // Initialize with an empty object
   })
   const [students, setStudents] = useState<Student[]>([])
-  const [konseling, setKonseling] = useState<Konseling[]>([])
-  const [tujuanKarir, setTujuanKarir] = useState<TujuanKarir[]>([]) // New state for career goals
+  const [recentKonseling, setRecentKonseling] = useState<Konseling[]>([])
+  const [recentTujuanKarir, setRecentTujuanKarir] = useState<TujuanKarir[]>([]) // New state for recent tujuan karir
+  const [tujuanKarir, setTujuanKarir] = useState<TujuanKarir[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
 
@@ -98,27 +105,48 @@ export default function AdminDashboard() {
     fetchDashboardData()
   }, [session, status])
 
+  useEffect(() => {
+    if (!loading && stats.totalKonselingBelumSelesai > 0) {
+      toast({
+        title: "Pemberitahuan Konseling",
+        description: `Ada ${stats.totalKonselingBelumSelesai} konseling yang belum selesai.`,
+        variant: "destructive",
+      })
+    }
+  }, [loading, stats.totalKonselingBelumSelesai, toast])
+
   const fetchDashboardData = async () => {
     setLoading(true)
     try {
-      const [statsRes, studentsRes, konselingRes, tujuanKarirRes] = await Promise.all([
+      const [statsRes, studentsRes, recentKonselingRes, recentTujuanKarirRes, tujuanKarirRes, konselingStatsRes] = await Promise.all([
         fetch("/api/admin/dashboard"),
         fetch("/api/admin/siswa"),
-        fetch("/api/admin/konseling"),
-        fetch("/api/admin/tujuan-karir"), // Fetch career goals
+        fetch("/api/admin/konseling?limit=5&orderBy=tanggalKonseling:desc"),
+        fetch("/api/admin/tujuan-karir?limit=5&orderBy=createdAt:desc"), // Fetch recent tujuan karir
+        fetch("/api/admin/tujuan-karir"),
+        fetch("/api/admin/konseling/stats"), // Fetch new konseling stats
       ])
 
-      const [statsData, studentsData, konselingData, tujuanKarirData] = await Promise.all([
+      const [statsData, studentsData, recentKonselingData, recentTujuanKarirData, tujuanKarirData, konselingStatsData] = await Promise.all([
         statsRes.json(),
         studentsRes.json(),
-        konselingRes.json(),
-        tujuanKarirRes.json(), // Parse career goals data
+        recentKonselingRes.json(),
+        recentTujuanKarirRes.json(),
+        tujuanKarirRes.json(),
+        konselingStatsRes.json(), // Parse new konseling stats
       ])
 
-      if (statsData.success) setStats(statsData.data)
+      if (statsData.success) {
+        setStats(prevStats => ({
+          ...prevStats,
+          ...statsData.data.stats,
+          konselingStatsByClass: konselingStatsData.success ? konselingStatsData.data.konselingStatsByClass : {},
+        }));
+      }
       if (studentsData.success) setStudents(studentsData.data.siswa)
-      if (konselingData.success) setKonseling(konselingData.data.konseling)
-      if (tujuanKarirData.success) setTujuanKarir(tujuanKarirData.data) // Set career goals state
+      if (recentKonselingData.success) setRecentKonseling(recentKonselingData.data.konseling)
+      if (recentTujuanKarirData.success) setRecentTujuanKarir(recentTujuanKarirData.data) // Set recent tujuan karir
+      if (tujuanKarirData.success) setTujuanKarir(tujuanKarirData.data)
     } catch (error) {
       console.error("Error fetching dashboard data:", error)
     } finally {
@@ -215,12 +243,12 @@ export default function AdminDashboard() {
             </div>
             <p className="text-slate-600 text-sm">Kelola sistem konseling karir SMK ITXPRO</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col md:flex-row gap-2">
             <PremiumButton onClick={() => router.push('/')} variant="secondary" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Kembali
             </PremiumButton>
-            <PremiumButton onClick={() => signOut({ callbackUrl: "/auth/admin" })} variant="secondary" size="sm">
+            <PremiumButton onClick={() => signOut({ callbackUrl: "/auth/admin" })} variant="secondary" size="sm" className="w-full md:w-auto">
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </PremiumButton>
@@ -228,7 +256,7 @@ export default function AdminDashboard() {
         </motion.div>
 
         {/* Stats Cards */}
-        <StatsCards stats={stats} />
+        <StatsCards stats={stats} totalKonselingBelumSelesai={stats.totalKonselingBelumSelesai} />
 
         {/* Navigation Tabs */}
         <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -240,7 +268,7 @@ export default function AdminDashboard() {
             <QuickActions fetchDashboardData={fetchDashboardData} />
 
             {/* Recent Activity */}
-            <RecentActivity konseling={konseling} />
+            <RecentActivity recentKonseling={recentKonseling} recentTujuanKarir={recentTujuanKarir} />
           </div>
         )}
 
@@ -254,9 +282,7 @@ export default function AdminDashboard() {
 
         {activeTab === "konseling" && (
           <KonselingList
-            konseling={konseling}
             fetchDashboardData={fetchDashboardData}
-            handleDeleteKonseling={handleDeleteKonseling}
           />
         )}
 
@@ -269,7 +295,7 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === "statistics" && (
-          <StatisticsView />
+          <StatisticsView konselingStatsByClass={stats.konselingStatsByClass} />
         )}
       </div>
     </div>

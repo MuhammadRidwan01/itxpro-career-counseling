@@ -127,8 +127,7 @@ exports.Prisma.HasilKonselingScalarFieldEnum = {
   kategori: 'kategori',
   adminId: 'adminId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  rekomendasi: 'rekomendasi'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.TujuanKarirScalarFieldEnum = {
@@ -195,7 +194,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "c:\\Users\\ridwa\\Downloads\\itxpro-career-counseling\\generated\\prisma\\client",
+      "value": "C:\\Users\\ridwa\\Downloads\\itxpro-career-counseling\\generated\\prisma\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -209,7 +208,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "c:\\Users\\ridwa\\Downloads\\itxpro-career-counseling\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\ridwa\\Downloads\\itxpro-career-counseling\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -223,7 +222,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "postinstall": false,
   "inlineDatasources": {
     "db": {

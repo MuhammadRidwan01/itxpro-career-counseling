@@ -14,25 +14,27 @@ interface Konseling {
   nisSiswa: string
   tanggalKonseling: string
   hasilText: string
-  deskripsi: string
-  tindakLanjut: string
+  deskripsi?: string
+  tindakLanjut?: string
   status: "SUDAH" | "BELUM"
   kategori: string
-  siswa: { // Hapus kategoriUtama dan rating
+  createdAt: string // Add createdAt
+  siswa: {
     nama: string
     kelasSaatIni: string
   }
 }
 
 interface KonselingListProps {
-  konseling: Konseling[]
   fetchDashboardData: () => void
-  handleDeleteKonseling: (id: string) => void
 }
 
-export function KonselingList({ konseling, fetchDashboardData, handleDeleteKonseling }: KonselingListProps) {
+export function KonselingList({ fetchDashboardData }: KonselingListProps) {
+  const [konseling, setKonseling] = useState<Konseling[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const debouncedSearchTerm = useDebounce(searchTerm, 500) // Debounce search term
+  const debouncedSearchTerm = useDebounce(searchTerm, 500)
   const [filterKategori, setFilterKategori] = useState("all")
   const [filterStatus, setFilterStatus] = useState("all")
   const [showMobileFilters, setShowMobileFilters] = useState(false)
@@ -40,28 +42,54 @@ export function KonselingList({ konseling, fetchDashboardData, handleDeleteKonse
   const [showKonselingBatchModal, setShowKonselingBatchModal] = useState(false)
   const [selectedKonseling, setSelectedKonseling] = useState<Konseling | null>(null)
 
-  useEffect(() => {
-    // Reset filters when konseling data changes (e.g., after fetchDashboardData)
-    setFilterKategori("all")
-    setFilterStatus("all")
-    setSearchTerm("")
-  }, [konseling])
+  const fetchKonseling = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const queryParams = new URLSearchParams()
+      if (debouncedSearchTerm) queryParams.append("search", debouncedSearchTerm)
+      if (filterKategori !== "all") queryParams.append("kategori", filterKategori)
+      if (filterStatus !== "all") queryParams.append("status", filterStatus)
 
-  const filteredKonseling = konseling.filter(
-    (item) => {
-      const matchesSearch =
-        item.siswa.nama.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        item.nisSiswa.includes(debouncedSearchTerm) ||
-        item.kategori.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-      
-      // Tambahkan kondisi untuk mengatasi kemungkinan perbedaan case atau penulisan "melanjutkan" vs "kuliah"
-      const matchesKategori = filterKategori === "all" || 
-                              (filterKategori.toLowerCase() === "karir" && (item.kategori.toLowerCase() === "karir" || item.kategori.toLowerCase() === "melanjutkan" || item.kategori.toLowerCase() === "kuliah")) ||
-                              (item.kategori.toLowerCase() === filterKategori.toLowerCase())
-      const matchesStatus = filterStatus === "all" || item.status.toLowerCase() === filterStatus.toLowerCase()
-      return matchesSearch && matchesKategori && matchesStatus
+      const response = await fetch(`/api/admin/konseling?${queryParams.toString()}`)
+      const data = await response.json()
+      if (data.success) {
+        setKonseling(data.data.konseling)
+      } else {
+        setError(data.message || "Gagal memuat data konseling.")
+      }
+    } catch (err) {
+      console.error("Error fetching konseling:", err)
+      setError("Terjadi kesalahan saat memuat data konseling.")
+    } finally {
+      setLoading(false)
     }
-  )
+  }
+
+  useEffect(() => {
+    fetchKonseling()
+  }, [debouncedSearchTerm, filterKategori, filterStatus])
+
+  const handleDeleteKonseling = async (id: string) => {
+    if (!confirm("Yakin ingin menghapus konseling ini?")) return;
+
+    try {
+      const response = await fetch(`/api/admin/konseling/${id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        fetchKonseling(); // Re-fetch konseling after deletion
+        fetchDashboardData(); // Update dashboard stats if needed
+      } else {
+        alert(data.message || "Gagal menghapus konseling");
+      }
+    } catch (error) {
+      console.error("Error deleting konseling:", error);
+      alert("Terjadi kesalahan");
+    }
+  };
 
   const konselingKategoris = [
     { label: "Semua Kategori", value: "all" },
@@ -99,7 +127,7 @@ export function KonselingList({ konseling, fetchDashboardData, handleDeleteKonse
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
               <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-              Data Konseling ({filteredKonseling.length})
+              Data Konseling ({konseling.length})
             </h3>
             <div className="flex flex-col sm:flex-row gap-3">
               <PremiumButton
@@ -201,7 +229,7 @@ export function KonselingList({ konseling, fetchDashboardData, handleDeleteKonse
           }}
           className="sm:hidden"
         >
-          {filteredKonseling.map((item) => (
+          {konseling.map((item) => (
             <motion.div
               key={item.id}
               variants={{
@@ -269,7 +297,7 @@ export function KonselingList({ konseling, fetchDashboardData, handleDeleteKonse
               </tr>
             </thead>
             <tbody>
-              {filteredKonseling.map((item) => (
+              {konseling.map((item) => (
                 <tr key={item.id} className="border-b border-white/20 hover:bg-white/10 transition-colors">
                   <td className="py-3 px-4">
                     <div>

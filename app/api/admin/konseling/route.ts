@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
     const limit = Number.parseInt(searchParams.get("limit") || "10")
     const search = searchParams.get("search") || ""
     const kategori = searchParams.get("kategori") || ""
+    const status = searchParams.get("status") || "" // Add status parameter
+    const kelasSaatIni = searchParams.get("kelasSaatIni") || "" // Add kelasSaatIni parameter
     const startDate = searchParams.get("startDate")
     const endDate = searchParams.get("endDate")
 
@@ -52,10 +54,26 @@ export async function GET(request: NextRequest) {
       where.kategori = kategori
     }
 
+    if (status) { // Add status filter
+      where.status = status
+    }
+
     if (startDate && endDate) {
       where.tanggalKonseling = {
         gte: new Date(startDate),
         lte: new Date(endDate),
+      }
+    }
+
+    if (kelasSaatIni) {
+      where.siswa = {
+        kelasSaatIni: kelasSaatIni,
+      }
+    }
+
+    if (kelasSaatIni) {
+      where.siswa = {
+        kelasSaatIni: kelasSaatIni,
       }
     }
 
@@ -108,7 +126,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { nisSiswa, tanggalKonseling, hasilText, kategori } = body
+    const { nisSiswa, tanggalKonseling, hasilText, deskripsi, tindakLanjut, kategori } = body
 
     // Validasi input
     if (!nisSiswa || !tanggalKonseling || !hasilText || !kategori) {
@@ -129,6 +147,8 @@ export async function POST(request: NextRequest) {
         nisSiswa,
         tanggalKonseling: new Date(tanggalKonseling),
         hasilText,
+        deskripsi,
+        tindakLanjut,
         kategori,
         adminId: session.user.id,
       },

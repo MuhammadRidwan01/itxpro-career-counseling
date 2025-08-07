@@ -14,6 +14,7 @@ import {
 import { format } from "date-fns"
 import { id } from "date-fns/locale"
 import { Badge } from "@/components/ui/badge"
+import { KonselingDetailModal } from "@/components/admin/konseling-detail-modal"
 
 interface Student {
   nis: string
@@ -36,6 +37,7 @@ interface Konseling {
   tindakLanjut: string
   status: "SUDAH" | "BELUM"
   kategori: string
+  createdAt: string // Add createdAt
   siswa: {
     nama: string
     kelasSaatIni: string
@@ -74,6 +76,8 @@ export function DetailListModal({ isOpen, onClose, dataType, filterParams }: Det
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showKonselingModal, setShowKonselingModal] = useState(false)
+  const [selectedKonseling, setSelectedKonseling] = useState<Konseling | null>(null)
 
   useEffect(() => {
     if (!isOpen) return
@@ -180,9 +184,18 @@ export function DetailListModal({ isOpen, onClose, dataType, filterParams }: Det
         ))
       case "konseling":
         return (data as Konseling[]).map((item) => (
-          <TableRow key={item.id}>
+          <TableRow
+            key={item.id}
+            className="cursor-pointer hover:bg-gray-100"
+            onClick={() => {
+              setSelectedKonseling(item)
+              setShowKonselingModal(true)
+            }}
+          >
             <TableCell>{item.siswa.nama} ({item.siswa.kelasSaatIni})</TableCell>
-            <TableCell>{format(new Date(item.tanggalKonseling), "dd MMM yyyy", { locale: id })}</TableCell>
+            <TableCell>
+              {item.tanggalKonseling ? format(new Date(item.tanggalKonseling), "dd MMM yyyy", { locale: id }) : "-"}
+            </TableCell>
             <TableCell><Badge>{item.kategori}</Badge></TableCell>
             <TableCell>
               <Badge variant={item.status === "SUDAH" ? "default" : "secondary"}>
@@ -198,9 +211,9 @@ export function DetailListModal({ isOpen, onClose, dataType, filterParams }: Det
             <TableCell>{item.siswa.nama} ({item.siswa.kelasSaatIni})</TableCell>
             <TableCell><Badge>{item.kategoriUtama}</Badge></TableCell>
             <TableCell className="max-w-xs truncate">
-              {item.kategoriUtama === "melanjutkan" && (item.ptn1 || item.jurusan1)}
-              {item.kategoriUtama === "bekerja" && item.detailBekerja}
-              {item.kategoriUtama === "wirausaha" && item.detailWirausaha}
+              {(filterParams.category === "Kuliah" || filterParams.category === "melanjutkan" || !filterParams.category) && item.kategoriUtama === "melanjutkan" && (item.ptn1 || item.jurusan1)}
+              {(filterParams.category === "bekerja" || !filterParams.category) && item.kategoriUtama === "bekerja" && item.detailBekerja}
+              {(filterParams.category === "wirausaha" || !filterParams.category) && item.kategoriUtama === "wirausaha" && item.detailWirausaha}
             </TableCell>
           </TableRow>
         ))
@@ -223,21 +236,33 @@ export function DetailListModal({ isOpen, onClose, dataType, filterParams }: Det
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{getModalTitle()}</DialogTitle>
-        </DialogHeader>
-        <div className="mt-4">
-          <Table>
-            <TableHeader>{renderTableHeaders()}</TableHeader>
-            <TableBody>{renderTableRows()}</TableBody>
-          </Table>
-        </div>
-        <div className="flex justify-end mt-4">
-          <Button onClick={onClose}>Tutup</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{getModalTitle()}</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 overflow-x-auto">
+            <Table>
+              <TableHeader>{renderTableHeaders()}</TableHeader>
+              <TableBody>{renderTableRows()}</TableBody>
+            </Table>
+          </div>
+          <div className="flex justify-end mt-4">
+            <Button onClick={onClose}>Tutup</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {showKonselingModal && (
+        <KonselingDetailModal
+          isOpen={showKonselingModal}
+          onClose={() => {
+            setShowKonselingModal(false)
+            setSelectedKonseling(null) // Clear selected konseling when modal closes
+          }}
+          konseling={selectedKonseling}
+        />
+      )}
+    </>
   )
 }

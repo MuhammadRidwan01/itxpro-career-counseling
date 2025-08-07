@@ -85,9 +85,9 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
 
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
-      student.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (student.nama || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.nis.includes(searchTerm) ||
-      student.kelasSaatIni.toLowerCase().includes(searchTerm.toLowerCase())
+      (student.kelasSaatIni || "").toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesJurusan = filterJurusan === "all" || student.jurusan === filterJurusan
     const matchesAngkatan = filterAngkatan === "all" || student.angkatan.toString() === filterAngkatan
@@ -162,7 +162,7 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] w-[95%] overflow-y-auto bg-white/95 backdrop-blur-lg sm:w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />

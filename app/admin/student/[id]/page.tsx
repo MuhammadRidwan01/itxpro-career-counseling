@@ -6,8 +6,14 @@ import { useSession } from "next-auth/react"
 import { redirect, useParams, useRouter } from "next/navigation" // Tambahkan useRouter
 import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button" // Tambahkan PremiumButton
-import { User, Target, FileText, Calendar, Check, Edit, BookOpen, ArrowLeft } from "lucide-react" // Tambahkan ArrowLeft
+import { User, Target, FileText, Calendar, Check, Edit, BookOpen, ArrowLeft, MessageSquare, List, ClipboardCheck } from "lucide-react" // Tambahkan ArrowLeft
 import { StudentDashboardData } from "@/types/api"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 export default function AdminStudentDetailPage() {
   const { data: session, status } = useSession()
@@ -73,7 +79,7 @@ export default function AdminStudentDetailPage() {
             <p className="text-white/80">Informasi lengkap tentang {siswa.nama}</p>
           </div>
           <div>
-            <PremiumButton onClick={() => router.back()} variant="secondary" size="sm">
+            <PremiumButton onClick={() => router.back()} variant="secondary" size="sm" className="w-full md:w-auto">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Kembali
             </PremiumButton>
@@ -185,50 +191,69 @@ export default function AdminStudentDetailPage() {
 
             {/* Counseling History */}
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Histori Konseling</h2>
-              </div>
-
-              {konselingHistory.length > 0 ? (
-                <div className="space-y-4">
-                  {konselingHistory.map((konseling, index: number) => (
-                    <motion.div
-                      key={konseling.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <GlassCard className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="px-3 py-1 bg-gold-100 text-gold-800 rounded-full text-sm font-medium">
-                                {konseling.kategori}
-                              </span>
-                              <span className="text-nude-600 text-sm">
-                                {new Date(konseling.tanggal).toLocaleDateString("id-ID", {
-                                  day: "numeric",
-                                  month: "long",
-                                  year: "numeric",
-                                })}
-                              </span>
-                            </div>
-                            <p className="text-nude-800 leading-relaxed">{konseling.hasil}</p>
-                          </div>
-                        </div>
-                      </GlassCard>
-                    </motion.div>
-                  ))}
+              <GlassCard className="p-8">
+                <div className="flex items-center gap-2 mb-6">
+                  <MessageSquare className="w-8 h-8 text-gold-500" />
+                  <h2 className="text-2xl font-bold text-nude-800">Histori Konseling</h2>
                 </div>
-              ) : (
-                <GlassCard className="p-12 text-center">
-                  <FileText className="w-16 h-16 text-nude-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-nude-800 mb-2">Belum Ada Konseling</h3>
-                  <p className="text-nude-600">
-                    Siswa ini belum memiliki histori konseling.
-                  </p>
-                </GlassCard>
-              )}
+
+                {konselingHistory.length > 0 ? (
+                  <Accordion type="multiple" className="w-full">
+                    {konselingHistory.map((konseling, index: number) => (
+                      <AccordionItem key={konseling.id} value={konseling.id}>
+                        <AccordionTrigger>
+                          <div className="flex items-center gap-3">
+                            <span className="px-3 py-1 bg-gold-100 text-gold-800 rounded-full text-sm font-medium capitalize">
+                              {konseling.kategori}
+                            </span>
+                            <span className="text-nude-600 text-sm">
+                              {new Date(konseling.tanggal).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-4 p-4 border border-nude-100 rounded-md bg-nude-50">
+                            <div>
+                              <h4 className="font-semibold text-nude-800 flex items-center gap-2 mb-1">
+                                <List className="w-4 h-4 text-gold-600" /> Hasil Konseling:
+                              </h4>
+                              <p className="text-nude-700 leading-relaxed">{konseling.hasil}</p>
+                            </div>
+                            {konseling.deskripsi && (
+                              <div>
+                                <h4 className="font-semibold text-nude-800 flex items-center gap-2 mb-1">
+                                  <BookOpen className="w-4 h-4 text-gold-600" /> Deskripsi:
+                                </h4>
+                                <p className="text-nude-700 leading-relaxed">{konseling.deskripsi}</p>
+                              </div>
+                            )}
+                            {konseling.tindakLanjut && (
+                              <div>
+                                <h4 className="font-semibold text-nude-800 flex items-center gap-2 mb-1">
+                                  <ClipboardCheck className="w-4 h-4 text-gold-600" /> Tindak Lanjut:
+                                </h4>
+                                <p className="text-nude-700 leading-relaxed">{konseling.tindakLanjut}</p>
+                              </div>
+                            )}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                ) : (
+                  <GlassCard className="p-12 text-center">
+                    <FileText className="w-16 h-16 text-nude-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-nude-800 mb-2">Belum Ada Konseling</h3>
+                    <p className="text-nude-600">
+                      Siswa ini belum memiliki histori konseling.
+                    </p>
+                  </GlassCard>
+                )}
+              </GlassCard>
             </div>
           </div>
         </div>

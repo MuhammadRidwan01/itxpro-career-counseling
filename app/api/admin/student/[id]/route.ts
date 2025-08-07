@@ -46,11 +46,13 @@ export async function GET(
         status: siswa.status,
         tujuanKarirSubmitted: siswa.tujuanKarirSubmitted,
       },
-      konselingHistory: siswa.hasilKonseling.map((k: { id: string; tanggalKonseling: Date; kategori: string | null; hasilText: string | null }) => ({
+      konselingHistory: siswa.hasilKonseling.map((k) => ({
         id: k.id,
         tanggal: k.tanggalKonseling,
-        kategori: k.kategori || "N/A", // Provide a default if null
-        hasil: k.hasilText || "N/A", // Provide a default if null
+        kategori: k.kategori || "N/A",
+        hasil: k.hasilText || "N/A",
+        deskripsi: k.deskripsi || null,
+        tindakLanjut: k.tindakLanjut || null,
       })),
       tujuanKarir: siswa.tujuanKarir ? {
         kategoriUtama: siswa.tujuanKarir.kategoriUtama,

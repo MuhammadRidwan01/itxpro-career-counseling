@@ -1,9 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { PrismaClient } from '@/generated/prisma/client'
+import { PrismaClient } from '@prisma/client' // Use @prisma/client directly
 
-const prisma = new PrismaClient()
+// Use a global singleton pattern for PrismaClient
+declare global {
+  var prisma: PrismaClient | undefined
+}
+
+const prisma = global.prisma || new PrismaClient()
+
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma
 
 export async function GET(request: NextRequest) {
   try {
@@ -56,6 +63,7 @@ export async function GET(request: NextRequest) {
       allClasses,
       allKonselingCategories, // New
       allTujuanKarirCategories, // New
+      konselingRecordsWithSiswa, // New: Fetch konseling records with siswa details
     ] = await Promise.all([
       prisma.hasilKonseling.count({ where: { ...dateFilter, ...konselingCategoryFilter } }),
       prisma.hasilKonseling.groupBy({
@@ -142,8 +150,46 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
+      // New query: Fetch konseling records with associated siswa details
+      prisma.hasilKonseling.findMany({
+        where: { ...dateFilter, ...konselingCategoryFilter },
+        select: {
+          nisSiswa: true,
+          siswa: {
+            select: {
+              kelasSaatIni: true,
+            },
+          },
+        },
+      }),
     ])
 
+
+const konselingStatsByClass: {
+      [key: string]: {
+        totalStudents: number;
+      };
+    } = {};
+
+    const uniqueStudentsByClass: {
+      [key: string]: Set<string>;
+    } = {};
+
+    konselingRecordsWithSiswa.forEach((record: { nisSiswa: string; siswa: { kelasSaatIni: string | null } }) => {
+      const kelasSaatIni = record.siswa.kelasSaatIni;
+      if (kelasSaatIni) {
+        if (!uniqueStudentsByClass[kelasSaatIni]) {
+          uniqueStudentsByClass[kelasSaatIni] = new Set();
+        }
+        uniqueStudentsByClass[kelasSaatIni].add(record.nisSiswa);
+      }
+    });
+
+    for (const kelas in uniqueStudentsByClass) {
+      konselingStatsByClass[kelas] = {
+        totalStudents: uniqueStudentsByClass[kelas].size,
+      };
+    }
     const studentsNotSubmittedByClass: {
       [key: string]: {
         students: { nis: string; nama: string }[];
@@ -176,16 +222,17 @@ export async function GET(request: NextRequest) {
         count: item._count.kategori,
       })),
       totalTujuanKarir,
-      tujuanKarirByCategory: tujuanKarirByCategory.map((item) => ({
+      tujuanKarirByCategory: tujuanKarirByCategory.map((item: { kategoriUtama: string | null; _count: { kategoriUtama: number } }) => ({
         category: item.kategoriUtama,
         count: item._count.kategoriUtama,
       })),
       studentsNotSubmittedTujuanKarir: studentsNotSubmittedTujuanKarir.length,
       studentsNotSubmittedDetails: studentsNotSubmittedTujuanKarir,
       studentsNotSubmittedByClass,
-      availableClasses: allClasses.map((c) => c.kelasSaatIni!).filter(Boolean) as string[],
-      availableKonselingCategories: allKonselingCategories.map((c) => c.kategori!).filter(Boolean) as string[],
-      availableTujuanKarirCategories: allTujuanKarirCategories.map((c) => c.kategoriUtama!).filter(Boolean) as string[],
+      availableClasses: allClasses.map((c: { kelasSaatIni: string | null }) => c.kelasSaatIni!).filter(Boolean) as string[],
+      availableKonselingCategories: allKonselingCategories.map((c: { kategori: string | null }) => c.kategori!).filter(Boolean) as string[],
+      availableTujuanKarirCategories: allTujuanKarirCategories.map((c: { kategoriUtama: string | null }) => c.kategoriUtama!).filter(Boolean) as string[],
+      konselingStatsByClass, // Add the new stats
     }
 
     return NextResponse.json({

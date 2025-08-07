@@ -39,7 +39,7 @@ export function StudentList({ students, fetchDashboardData, handleDeleteStudent 
     const matchesSearch =
       student.nama.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) || // Use debounced term
       student.nis.includes(debouncedSearchTerm) || // Use debounced term
-      student.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+      (student.email || "").toLowerCase().includes(debouncedSearchTerm.toLowerCase())
 
     const matchesFilter = filterStatus === "all" || student.status.toLowerCase() === filterStatus.toLowerCase()
 

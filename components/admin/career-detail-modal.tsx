@@ -52,7 +52,7 @@ export function CareerDetailModal({ isOpen, onClose, tujuanKarir }: CareerDetail
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className="sm:max-w-[800px] p-6">
+      <AlertDialogContent className="sm:max-w-[800px] w-[95%] p-6 sm:w-full">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl font-bold text-slate-800">Detail Tujuan Karir</AlertDialogTitle>
           <AlertDialogDescription className="text-slate-600">

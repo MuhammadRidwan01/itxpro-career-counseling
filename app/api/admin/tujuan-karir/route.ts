@@ -5,35 +5,31 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const nisSiswa = searchParams.get("nisSiswa")
+    const limit = searchParams.get("limit") ? Number(searchParams.get("limit")) : undefined
+    const orderBy = searchParams.get("orderBy") || "createdAt:desc" // Default to most recent
 
-    let tujuanKarir
+    let findManyArgs: any = {
+      include: {
+        siswa: {
+          select: {
+            nama: true,
+            kelasSaatIni: true,
+          },
+        },
+      },
+      orderBy: {
+        [orderBy.split(":")[0]]: orderBy.split(":")[1],
+      },
+      take: limit,
+    }
 
     if (nisSiswa) {
-      tujuanKarir = await prisma.tujuanKarir.findMany({
-        where: {
-          nisSiswa: nisSiswa,
-        },
-        include: {
-          siswa: {
-            select: {
-              nama: true,
-              kelasSaatIni: true,
-            },
-          },
-        },
-      })
-    } else {
-      tujuanKarir = await prisma.tujuanKarir.findMany({
-        include: {
-          siswa: {
-            select: {
-              nama: true,
-              kelasSaatIni: true,
-            },
-          },
-        },
-      })
+      findManyArgs.where = {
+        nisSiswa: nisSiswa,
+      }
     }
+
+    const tujuanKarir = await prisma.tujuanKarir.findMany(findManyArgs)
 
     return NextResponse.json({ success: true, data: tujuanKarir })
   } catch (error: any) {

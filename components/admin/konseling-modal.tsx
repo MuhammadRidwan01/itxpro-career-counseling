@@ -17,10 +17,11 @@ interface Konseling {
   nisSiswa: string
   tanggalKonseling: string
   hasilText: string
-  deskripsi: string
-  tindakLanjut: string
+  deskripsi?: string // Make optional
+  tindakLanjut?: string // Make optional
   status: 'SUDAH' | 'BELUM'
   kategori: string
+  createdAt: string // Add createdAt
   siswa: {
     nama: string
     kelasSaatIni: string
@@ -258,10 +259,10 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
                     ) : (
                       students
                         .filter((student) => {
-                          const matchesSearch = 
-                            student.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          const matchesSearch =
+                            (student.nama || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                             student.nis.includes(searchTerm) ||
-                            student.kelasSaatIni.toLowerCase().includes(searchTerm.toLowerCase());
+                            (student.kelasSaatIni || "").toLowerCase().includes(searchTerm.toLowerCase());
                           
                           const matchesJurusan = filterJurusan === "all" || student.jurusan === filterJurusan;
                           const matchesAngkatan = filterAngkatan === "all" || student.angkatan.toString() === filterAngkatan;

@@ -69,11 +69,16 @@ interface StatsData {
   availableClasses: string[]
   availableKonselingCategories: string[]
   availableTujuanKarirCategories: string[]
+  konselingStatsByClass: { [key: string]: { totalStudents: number } } // New
+}
+
+interface StatisticsViewProps {
+  konselingStatsByClass: { [key: string]: { totalStudents: number } }
 }
 
 type DetailModalDataType = "siswa" | "konseling" | "tujuanKarir"
 
-export function StatisticsView() {
+export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -126,13 +131,19 @@ export function StatisticsView() {
   const handleBarClick = (data: any, dataType: DetailModalDataType, categoryKey: string) => {
     setShowDetailModal(true)
     setDetailModalDataType(dataType)
-    setDetailModalFilterParams({ [categoryKey]: data.category })
+    setDetailModalFilterParams({ [categoryKey]: data.payload.category })
   }
 
   const handleClassNotSubmittedClick = (kelas: string) => {
     setShowDetailModal(true)
     setDetailModalDataType("siswa")
     setDetailModalFilterParams({ kelasSaatIni: kelas, tujuanKarirSubmitted: "false" })
+  }
+
+  const handleKonselingClassClick = (data: any) => {
+    setShowDetailModal(true)
+    setDetailModalDataType("konseling") // Change to "konseling"
+    setDetailModalFilterParams({ kelasSaatIni: data.kelas }) // Remove hasKonseling filter
   }
 
   if (loading) {
@@ -346,7 +357,7 @@ export function StatisticsView() {
                     radius={8}
                     fillOpacity={0.6}
                     className="stroke-primary"
-                    onClick={(data) => handleBarClick(data, "konseling", "kategori")}
+                    onClick={(data) => handleBarClick(data, "konseling", "category")}
                   />
                   <ChartLegend content={<ChartLegendContent payload={stats.konselingByCategory.map(item => ({ value: item.category, type: 'square', color: chartConfigKonseling[item.category]?.color }))} />} />
                 </BarChart>
@@ -389,13 +400,61 @@ export function StatisticsView() {
                     radius={8}
                     fillOpacity={0.6}
                     className="stroke-primary"
-                    onClick={(data) => handleBarClick(data, "tujuanKarir", "kategoriUtama")}
+                    onClick={(data) => handleBarClick(data, "tujuanKarir", "category")}
                   />
                   <ChartLegend content={<ChartLegendContent payload={stats.tujuanKarirByCategory.map(item => ({ value: item.category, type: 'square', color: chartConfigTujuanKarir[item.category]?.color }))} />} />
                 </BarChart>
               </ChartContainer>
             ) : (
               <p className="text-center text-muted-foreground">Tidak ada data tujuan karir berdasarkan kategori.</p>
+            )}
+          </CardContent>
+        </Card>
+  
+        <Card>
+          <CardHeader>
+            <CardTitle>Total Konseling per Kelas</CardTitle>
+            <CardDescription>Jumlah siswa yang telah melakukan konseling per kelas.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {Object.keys(konselingStatsByClass).length > 0 ? (
+              <ChartContainer config={{}} className="min-h-[300px] w-full">
+                <BarChart
+                  accessibilityLayer
+                  data={Object.entries(konselingStatsByClass).map(([kelas, data]) => ({
+                    kelas,
+                    totalStudents: data.totalStudents,
+                  }))}
+                >
+                  <XAxis
+                    dataKey="kelas"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    className="text-xs"
+                  />
+                  <YAxis
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    className="text-xs"
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent />}
+                  />
+                  <Bar
+                    dataKey="totalStudents"
+                    fill="hsl(var(--chart-1))"
+                    radius={8}
+                    fillOpacity={0.6}
+                    className="stroke-primary"
+                    onClick={(data) => handleKonselingClassClick(data)}
+                  />
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <p className="text-center text-muted-foreground">Tidak ada data konseling per kelas.</p>
             )}
           </CardContent>
         </Card>

@@ -9,13 +9,26 @@ interface DashboardStats {
   totalKonseling: number
   totalTujuanKarir: number
   siswaAktif: number
+  totalKonselingBelumSelesai: number
+}
+
+interface DashboardStats {
+  totalSiswa: number
+  totalKonseling: number
+  totalTujuanKarir: number
+  siswaAktif: number
+  totalKonselingBelumSelesai: number
 }
 
 interface StatsCardsProps {
-  stats: DashboardStats
+  stats: DashboardStats;
+  totalKonselingBelumSelesai: number;
 }
 
-export function StatsCards({ stats }: StatsCardsProps) {
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Terminal } from "lucide-react"
+
+export function StatsCards({ stats, totalKonselingBelumSelesai }: StatsCardsProps) {
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
@@ -34,6 +47,17 @@ export function StatsCards({ stats }: StatsCardsProps) {
       }}
       className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
     >
+      {totalKonselingBelumSelesai > 0 && (
+        <motion.div variants={cardVariants} className="lg:col-span-4 col-span-2">
+          <Alert variant="destructive">
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Pemberitahuan Konseling</AlertTitle>
+            <AlertDescription>
+              Ada {totalKonselingBelumSelesai} konseling yang belum selesai.
+            </AlertDescription>
+          </Alert>
+        </motion.div>
+      )}
       <motion.div variants={cardVariants}>
         <GlassCard hover className="p-6">
           <div className="flex items-center justify-between">

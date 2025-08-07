@@ -1,9 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { PrismaClient } from '@/generated/prisma/client'
+import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+// Use a global singleton pattern for PrismaClient
+declare global {
+  var prisma: PrismaClient | undefined
+}
+
+const prisma = global.prisma || new PrismaClient()
+
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,7 +55,7 @@ export async function GET(request: NextRequest) {
         break
       case "konseling":
         const konselingWhere: any = {}
-        if (category) konselingWhere.kategori = category
+        if (category) konselingWhere.kategori = { equals: category, mode: "insensitive" } // Case-insensitive
         if (nis) konselingWhere.nisSiswa = nis
         if (kelasSaatIni) konselingWhere.siswa = { kelasSaatIni: kelasSaatIni }
 
@@ -67,7 +74,13 @@ export async function GET(request: NextRequest) {
         break
       case "tujuanKarir":
         const tujuanKarirWhere: any = {}
-        if (category) tujuanKarirWhere.kategoriUtama = category
+        if (category) {
+          // Handle "Kuliah" mapping to "melanjutkan" for consistency with frontend
+          tujuanKarirWhere.kategoriUtama = {
+            equals: category === "Kuliah" ? "melanjutkan" : category,
+            mode: "insensitive",
+          }
+        }
         if (nis) tujuanKarirWhere.nisSiswa = nis
         if (kelasSaatIni) tujuanKarirWhere.siswa = { kelasSaatIni: kelasSaatIni }
 

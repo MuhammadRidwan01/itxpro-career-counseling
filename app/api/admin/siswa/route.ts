@@ -18,6 +18,7 @@ export async function GET(request: Request) {
     const limit = getAllData ? undefined : Number.parseInt(searchParams.get("limit") || "100") // Meningkatkan default limit
     const status = searchParams.get("status")
     const angkatan = searchParams.get("angkatan")
+    const hasKonseling = searchParams.get("hasKonseling")
 
     const where: any = {}
 
@@ -35,6 +36,12 @@ export async function GET(request: Request) {
 
     if (angkatan) {
       where.angkatan = Number.parseInt(angkatan)
+    }
+
+    if (hasKonseling === "true") {
+      where.hasilKonseling = {
+        some: {}, // Ensures the student has at least one konseling record
+      }
     }
 
     const [siswa, total] = await Promise.all([
