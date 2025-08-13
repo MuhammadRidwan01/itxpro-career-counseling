@@ -38,8 +38,8 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
   const [formData, setFormData] = useState({
     tanggalKonseling: new Date().toISOString().split("T")[0],
     hasilText: "",
-    rekomendasi: "",
-    rating: 5,
+    deskripsi: "",
+    tindakLanjut: "",
     kategori: "akademik",
   })
 
@@ -59,8 +59,8 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
       setFormData({
         tanggalKonseling: new Date().toISOString().split("T")[0],
         hasilText: "",
-        rekomendasi: "",
-        rating: 5,
+        deskripsi: "",
+        tindakLanjut: "",
         kategori: "akademik",
       })
       setError("")
@@ -355,28 +355,6 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="rating" className="flex items-center gap-2">
-                  <Star className="w-4 h-4" />
-                  Rating (1-5)
-                </Label>
-                <Select
-                  value={formData.rating.toString()}
-                  onValueChange={(value) => setFormData({ ...formData, rating: Number.parseInt(value) })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih rating" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1 - Sangat Kurang</SelectItem>
-                    <SelectItem value="2">2 - Kurang</SelectItem>
-                    <SelectItem value="3">3 - Cukup</SelectItem>
-                    <SelectItem value="4">4 - Baik</SelectItem>
-                    <SelectItem value="5">5 - Sangat Baik</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
             <div className="space-y-2">
@@ -395,18 +373,33 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="rekomendasi" className="flex items-center gap-2">
-                <Target className="w-4 h-4" />
-                Rekomendasi
+              <Label htmlFor="deskripsi" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Deskripsi
               </Label>
               <Textarea
-                id="rekomendasi"
-                value={formData.rekomendasi}
-                onChange={(e) => setFormData({ ...formData, rekomendasi: e.target.value })}
-                placeholder="Tuliskan rekomendasi yang akan diterapkan untuk semua siswa yang dipilih..."
+                id="deskripsi"
+                value={formData.deskripsi}
+                onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
+                placeholder="Tuliskan deskripsi konseling (opsional)..."
                 rows={3}
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tindakLanjut" className="flex items-center gap-2">
+                <Target className="w-4 h-4" />
+                Tindak Lanjut
+              </Label>
+              <Textarea
+                id="tindakLanjut"
+                value={formData.tindakLanjut}
+                onChange={(e) => setFormData({ ...formData, tindakLanjut: e.target.value })}
+                placeholder="Tuliskan tindak lanjut konseling (opsional)..."
+                rows={3}
+              />
+            </div>
+
 
             <div className="flex justify-end gap-3">
               <Button type="button" variant="outline" onClick={() => setStep("select")}>

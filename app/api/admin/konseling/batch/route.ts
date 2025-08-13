@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
 
 interface SessionUser {
   id: string
@@ -22,12 +23,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { siswaList, tanggalKonseling, hasilText, rekomendasi, rating, kategori } = body as {
+    const { siswaList, tanggalKonseling, hasilText, deskripsi, tindakLanjut, kategori } = body as {
       siswaList: string[]
       tanggalKonseling: string
       hasilText: string
-      rekomendasi?: string
-      rating: string
+      deskripsi?: string
+      tindakLanjut?: string
       kategori: string
     }
 
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: "Daftar siswa tidak boleh kosong" }, { status: 400 })
     }
 
-    if (!tanggalKonseling || !hasilText || !kategori || !rating) {
+    if (!tanggalKonseling || !hasilText || !kategori) {
       return NextResponse.json({ success: false, message: "Semua field wajib diisi" }, { status: 400 })
     }
 
@@ -67,10 +68,11 @@ export async function POST(request: NextRequest) {
       nisSiswa: nis,
       tanggalKonseling: new Date(tanggalKonseling),
       hasilText,
-      rating: Number.parseInt(rating as string),
       kategori,
       adminId: session.user.id,
-      ...(rekomendasi ? { rekomendasi } : {})
+      status: "BELUM", // Set default status as per model
+      ...(deskripsi ? { deskripsi } : {}),
+      ...(tindakLanjut ? { tindakLanjut } : {}),
     }))
 
     // Insert batch konseling

@@ -429,15 +429,17 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
               Batal
             </Button>
             <Button 
-              type="submit" 
-              disabled={loading || !formData.nisSiswa} 
-              className="bg-gold-600 hover:bg-gold-700 text-white px-8"
+              type="submit"
+              disabled={loading || !formData.nisSiswa}
+              className={`${isEdit && formData.status === "SUDAH" ? "bg-green-600 hover:bg-green-700" : "bg-gold-600 hover:bg-gold-700"} text-white px-8`}
             >
               {loading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   <span>Menyimpan...</span>
                 </div>
+              ) : isEdit && formData.status === "SUDAH" ? (
+                "Selesaikan Konseling"
               ) : isEdit ? (
                 "Update Konseling"
               ) : (
