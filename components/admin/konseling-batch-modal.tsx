@@ -29,11 +29,11 @@ interface KonselingBatchModalProps {
 }
 
 export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBatchModalProps) {
-  const [students, setStudents] = useState<Student[]>([])
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterJurusan, setFilterJurusan] = useState("all")
-  const [filterAngkatan, setFilterAngkatan] = useState("all")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterJurusan, setFilterJurusan] = useState("all");
+  const [filterAngkatan, setFilterAngkatan] = useState("all");
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     tanggalKonseling: new Date().toISOString().split("T")[0],
@@ -41,63 +41,81 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
     deskripsi: "",
     tindakLanjut: "",
     kategori: "akademik",
-  })
+  });
 
-  const [loading, setLoading] = useState(false)
-  const [loadingStudents, setLoadingStudents] = useState(false)
-  const [error, setError] = useState("")
-  const [step, setStep] = useState<"select" | "form" | "processing">("select")
+  const [loading, setLoading] = useState(false);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [error, setError] = useState("");
+  const [step, setStep] = useState<"select" | "form" | "processing">("select");
+
+  // Fetch students based on filters
+  const fetchStudents = async () => {
+    setLoadingStudents(true);
+    try {
+      const params = new URLSearchParams({
+        search: searchTerm,
+        status: "AKTIF", // Always fetch active students
+        all: "true" // Fetch all data to ensure search works across all students
+      });
+
+      if (filterJurusan !== "all") {
+        params.append("jurusan", filterJurusan);
+      }
+      if (filterAngkatan !== "all") {
+        params.append("angkatan", filterAngkatan);
+      }
+
+      const response = await fetch(`/api/admin/siswa?${params.toString()}`);
+      const data = await response.json();
+      if (data.success) {
+        setStudents(data.data.siswa);
+      }
+    } catch (error) {
+      console.error("Error fetching students:", error);
+      setError("Gagal memuat data siswa");
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
-      fetchStudents()
-      setStep("select")
-      setSelectedStudents([])
-      setSearchTerm("")
-      setFilterJurusan("all")
-      setFilterAngkatan("all")
+      fetchStudents();
+      setStep("select");
+      setSelectedStudents([]);
+      setSearchTerm("");
+      setFilterJurusan("all");
+      setFilterAngkatan("all");
       setFormData({
         tanggalKonseling: new Date().toISOString().split("T")[0],
         hasilText: "",
         deskripsi: "",
         tindakLanjut: "",
         kategori: "akademik",
-      })
-      setError("")
+      });
+      setError("");
     }
-  }, [isOpen])
+  }, [isOpen]);
 
-  const fetchStudents = async () => {
-    setLoadingStudents(true)
-    try {
-      const response = await fetch("/api/admin/siswa")
-      const data = await response.json()
-      if (data.success) {
-        setStudents(data.data.siswa.filter((s: Student) => s.status === "AKTIF"))
+  useEffect(() => {
+    // Re-fetch students when search term or filters change
+    const debounceFetch = setTimeout(() => {
+      if (isOpen) { // Only fetch if modal is open
+        fetchStudents();
       }
-    } catch (error) {
-      console.error("Error fetching students:", error)
-      setError("Gagal memuat data siswa")
-    } finally {
-      setLoadingStudents(false)
-    }
-  }
+    }, 300); // Debounce for 300ms
 
-  const filteredStudents = students.filter((student) => {
-    const matchesSearch =
-      (student.nama || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.nis.includes(searchTerm) ||
-      (student.kelasSaatIni || "").toLowerCase().includes(searchTerm.toLowerCase())
-
-    const matchesJurusan = filterJurusan === "all" || student.jurusan === filterJurusan
-    const matchesAngkatan = filterAngkatan === "all" || student.angkatan.toString() === filterAngkatan
-
-    return matchesSearch && matchesJurusan && matchesAngkatan
-  })
+    return () => clearTimeout(debounceFetch);
+  }, [searchTerm, filterJurusan, filterAngkatan, isOpen]); // Added isOpen to the dependency array
 
   const handleStudentToggle = (nis: string) => {
-    setSelectedStudents((prev) => (prev.includes(nis) ? prev.filter((id) => id !== nis) : [...prev, nis]))
-  }
+    setSelectedStudents((prev) =>
+      prev.includes(nis) ? prev.filter((id) => id !== nis) : [...prev, nis]
+    );
+  };
+
+  // Filtered students are now directly from the `students` state, as backend handles filtering
+  const filteredStudents = students;
 
   const handleSelectAll = () => {
     if (selectedStudents.length === filteredStudents.length) {

@@ -1,13 +1,13 @@
 "use client"
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
 import { Search, Filter, Edit, Trash2, Plus, X } from "lucide-react"
 import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button"
 import { StudentModal } from "@/components/admin/student-modal"
-import { useState, useEffect } from "react"
+import { useState } from "react" // Removed useEffect as it's handled by parent
 import { motion } from "framer-motion"
-import { useDebounce } from "@/hooks/use-debounce"
+// Removed useDebounce as it's handled by parent
 
 interface Student {
   nis: string
@@ -23,28 +23,41 @@ interface Student {
 
 interface StudentListProps {
   students: Student[]
-  fetchDashboardData: () => void
+  fetchDashboardData: () => void // This will now trigger parent's fetch
   handleDeleteStudent: (nis: string) => void
+  // New props for search and filters
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  filterStatus: string;
+  setFilterStatus: (status: string) => void;
+  filterJurusan: string; // Added
+  setFilterJurusan: (jurusan: string) => void; // Added
+  filterAngkatan: string; // Added
+  setFilterAngkatan: (angkatan: string) => void; // Added
+  loadingStudents: boolean; // Added
 }
 
-export function StudentList({ students, fetchDashboardData, handleDeleteStudent }: StudentListProps) {
-  const [searchTerm, setSearchTerm] = useState("")
-  const debouncedSearchTerm = useDebounce(searchTerm, 500) // Debounce search term
-  const [filterStatus, setFilterStatus] = useState("all")
+export function StudentList({
+  students,
+  fetchDashboardData,
+  handleDeleteStudent,
+  searchTerm,
+  setSearchTerm,
+  filterStatus,
+  setFilterStatus,
+  filterJurusan,
+  setFilterJurusan,
+  filterAngkatan,
+  setFilterAngkatan,
+  loadingStudents,
+}: StudentListProps) {
+  // Removed local state for searchTerm, filterStatus, debouncedSearchTerm
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [showStudentModal, setShowStudentModal] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
 
-  const filteredStudents = students.filter((student) => {
-    const matchesSearch =
-      student.nama.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) || // Use debounced term
-      student.nis.includes(debouncedSearchTerm) || // Use debounced term
-      (student.email || "").toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-
-    const matchesFilter = filterStatus === "all" || student.status.toLowerCase() === filterStatus.toLowerCase()
-
-    return matchesSearch && matchesFilter
-  })
+  // filteredStudents is now simply the students prop, as filtering is done by parent/backend
+  const filteredStudents = students;
 
   const studentStatuses = [
     { label: "Semua", value: "all" },
@@ -52,6 +65,11 @@ export function StudentList({ students, fetchDashboardData, handleDeleteStudent 
     { label: "Alumni", value: "ALUMNI" },
     { label: "Pindah", value: "PINDAH" },
   ]
+  
+  // Add unique jurusan and angkatan from the students prop for filters
+  const uniqueJurusan = [...new Set(students.map((s) => s.jurusan))].filter(jurusan => jurusan && jurusan.trim() !== '');
+  const uniqueAngkatan = [...new Set(students.map((s) => s.angkatan))].sort((a, b) => b - a);
+
 
   return (
     <>
@@ -123,6 +141,33 @@ export function StudentList({ students, fetchDashboardData, handleDeleteStudent 
                   </PremiumButton>
                 ))}
               </div>
+              {/* Jurusan and Angkatan Filters (New) */}
+              <Select value={filterJurusan} onValueChange={setFilterJurusan}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Semua Jurusan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Jurusan</SelectItem>
+                  {uniqueJurusan.map((jurusan) => (
+                    <SelectItem key={jurusan} value={jurusan}>
+                      {jurusan}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterAngkatan} onValueChange={setFilterAngkatan}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Semua Angkatan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Angkatan</SelectItem>
+                  {uniqueAngkatan.map((angkatan) => (
+                    <SelectItem key={angkatan} value={angkatan.toString()}>
+                      {angkatan}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -225,63 +270,74 @@ export function StudentList({ students, fetchDashboardData, handleDeleteStudent 
               </tr>
             </thead>
             <tbody>
-              {filteredStudents.map((student) => (
-                <tr key={student.nis} className="border-b border-white/20 hover:bg-white/10 transition-colors">
-                  <td className="py-3 px-4 text-sm text-slate-800 font-mono">{student.nis}</td>
-                  <td className="py-3 px-4 text-sm text-slate-800 font-medium">
-                    <Link href={`/admin/student/${student.nis}`} className="hover:underline">
-                      {student.nama}
-                    </Link>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-slate-600">{student.kelasSaatIni}</td>
-                  <td className="py-3 px-4 text-sm text-slate-600">{student.jurusan}</td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        student.status === "AKTIF"
-                          ? "bg-green-100 text-green-700"
-                          : student.status === "ALUMNI"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {student.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        student.tujuanKarirSubmitted
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
-                      {student.tujuanKarirSubmitted ? "Sudah" : "Belum"}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-1">
-                      <PremiumButton
-                        onClick={() => {
-                          setSelectedStudent(student)
-                          setShowStudentModal(true)
-                        }}
-                        variant="ghost"
-                        size="sm"
-                      >
-                        <Edit className="w-4 h-4 text-slate-600" />
-                      </PremiumButton>
-                      <PremiumButton
-                        onClick={() => handleDeleteStudent(student.nis)}
-                        variant="ghost"
-                        size="sm"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </PremiumButton>
+              {loadingStudents ? (
+                <tr>
+                  <td colSpan={7} className="py-4 text-center">
+                    <div className="animate-pulse flex flex-col items-center">
+                      <div className="h-4 w-3/4 bg-gray-300 rounded mb-2"></div>
+                      <div className="h-4 w-1/2 bg-gray-300 rounded"></div>
                     </div>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredStudents.map((student) => (
+                  <tr key={student.nis} className="border-b border-white/20 hover:bg-white/10 transition-colors">
+                    <td className="py-3 px-4 text-sm text-slate-800 font-mono">{student.nis}</td>
+                    <td className="py-3 px-4 text-sm text-slate-800 font-medium">
+                      <Link href={`/admin/student/${student.nis}`} className="hover:underline">
+                        {student.nama}
+                      </Link>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-slate-600">{student.kelasSaatIni}</td>
+                    <td className="py-3 px-4 text-sm text-slate-600">{student.jurusan}</td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          student.status === "AKTIF"
+                            ? "bg-green-100 text-green-700"
+                            : student.status === "ALUMNI"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {student.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          student.tujuanKarirSubmitted
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
+                        {student.tujuanKarirSubmitted ? "Sudah" : "Belum"}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-1">
+                        <PremiumButton
+                          onClick={() => {
+                            setSelectedStudent(student)
+                            setShowStudentModal(true)
+                          }}
+                          variant="ghost"
+                          size="sm"
+                        >
+                          <Edit className="w-4 h-4 text-slate-600" />
+                        </PremiumButton>
+                        <PremiumButton
+                          onClick={() => handleDeleteStudent(student.nis)}
+                          variant="ghost"
+                          size="sm"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </PremiumButton>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

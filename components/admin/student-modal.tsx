@@ -198,9 +198,6 @@ export function StudentModal({ isOpen, onClose, onSuccess, student }: StudentMod
                   <SelectItem value="RPL">Rekayasa Perangkat Lunak</SelectItem>
                   <SelectItem value="TKJ">Teknik Komputer dan Jaringan</SelectItem>
                   <SelectItem value="DKV">Desain Komunikasi Visual</SelectItem>
-                  <SelectItem value="MM">Multimedia</SelectItem>
-                  <SelectItem value="OTKP">Otomatisasi dan Tata Kelola Perkantoran</SelectItem>
-                  <SelectItem value="AKL">Akuntansi dan Keuangan Lembaga</SelectItem>
                 </SelectContent>
               </Select>
             </div>

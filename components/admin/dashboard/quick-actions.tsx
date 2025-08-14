@@ -1,10 +1,11 @@
 "use client"
 
-import { UserPlus, Plus, UsersIcon } from "lucide-react"
+import { UserPlus, Plus, UsersIcon, UploadCloud } from "lucide-react"
 import { GlassCard } from "@/components/ui/glass-card"
 import { StudentModal } from "@/components/admin/student-modal"
 import { KonselingModal } from "@/components/admin/konseling-modal"
 import { KonselingBatchModal } from "@/components/admin/konseling-batch-modal"
+import { ImportStudentModal } from "@/components/admin/import-student-modal-component" // Import new modal
 import { useState } from "react"
 
 interface QuickActionsProps {
@@ -15,6 +16,7 @@ export function QuickActions({ fetchDashboardData }: QuickActionsProps) {
   const [showStudentModal, setShowStudentModal] = useState(false)
   const [showKonselingModal, setShowKonselingModal] = useState(false)
   const [showKonselingBatchModal, setShowKonselingBatchModal] = useState(false)
+  const [showImportStudentModal, setShowImportStudentModal] = useState(false) // New state - set to false by default
 
   return (
     <>
@@ -30,6 +32,16 @@ export function QuickActions({ fetchDashboardData }: QuickActionsProps) {
               <UserPlus className="w-4 h-4 text-white" />
             </div>
             <span className="font-medium text-slate-700">Tambah Siswa</span>
+          </button>
+
+          <button
+            onClick={() => setShowImportStudentModal(true)} // Button to open import modal
+            className="w-full flex items-center gap-3 p-3 bg-white/10 rounded-lg border-l-4 border-blue-500" // Use blue for import
+          >
+            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+              <UploadCloud className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-medium text-slate-700">Import Siswa (CSV)</span>
           </button>
 
           <button
@@ -72,6 +84,13 @@ export function QuickActions({ fetchDashboardData }: QuickActionsProps) {
       <KonselingBatchModal
         isOpen={showKonselingBatchModal}
         onClose={() => setShowKonselingBatchModal(false)}
+        onSuccess={fetchDashboardData}
+      />
+
+      {/* New Import Student Modal */}
+      <ImportStudentModal
+        isOpen={showImportStudentModal}
+        onClose={() => setShowImportStudentModal(false)}
         onSuccess={fetchDashboardData}
       />
     </>
