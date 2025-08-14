@@ -226,3 +226,66 @@ graph TD
     C --> D[Display Counseling History];
     B --> E[Fetch Career Goal Status];
     E --> F[Display Career Goal Status];
+```
+
+## VI. Entity-Relationship Diagram (ERD)
+
+```mermaid
+erDiagram
+    USERS {
+        text id PK
+        text email
+        text password
+        Role role
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    SISWA {
+        varchar nis PK
+        text nama
+        text email
+        text kelasSaatIni
+        integer angkatan
+        text jurusan
+        Status status
+        integer tahunLulusTarget
+        boolean tujuanKarirSubmitted
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    HASIL_KONSELING {
+        text id PK
+        varchar nisSiswa FK "SISWA.nis"
+        timestamp tanggalKonseling
+        text hasilText
+        text deskripsi
+        text tindakLanjut
+        StatusKonseling status
+        text kategori
+        text adminId FK "USERS.id"
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    TUJUAN_KARIR {
+        text id PK
+        varchar nisSiswa FK "SISWA.nis"
+        text kategoriUtama
+        text ptn1
+        text jurusan1
+        text ptn2
+        text jurusan2
+        text ptn3
+        text jurusan3
+        text detailBekerja
+        text detailWirausaha
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    USERS ||--o{ HASIL_KONSELING : records
+    SISWA ||--o{ HASIL_KONSELING : has
+    SISWA ||--|{ TUJUAN_KARIR : submits
+    USERS ||--|{ SISWA : "is_associated_with"

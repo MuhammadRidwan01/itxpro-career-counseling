@@ -15,7 +15,8 @@ export async function GET(request: Request) {
     const search = searchParams.get("search") || ""
     const getAllData = searchParams.get("all") === "true"
     const page = getAllData ? 1 : Number.parseInt(searchParams.get("page") || "1")
-    const limit = getAllData ? undefined : Number.parseInt(searchParams.get("limit") || "100") // Meningkatkan default limit
+    const limitParam = searchParams.get("limit")
+    const limit = getAllData ? undefined : (limitParam ? Number.parseInt(limitParam) : undefined)
     const status = searchParams.get("status")
     const angkatan = searchParams.get("angkatan")
     const hasKonseling = searchParams.get("hasKonseling")
@@ -44,37 +45,40 @@ export async function GET(request: Request) {
       }
     }
 
-    const [siswa, total] = await Promise.all([
-      prisma.siswa.findMany({
-        where,
-        ...(getAllData ? {} : {
-          skip: (page - 1) * (limit || 100),
-          take: limit,
-        }),
-        orderBy: { createdAt: "desc" },
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              createdAt: true,
-            },
-          },
-          tujuanKarir: {
-            select: {
-              kategoriUtama: true,
-            },
-          },
-          hasilKonseling: {
-            select: {
-              id: true,
-              tanggalKonseling: true,
-            },
-            orderBy: { tanggalKonseling: "desc" },
-            take: 1,
+    const findManyOptions: any = {
+      where,
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            createdAt: true,
           },
         },
-      }),
+        tujuanKarir: {
+          select: {
+            kategoriUtama: true,
+          },
+        },
+        hasilKonseling: {
+          select: {
+            id: true,
+            tanggalKonseling: true,
+          },
+          orderBy: { tanggalKonseling: "desc" },
+          take: 1,
+        },
+      },
+    }
+
+    if (!getAllData && limit !== undefined) {
+      findManyOptions.skip = (page - 1) * limit
+      findManyOptions.take = limit
+    }
+
+    const [siswa, total] = await Promise.all([
+      prisma.siswa.findMany(findManyOptions),
       prisma.siswa.count({ where }),
     ])
 
@@ -82,12 +86,12 @@ export async function GET(request: Request) {
       success: true,
       data: {
         siswa,
-        ...(getAllData ? {} : {
+        ...(getAllData || limit === undefined ? {} : { // Only show pagination if not getting all data and limit is defined
           pagination: {
             page,
-            limit: limit || 100,
+            limit: limit,
             total,
-            totalPages: Math.ceil(total / (limit || 100)),
+            totalPages: Math.ceil(total / limit),
           },
         }),
       },
