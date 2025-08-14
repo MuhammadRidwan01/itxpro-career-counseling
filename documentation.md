@@ -53,9 +53,19 @@ This section details the secure access mechanisms for both user roles within the
 The administrative module provides comprehensive tools for managing counseling processes and student data.
 
 *   **Dashboard:**
-    *   **Purpose:** Provides a centralized overview of key metrics and activities related to counseling and student career goals.
-    *   **Functionality:** Displays statistics such as total counseling sessions, career goal distribution, monthly counseling trends, and student batch distribution. Includes quick actions, recent activity logs, and lists of students and counseling sessions.
-    *   **Key Components:** [`app/admin/dashboard/page.tsx`](app/admin/dashboard/page.tsx) (frontend), [`app/api/admin/dashboard/route.ts`](app/api/admin/dashboard/route.ts) (backend API for statistics), various components in `components/admin/dashboard/`.
+    *   **Purpose:** Provides a centralized overview of key metrics and activities related to counseling and student career goals, enabling administrators to quickly grasp the overall status and identify areas requiring attention.
+    *   **Functionality:** Displays a variety of statistics and summaries, including:
+        *   **Total Counseling Sessions:** A count of all counseling sessions recorded in the system.
+        *   **Counseling Session Trends:** Monthly breakdown of counseling sessions, showing activity over time.
+        *   **Career Goal Distribution:** Visual representation of students' primary career aspirations, categorized for easy analysis.
+        *   **Student Batch Distribution:** Breakdown of students by their current class or batch, providing demographic insights.
+        *   **Students Not Submitted Career Goals:** A list and count of students who have not yet submitted their career goals, allowing for targeted follow-ups.
+        *   **Counseling Statistics by Class:** Metrics on counseling engagement per class, showing the number of unique students counseled.
+        *   **Quick Actions:** Shortcuts to frequently used administrative tasks, such as adding a new counseling record or importing student data.
+        *   **Recent Activity:** A log of recent interactions and changes within the system, providing an audit trail.
+        *   **Student List Overview:** A summarized list of registered students.
+        *   **Counseling List Overview:** A summarized list of counseling sessions.
+    *   **Key Components:** [`app/admin/dashboard/page.tsx`](app/admin/dashboard/page.tsx) (frontend dashboard page), [`app/api/admin/dashboard/route.ts`](app/api/admin/dashboard/route.ts) (backend API for fetching general dashboard statistics), [`app/api/admin/konseling/stats/route.ts`](app/api/admin/konseling/stats/route.ts) (backend API for comprehensive counseling and career goal statistics), various UI components in `components/admin/dashboard/` (e.g., `StatisticsCard`, `StatisticsView`, `KonselingList`, `StudentList`, `QuickActions`, `RecentActivity`, `CareerManagement`).
 
 *   **Student Management:**
     *   **Purpose:** Facilitates the administration and management of student records.
@@ -87,9 +97,11 @@ The administrative module provides comprehensive tools for managing counseling p
 The student module offers personalized features for career planning and tracking.
 
 *   **Dashboard:**
-    *   **Purpose:** Provides students with a personalized overview of their career counseling journey.
-    *   **Functionality:** Displays a history of their counseling sessions.
-    *   **Key Components:** [`app/student/dashboard/page.tsx`](app/student/dashboard/page.tsx) (frontend), [`app/api/student/dashboard/route.ts`](app/api/student/dashboard/route.ts) (backend API for counseling history).
+    *   **Purpose:** Serves as the student's personalized homepage, providing a quick overview of their counseling journey and career goal status.
+    *   **Functionality:**
+        *   **Counseling History:** Displays a chronological record of all past counseling sessions the student has participated in, including dates, outcomes, and any follow-up actions.
+        *   **Career Goal Status:** Shows whether the student has submitted their career goals, and provides a direct link to the career goal submission/viewing page.
+    *   **Key Components:** [`app/student/dashboard/page.tsx`](app/student/dashboard/page.tsx) (frontend dashboard page), [`app/api/student/dashboard/route.ts`](app/api/student/dashboard/route.ts) (backend API for fetching student-specific dashboard data, including counseling history and career goal status).
 
 *   **Career Goal Management:**
     *   **Purpose:** Enables students to define, submit, and review their career aspirations.
