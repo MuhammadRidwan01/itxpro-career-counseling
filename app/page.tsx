@@ -114,7 +114,7 @@ export default function LandingPage() {
                   <Users className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-nude-800 mb-4">Portal Siswa</h3>
-                <p className="text-nude-600 mb-6">Akses profil, input tujuan karir, dan lihat histori konseling</p>
+                <p className="text-white/80 mb-6">Akses profil, input tujuan karir, dan lihat histori konseling</p>
                 <PremiumButton className="w-full" onClick={() => (window.location.href = "/auth/student")}>
                   Masuk Sebagai Siswa
                   <ChevronRight className="w-4 h-4" />
@@ -126,7 +126,7 @@ export default function LandingPage() {
                   <BookOpen className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-nude-800 mb-4">Portal Guru BK</h3>
-                <p className="text-nude-600 mb-6">Kelola data siswa, input konseling, dan analisis progress</p>
+                <p className="text-white/80 mb-6">Kelola data siswa, input konseling, dan analisis progress</p>
                 <PremiumButton
                   variant="secondary"
                   className="w-full"
@@ -166,8 +166,8 @@ export default function LandingPage() {
                   <div className="w-12 h-12 bg-gradient-button rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <feature.icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-nude-800 mb-3">{feature.title}</h3>
-                  <p className="text-nude-600 text-sm leading-relaxed">{feature.description}</p>
+                  <h3 className="text-lg font-semibold text-nude-900 mb-3">{feature.title}</h3>
+                  <p className="text-white/50 text-sm leading-relaxed">{feature.description}</p>
                 </GlassCard>
               </motion.div>
             ))}
