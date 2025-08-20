@@ -27,13 +27,13 @@ export default function TentangPage() {
         </motion.div>
             <div className="text-center max-w-4xl mx-auto">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-              <h3 className="text-5xl md:text-4xl font-bold text-white mb-6 leading-tight">
+              <h3 className="text-5xl md:text-4xl font-bold text-white/70 mb-6 leading-tight">
                 Kontak Bimbingan Konseling
-                <span className="block text-white bg-clip-text ">
+                <span className="block text-white/70 bg-clip-text ">
                   SMK ITXPRO 2026
                 </span>
               </h3>
-              <p className="text-lg text-white/90 mb-12 leading-relaxed">
+              <p className="text-lg text-white/70 mb-12 leading-relaxed">
                 Platform modern untuk mengelola konseling karir siswa dengan teknologi terdepan. Wujudkan masa depan
                 cemerlang bersama sistem yang dirancang khusus untuk SMK Informatika.
               </p>
