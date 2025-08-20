@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { Users, Search, X, Calendar, Star, FileText, Target, Check } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -12,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface Student {
   nis: string
@@ -29,11 +28,15 @@ interface KonselingBatchModalProps {
 }
 
 export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBatchModalProps) {
+  const isMobile = useIsMobile()
   const [searchTerm, setSearchTerm] = useState("");
   const [filterJurusan, setFilterJurusan] = useState("all");
   const [filterAngkatan, setFilterAngkatan] = useState("all");
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const studentListRef = React.useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     tanggalKonseling: new Date().toISOString().split("T")[0],
@@ -48,16 +51,23 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
   const [error, setError] = useState("");
   const [step, setStep] = useState<"select" | "form" | "processing">("select");
 
+  const [availableJurusan, setAvailableJurusan] = useState<string[]>([]);
+  const [availableAngkatan, setAvailableAngkatan] = useState<number[]>([]);
+
   // Fetch students based on filters
-  const fetchStudents = async () => {
+  const fetchStudents = async (page: number, append: boolean = false) => {
     setLoadingStudents(true);
     try {
       const params = new URLSearchParams({
-        search: searchTerm,
         status: "AKTIF", // Always fetch active students
-        all: "true" // Fetch all data to ensure search works across all students
+        page: page.toString(),
+        limit: "20", // Fetch 20 students at a time
+        all: "true", // Fetch all data to ensure search works across all students
       });
 
+      if (searchTerm) { // Only append search if there's a term
+        params.append("search", searchTerm);
+      }
       if (filterJurusan !== "all") {
         params.append("jurusan", filterJurusan);
       }
@@ -68,7 +78,12 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
       const response = await fetch(`/api/admin/siswa?${params.toString()}`);
       const data = await response.json();
       if (data.success) {
-        setStudents(data.data.siswa);
+        if (append) {
+          setStudents((prevStudents) => [...prevStudents, ...data.data.siswa]);
+        } else {
+          setStudents(data.data.siswa);
+        }
+        setHasMore(data.data.pagination.page < data.data.pagination.totalPages);
       }
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -78,9 +93,35 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
     }
   };
 
+  // Fetch unique jurusan and angkatan
+  const fetchFilterOptions = async () => {
+    try {
+      const [jurusanRes, angkatanRes] = await Promise.all([
+        fetch("/api/admin/data?type=jurusan"),
+        fetch("/api/admin/data?type=angkatan"),
+      ]);
+      const jurusanData = await jurusanRes.json();
+      const angkatanData = await angkatanRes.json();
+
+      if (jurusanData.success) {
+        setAvailableJurusan(jurusanData.data);
+      }
+      if (angkatanData.success) {
+        setAvailableAngkatan(angkatanData.data);
+      }
+    } catch (error) {
+      console.error("Error fetching filter options:", error);
+    }
+  };
+
+  // Initial fetch and reset on modal open
   useEffect(() => {
     if (isOpen) {
-      fetchStudents();
+      setStudents([]); // Clear students on open
+      setCurrentPage(1);
+      setHasMore(true);
+      fetchStudents(1);
+      fetchFilterOptions(); // Fetch filter options on modal open
       setStep("select");
       setSelectedStudents([]);
       setSearchTerm("");
@@ -97,16 +138,43 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
     }
   }, [isOpen]);
 
+  // Refetch when filters or search term change
   useEffect(() => {
-    // Re-fetch students when search term or filters change
-    const debounceFetch = setTimeout(() => {
-      if (isOpen) { // Only fetch if modal is open
-        fetchStudents();
-      }
-    }, 300); // Debounce for 300ms
+    if (isOpen) { // Only refetch if modal is open
+      setStudents([]); // Clear students on filter/search change
+      setCurrentPage(1);
+      setHasMore(true);
+      fetchStudents(1); // Fetch immediately on filter/search change
+    }
+  }, [searchTerm, filterJurusan, filterAngkatan]);
 
-    return () => clearTimeout(debounceFetch);
-  }, [searchTerm, filterJurusan, filterAngkatan, isOpen]); // Added isOpen to the dependency array
+  // Infinite scroll logic
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingStudents) {
+          setCurrentPage((prevPage) => prevPage + 1);
+        }
+      },
+      { threshold: 1.0 },
+    );
+
+    if (studentListRef.current) {
+      observer.observe(studentListRef.current);
+    }
+
+    return () => {
+      if (studentListRef.current) {
+        observer.unobserve(studentListRef.current);
+      }
+    };
+  }, [hasMore, loadingStudents]);
+
+  useEffect(() => {
+    if (currentPage > 1) {
+      fetchStudents(currentPage, true);
+    }
+  }, [currentPage]);
 
   const handleStudentToggle = (nis: string) => {
     setSelectedStudents((prev) =>
@@ -175,12 +243,13 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
   }
 
   const selectedStudentDetails = students.filter((s) => selectedStudents.includes(s.nis))
-  const uniqueJurusan = [...new Set(students.map((s) => s.jurusan))]
-  const uniqueAngkatan = [...new Set(students.map((s) => s.angkatan))].sort((a, b) => b - a)
+  // Use fetched availableJurusan and availableAngkatan
+  // const uniqueJurusan = [...new Set(students.map((s) => s.jurusan))]
+  // const uniqueAngkatan = [...new Set(students.map((s) => s.angkatan))].sort((a, b) => b - a)
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] w-[95%] overflow-y-auto bg-white/95 backdrop-blur-lg sm:w-full">
+      <DialogContent className="max-h-[90vh] w-[95%] sm:max-w-xl md:max-w-4xl overflow-y-auto bg-white/95 backdrop-blur-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
@@ -208,7 +277,7 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Semua Jurusan</SelectItem>
-                  {uniqueJurusan
+                  {availableJurusan
                     .filter(jurusan => jurusan && jurusan.trim() !== '')
                     .map((jurusan) => (
                       <SelectItem key={jurusan} value={jurusan}>
@@ -224,7 +293,7 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Semua Angkatan</SelectItem>
-                  {uniqueAngkatan.map((angkatan) => (
+                  {availableAngkatan.map((angkatan) => (
                     <SelectItem key={angkatan} value={angkatan.toString()}>
                       {angkatan}
                     </SelectItem>
@@ -252,14 +321,39 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
             )}
 
             {/* Students List */}
-            <div className="border rounded-lg">
-              <div className="max-h-96 overflow-y-auto">
-                {loadingStudents ? (
-                  <div className="p-8 text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold-600 mx-auto mb-2"></div>
-                    <p>Memuat data siswa...</p>
-                  </div>
-                ) : (
+            <div className="border rounded-lg overflow-x-auto">
+              {loadingStudents ? (
+                <div className="p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold-600 mx-auto mb-2"></div>
+                  <p>Memuat data siswa...</p>
+                </div>
+              ) : isMobile ? (
+                <div className="p-2 space-y-1">
+                  {filteredStudents.map((student) => (
+                    <div
+                      key={student.nis}
+                      className={`p-3 rounded-md border cursor-pointer ${
+                        selectedStudents.includes(student.nis)
+                          ? "bg-blue-50 border-blue-200"
+                          : "bg-white border-gray-200"
+                      }`}
+                      onClick={() => handleStudentToggle(student.nis)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium text-gray-800">{student.nama}</h4>
+                        <Checkbox
+                          checked={selectedStudents.includes(student.nis)}
+                          onCheckedChange={() => handleStudentToggle(student.nis)}
+                        />
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        {student.nis} • {student.kelasSaatIni} • {student.jurusan} • Angkatan {student.angkatan}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="max-h-96 overflow-y-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50 sticky top-0">
                       <tr>
@@ -278,7 +372,7 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
                     </thead>
                     <tbody>
                       {filteredStudents.map((student) => (
-                        <tr key={student.nis} className="border-t hover:bg-gray-50">
+                        <tr key={student.nis} className="border-t hover:bg-gray-50 cursor-pointer" onClick={() => handleStudentToggle(student.nis)}>
                           <td className="px-4 py-2">
                             <Checkbox
                               checked={selectedStudents.includes(student.nis)}
@@ -294,8 +388,8 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
                       ))}
                     </tbody>
                   </table>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-3">

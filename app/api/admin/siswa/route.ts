@@ -19,6 +19,7 @@ export async function GET(request: Request) {
     const limit = getAllData ? undefined : (limitParam ? Number.parseInt(limitParam) : undefined)
     const status = searchParams.get("status")
     const angkatan = searchParams.get("angkatan")
+    const jurusan = searchParams.get("jurusan") // Add jurusan parameter
     const hasKonseling = searchParams.get("hasKonseling")
 
     const where: any = {}
@@ -37,6 +38,10 @@ export async function GET(request: Request) {
 
     if (angkatan) {
       where.angkatan = Number.parseInt(angkatan)
+    }
+
+    if (jurusan) { // Add jurusan filter
+      where.jurusan = jurusan
     }
 
     if (hasKonseling === "true") {

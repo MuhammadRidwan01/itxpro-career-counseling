@@ -83,11 +83,11 @@ export function KonselingList({ fetchDashboardData }: KonselingListProps) {
         fetchKonseling(); // Re-fetch konseling after deletion
         fetchDashboardData(); // Update dashboard stats if needed
       } else {
-        alert(data.message || "Gagal menghapus konseling");
+        alert(data.message || "Gagal menghapus konseling.");
       }
     } catch (error) {
       console.error("Error deleting konseling:", error);
-      alert("Terjadi kesalahan");
+      alert(`Terjadi kesalahan saat menghapus konseling: ${error instanceof Error ? error.message : "Pesan tidak diketahui."}`);
     }
   };
 
@@ -352,15 +352,22 @@ export function KonselingList({ fetchDashboardData }: KonselingListProps) {
         onClose={() => {
           setShowKonselingModal(false)
           setSelectedKonseling(null)
+          fetchKonseling(); // Re-fetch konseling data after modal closes
         }}
-        onSuccess={fetchDashboardData}
+        onSuccess={() => {
+          fetchDashboardData(); // Update dashboard stats
+          fetchKonseling(); // Re-fetch konseling data in this component
+        }}
         konseling={selectedKonseling}
       />
 
       <KonselingBatchModal
         isOpen={showKonselingBatchModal}
         onClose={() => setShowKonselingBatchModal(false)}
-        onSuccess={fetchDashboardData}
+        onSuccess={() => {
+          fetchDashboardData(); // Update dashboard stats
+          fetchKonseling(); // Re-fetch konseling data in this component
+        }}
       />
     </>
   )

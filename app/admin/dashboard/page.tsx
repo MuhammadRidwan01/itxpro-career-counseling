@@ -162,11 +162,6 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (status === "loading") return
-    // Temporarily bypass authentication for UI/UX verification
-    // if (!session || session.user.role !== "ADMIN") {
-    //   redirect("/auth/admin")
-    // }
-    // Initial fetch when session status changes or modal is opened
     fetchDashboardData()
   }, [session, status]); // Removed fetchDashboardData from dependency array to avoid infinite loop
 

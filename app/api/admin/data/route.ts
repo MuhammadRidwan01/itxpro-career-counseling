@@ -97,6 +97,25 @@ export async function GET(request: NextRequest) {
         })
         totalCount = await prisma.tujuanKarir.count({ where: tujuanKarirWhere })
         break
+      case "jurusan": // New case for fetching unique jurusan
+        data = await prisma.siswa.findMany({
+          distinct: ['jurusan'],
+          select: { jurusan: true },
+          where: {
+            jurusan: {
+              not: "",
+            },
+          },
+        }).then(res => res.map(item => item.jurusan).filter(Boolean)) // Extract only the jurusan string and filter out null/undefined/empty strings
+        break
+      case "angkatan": // New case for fetching unique angkatan
+        data = await prisma.siswa.findMany({
+          distinct: ['angkatan'],
+          select: { angkatan: true },
+          where: { }, // Removed redundant 'not: null' for angkatan as it's a non-nullable field
+          orderBy: { angkatan: 'desc' },
+        }).then(res => res.map(item => item.angkatan)) // Filter out nulls after mapping
+        break
       default:
         return NextResponse.json({ success: false, message: "Invalid data type" }, { status: 400 })
     }
