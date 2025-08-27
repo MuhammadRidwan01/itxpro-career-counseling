@@ -165,32 +165,6 @@ export default function StudentLogin() {
               </p>
             </div>
 
-            {/* Debug Info */}
-            <div className="mt-4 p-3 bg-white/20 rounded-lg text-xs text-nude-600">
-              <p className="font-semibold mb-2">🔧 Testing Login:</p>
-              <div className="space-y-1">
-                <p>
-                  <strong>Admin:</strong> admin@itxpro.sch.id
-                </p>
-                <p>
-                  <strong>Password:</strong> 123456
-                </p>
-                <hr className="my-2 border-nude-300" />
-                <p>
-                  <strong>Siswa NIS:</strong> 252610001
-                </p>
-                <p>
-                  <strong>Password:</strong> 123456
-                </p>
-                <hr className="my-2 border-nude-300" />
-                <p>
-                  <strong>Siswa Email:</strong> 252610001@temp.itxpro.sch.id
-                </p>
-                <p>
-                  <strong>Password:</strong> 123456
-                </p>
-              </div>
-            </div>
           </GlassCard>
         </motion.div>
       </div>

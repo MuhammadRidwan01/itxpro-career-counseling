@@ -153,18 +153,6 @@ export default function AdminLogin() {
               </PremiumButton>
             </form>
 
-            {/* Debug Info */}
-            <div className="mt-6 p-3 bg-white/20 rounded-lg text-xs text-nude-600">
-              <p className="font-semibold mb-2">🔧 Testing Login:</p>
-              <div className="space-y-1">
-                <p>
-                  <strong>Email:</strong> admin@itxpro.sch.id
-                </p>
-                <p>
-                  <strong>Password:</strong> admin123
-                </p>
-              </div>
-            </div>
           </GlassCard>
         </motion.div>
       </div>

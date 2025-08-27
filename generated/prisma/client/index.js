@@ -194,7 +194,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\ridwa\\Downloads\\itxpro-career-counseling\\generated\\prisma\\client",
+      "value": "c:\\Users\\ridwa\\Downloads\\itxpro-career-counseling\\generated\\prisma\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -208,7 +208,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\ridwa\\Downloads\\itxpro-career-counseling\\prisma\\schema.prisma",
+    "sourceFilePath": "c:\\Users\\ridwa\\Downloads\\itxpro-career-counseling\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
