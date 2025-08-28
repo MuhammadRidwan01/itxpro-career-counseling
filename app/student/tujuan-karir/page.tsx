@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useSession } from "next-auth/react"
@@ -131,29 +130,39 @@ export default function TujuanKarirForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-primary">
-      <div className="container mx-auto px-6 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-nude-800 via-nude-900 to-nude-950 relative overflow-hidden">
+      {/* Decorative Elements */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-nude-400/20 to-nude-500/20 rounded-full filter blur-[100px] transform -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-tl from-nude-500/10 to-nude-600/10 rounded-full filter blur-[120px] transform translate-x-1/3 translate-y-1/3"></div>
+        <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-gradient-to-br from-nude-700/10 to-nude-800/10 rounded-full filter blur-[80px] transform -translate-x-1/2 -translate-y-1/2"></div>
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
+          className="flex items-center justify-between mb-8 bg-nude-800/20 backdrop-blur-sm rounded-2xl p-6 border border-nude-200/20"
         >
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
               <Link href="/student/dashboard">
-                <PremiumButton variant="ghost" size="sm">
+                <PremiumButton variant="outline-glass" size="sm" className="bg-nude-800/30 hover:bg-nude-800/40 text-nude-100">
                   <ArrowLeft className="w-4 h-4" />
-                  Kembali
+                  <span className="hidden sm:inline ml-2">Kembali</span>
                 </PremiumButton>
               </Link>
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Tujuan Karir</h1>
-                <p className="text-white/80">Tentukan tujuan Anda setelah lulus</p>
+                <h1 className="text-3xl sm:text-4xl font-bold text-nude-100 mb-2 leading-tight">Tujuan Karir</h1>
+                <p className="text-nude-200 text-sm sm:text-base">Tentukan tujuan Anda setelah lulus</p>
               </div>
             </div>
             {isEditMode && (
-              <PremiumButton onClick={() => setStep(1)} className="ml-auto">
+              <PremiumButton 
+                onClick={() => setStep(1)} 
+                className="w-full sm:w-auto bg-nude-700/50 hover:bg-nude-700/60 text-nude-100 border border-nude-600/30"
+              >
                 Edit Tujuan Karir
               </PremiumButton>
             )}
@@ -163,32 +172,74 @@ export default function TujuanKarirForm() {
         <div className="max-w-4xl mx-auto">
           {/* Progress Indicator */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <GlassCard className="p-6">
-              <div className="flex items-center justify-center">
+            <GlassCard className="p-4 sm:p-6 md:p-8 bg-nude-800/30 border border-nude-300/20">
+              {/* Desktop Progress Indicator - Hidden on Mobile */}
+              <div className="hidden sm:flex items-center justify-between">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="flex items-center">
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
-                        step >= i ? "bg-gradient-button text-white shadow-lg" : "bg-white/20 text-nude-600"
-                      }`}
-                    >
-                      {step > i ? <CheckCircle className="w-5 h-5" /> : i}
+                  <div key={i} className="flex items-center flex-1">
+                    <div className="flex flex-col items-center relative">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                          step >= i 
+                            ? "bg-gradient-to-br from-nude-600 to-nude-700 text-nude-100 shadow-lg transform scale-105" 
+                            : "bg-nude-700/30 text-nude-300 border border-nude-600/20"
+                        }`}
+                      >
+                        {step > i ? <CheckCircle className="w-6 h-6" /> : i}
+                      </div>
+                      <div className="mt-3 text-center">
+                        <span className={`block font-medium transition-all duration-300 ${
+                          step >= i ? "text-nude-100" : "text-nude-400"
+                        }`}>
+                          {i === 1 ? "Pilih Kategori" : 
+                           i === 2 ? "Detail" :
+                           i === 3 ? "Konfirmasi" : "Selesai"}
+                        </span>
+                      </div>
                     </div>
                     {i < 4 && (
-                      <div
-                        className={`w-16 h-1 mx-3 rounded transition-all duration-300 ${
-                          step > i ? "bg-gradient-button" : "bg-white/20"
-                        }`}
-                      />
+                      <div className="flex-1 mx-4">
+                        <div className="h-1 relative">
+                          <div className={`absolute inset-0 rounded-full transition-all duration-300 ${
+                            step > i ? "bg-nude-600" : "bg-nude-700/30"
+                          }`} />
+                          <div
+                            className={`absolute inset-0 rounded-full transition-all duration-300 bg-gradient-to-r from-nude-500 to-nude-600
+                              ${step > i ? "w-full" : "w-0"}`}
+                          />
+                        </div>
+                      </div>
                     )}
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between mt-4 text-sm text-nude-600">
-                <span>Pilih Kategori</span>
-                <span>Detail</span>
-                <span>Konfirmasi</span>
-                <span>Selesai</span>
+
+              {/* Mobile Progress Indicator */}
+              <div className="sm:hidden">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-nude-100 font-medium">Langkah {step} dari 4</span>
+                  <span className="text-nude-200">
+                    {step === 1 ? "Pilih Kategori" : 
+                     step === 2 ? "Detail" :
+                     step === 3 ? "Konfirmasi" : "Selesai"}
+                  </span>
+                </div>
+                <div className="h-2 bg-nude-700/30 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-nude-500 to-nude-600 rounded-full transition-all duration-300"
+                    style={{ width: `${(step / 4) * 100}%` }}
+                  />
+                </div>
+                <div className="flex justify-between mt-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        step >= i ? "bg-nude-500" : "bg-nude-700/30"
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
             </GlassCard>
           </motion.div>
@@ -202,33 +253,49 @@ export default function TujuanKarirForm() {
           >
             {/* Step 1: Pilih Kategori */}
             {step === 1 && (
-              <GlassCard className="p-8">
-                <div className="text-center mb-8">
-                  <Target className="w-16 h-16 text-gold-500 mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-nude-800 mb-2">Pilih Tujuan Utama</h2>
-                  <p className="text-nude-600">Apa yang ingin Anda lakukan setelah lulus?</p>
+              <GlassCard className="p-4 sm:p-6 md:p-8 bg-nude-800/30 border border-nude-300/20">
+                <div className="text-center mb-12">
+                  <div className="relative inline-block">
+                    <div className="absolute inset-0 bg-nude-500/20 blur-2xl rounded-full"></div>
+                    <Target className="w-20 h-20 text-nude-100 mx-auto mb-4 relative z-10 transform hover:scale-110 transition-transform duration-300" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-nude-100 mb-3">Pilih Tujuan Utama</h2>
+                  <p className="text-nude-200 text-lg">Apa yang ingin Anda lakukan setelah lulus?</p>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
                   {kategoriOptions.map((option) => (
                     <motion.div
                       key={option.id}
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{ scale: 1.02, translateY: -5 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+                      className={`p-6 sm:p-8 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden group backdrop-blur-md ${
                         formData.kategoriUtama === option.id
-                          ? "border-gold-500 bg-gold-50/50"
-                          : "border-white/20 bg-white/10 hover:border-white/40"
+                          ? "bg-nude-500/20 border-2 border-nude-400"
+                          : "bg-nude-800/10 border border-nude-700/30 hover:bg-nude-700/20"
                       }`}
                       onClick={() => setFormData({ ...formData, kategoriUtama: option.id })}
                     >
+                      <div className="absolute inset-0 bg-gradient-to-br from-nude-400/20 to-nude-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute -right-16 -top-16 w-32 h-32 bg-nude-400/10 rounded-full blur-2xl transform group-hover:translate-x-8 transition-transform duration-500" />
                       <div
-                        className={`w-12 h-12 bg-gradient-to-br ${option.color} rounded-xl flex items-center justify-center mb-4`}
+                        className={`w-16 h-16 bg-gradient-to-br from-nude-400 to-nude-600 rounded-2xl flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300 shadow-lg relative z-10`}
                       >
-                        <option.icon className="w-6 h-6 text-white" />
+                        <option.icon className="w-8 h-8 text-nude-100" />
                       </div>
-                      <h3 className="text-lg font-semibold text-nude-800 mb-2">{option.title}</h3>
-                      <p className="text-nude-600 text-sm">{option.description}</p>
+                      <div className="relative z-10">
+                        <h3 className="text-xl font-semibold text-nude-100 mb-3">{option.title}</h3>
+                        <p className="text-nude-200 text-base leading-relaxed">{option.description}</p>
+                      </div>
+                      {formData.kategoriUtama === option.id && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute top-4 right-4 w-8 h-8 bg-nude-400/30 rounded-full flex items-center justify-center backdrop-blur-sm"
+                        >
+                          <CheckCircle className="w-5 h-5 text-nude-100" />
+                        </motion.div>
+                      )}
                     </motion.div>
                   ))}
                 </div>
@@ -243,8 +310,8 @@ export default function TujuanKarirForm() {
             {step === 2 && (
               <GlassCard className="p-8">
                 <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-nude-800 mb-2">Detail Tujuan</h2>
-                  <p className="text-nude-600">
+                  <h2 className="text-2xl font-bold text-nude-100 dark:text-nude-100 mb-2">Detail Tujuan</h2>
+                  <p className="text-nude-400 dark:text-nude-200">
                     {formData.kategoriUtama === "kuliah" && "Pilih universitas dan jurusan yang Anda inginkan"}
                     {formData.kategoriUtama === "bekerja" && "Jelaskan bidang pekerjaan yang Anda minati"}
                     {formData.kategoriUtama === "wirausaha" && "Jelaskan jenis usaha yang ingin Anda jalankan"}
@@ -255,29 +322,29 @@ export default function TujuanKarirForm() {
                   {formData.kategoriUtama === "kuliah" && (
                     <div className="space-y-6">
                       {[1, 2, 3].map((num) => (
-                        <div key={num} className="grid md:grid-cols-2 gap-4">
+                        <div key={num} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-nude-700 mb-2">
+                            <label className="block text-sm font-medium text-nude-100 dark:text-nude-200 mb-2">
                               Pilihan {num} - Universitas/Institut
                             </label>
                             <input
                               type="text"
                               value={formData[`ptn${num}` as keyof typeof formData]}
                               onChange={(e) => setFormData({ ...formData, [`ptn${num}`]: e.target.value })}
-                              className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent transition-all duration-300 text-nude-800 placeholder-nude-500"
+                              className="w-full px-4 py-3 bg-nude-800/20 backdrop-blur-md border border-nude-400/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-nude-400 focus:border-transparent transition-all duration-300 text-nude-100 dark:text-nude-100 placeholder-nude-500 shadow-inner text-sm sm:text-base"
                               placeholder="Contoh: Universitas Indonesia"
                               required={num === 1}
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-nude-700 mb-2">
+                            <label className="block text-sm font-medium text-nude-100 dark:text-nude-200 mb-2">
                               Pilihan {num} - Jurusan
                             </label>
                             <input
                               type="text"
                               value={formData[`jurusan${num}` as keyof typeof formData]}
                               onChange={(e) => setFormData({ ...formData, [`jurusan${num}`]: e.target.value })}
-                              className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent transition-all duration-300 text-nude-800 placeholder-nude-500"
+                              className="w-full px-4 py-3 bg-nude-800/20 backdrop-blur-md border border-nude-400/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-nude-400 focus:border-transparent transition-all duration-300 text-nude-100 dark:text-nude-100 placeholder-nude-500 shadow-inner"
                               placeholder="Contoh: Teknik Informatika"
                               required={num === 1}
                             />
@@ -289,14 +356,14 @@ export default function TujuanKarirForm() {
 
                   {formData.kategoriUtama === "bekerja" && (
                     <div>
-                      <label className="block text-sm font-medium text-nude-700 mb-2">
+                      <label className="block text-sm font-medium text-nude-100 dark:text-nude-200 mb-2">
                         Detail Pekerjaan yang Diinginkan
                       </label>
                       <textarea
                         value={formData.detailBekerja}
                         onChange={(e) => setFormData({ ...formData, detailBekerja: e.target.value })}
                         rows={6}
-                        className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent transition-all duration-300 text-nude-800 placeholder-nude-500 resize-none"
+                        className="w-full px-4 py-3 bg-nude-800/20 backdrop-blur-md border border-nude-400/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-nude-400 focus:border-transparent transition-all duration-300 text-nude-100 dark:text-nude-100 placeholder-nude-500 resize-none shadow-inner min-h-[150px]"
                         placeholder="Jelaskan bidang pekerjaan, posisi yang diinginkan, perusahaan target, dll."
                         required
                       />
@@ -305,12 +372,12 @@ export default function TujuanKarirForm() {
 
                   {formData.kategoriUtama === "wirausaha" && (
                     <div>
-                      <label className="block text-sm font-medium text-nude-700 mb-2">Detail Rencana Wirausaha</label>
+                      <label className="block text-sm font-medium text-nude-100 dark:text-nude-200 mb-2">Detail Rencana Wirausaha</label>
                       <textarea
                         value={formData.detailWirausaha}
                         onChange={(e) => setFormData({ ...formData, detailWirausaha: e.target.value })}
                         rows={6}
-                        className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent transition-all duration-300 text-nude-800 placeholder-nude-500 resize-none"
+                        className="w-full px-4 py-3 bg-nude-800/20 backdrop-blur-md border border-nude-400/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-nude-400 focus:border-transparent transition-all duration-300 text-nude-100 dark:text-nude-100 placeholder-nude-500 resize-none shadow-inner"
                         placeholder="Jelaskan jenis usaha, target pasar, modal yang dibutuhkan, dll."
                         required
                       />
@@ -318,9 +385,9 @@ export default function TujuanKarirForm() {
                   )}
                 </form>
 
-                <div className="flex justify-between mt-8">
-                  <PremiumButton variant="secondary" onClick={() => setStep(1)}>Kembali</PremiumButton>
-                  <PremiumButton onClick={() => setStep(3)} disabled={!isFormValid()}>Lanjutkan</PremiumButton>
+                <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
+                  <PremiumButton variant="secondary" onClick={() => setStep(1)} className="w-full sm:w-auto order-2 sm:order-1">Kembali</PremiumButton>
+                  <PremiumButton onClick={() => setStep(3)} disabled={!isFormValid()} className="w-full sm:w-auto order-1 sm:order-2">Lanjutkan</PremiumButton>
                 </div>
               </GlassCard>
             )}
@@ -329,28 +396,28 @@ export default function TujuanKarirForm() {
             {step === 3 && (
               <GlassCard className="p-8">
                 <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-nude-800 mb-2">Konfirmasi Tujuan Karir</h2>
-                  <p className="text-nude-600">Periksa kembali data Anda sebelum menyimpan</p>
+                  <h2 className="text-2xl font-bold text-nude-100 dark:text-nude-100 mb-2">Konfirmasi Tujuan Karir</h2>
+                  <p className="text-nude-400 dark:text-nude-200">Periksa kembali data Anda sebelum menyimpan</p>
                 </div>
 
                 <div className="space-y-6">
-                  <div className="p-6 bg-white/10 rounded-xl">
-                    <h3 className="font-semibold text-nude-800 mb-4">Tujuan Utama</h3>
-                    <p className="text-nude-700 capitalize">{formData.kategoriUtama}</p>
+                  <div className="p-6 bg-nude-800/20 backdrop-blur-md rounded-xl">
+                    <h3 className="font-semibold text-nude-100 dark:text-nude-100 mb-4">Tujuan Utama</h3>
+                    <p className="text-nude-200 dark:text-nude-200 capitalize">{formData.kategoriUtama}</p>
                   </div>
 
                   {formData.kategoriUtama === "kuliah" && (
-                    <div className="p-6 bg-white/10 rounded-xl">
-                      <h3 className="font-semibold text-nude-800 mb-4">Pilihan Universitas & Jurusan</h3>
+                    <div className="p-6 bg-nude-800/20 backdrop-blur-md rounded-xl">
+                      <h3 className="font-semibold text-nude-100 dark:text-nude-100 mb-4">Pilihan Universitas & Jurusan</h3>
                       <div className="space-y-3">
                         {[1, 2, 3].map((num) => {
                           const ptn = formData[`ptn${num}` as keyof typeof formData]
                           const jurusan = formData[`jurusan${num}` as keyof typeof formData]
                           if (ptn && jurusan) {
                             return (
-                              <div key={num} className="flex justify-between">
-                                <span className="text-nude-600">Pilihan {num}:</span>
-                                <span className="text-nude-800 font-medium">
+                              <div key={num} className="flex justify-between items-center">
+                                <span className="text-nude-300 dark:text-nude-300">Pilihan {num}:</span>
+                                <span className="text-nude-100 dark:text-nude-100 font-medium">
                                   {ptn} - {jurusan}
                                 </span>
                               </div>
@@ -363,16 +430,16 @@ export default function TujuanKarirForm() {
                   )}
 
                   {formData.kategoriUtama === "bekerja" && (
-                    <div className="p-6 bg-white/10 rounded-xl">
-                      <h3 className="font-semibold text-nude-800 mb-4">Detail Pekerjaan</h3>
-                      <p className="text-nude-700 leading-relaxed">{formData.detailBekerja}</p>
+                    <div className="p-6 bg-nude-800/20 backdrop-blur-md rounded-xl">
+                      <h3 className="font-semibold text-nude-100 dark:text-nude-100 mb-4">Detail Pekerjaan</h3>
+                      <p className="text-nude-200 dark:text-nude-200 leading-relaxed">{formData.detailBekerja}</p>
                     </div>
                   )}
 
                   {formData.kategoriUtama === "wirausaha" && (
-                    <div className="p-6 bg-white/10 rounded-xl">
-                      <h3 className="font-semibold text-nude-800 mb-4">Detail Wirausaha</h3>
-                      <p className="text-nude-700 leading-relaxed">{formData.detailWirausaha}</p>
+                    <div className="p-6 bg-nude-800/20 backdrop-blur-md rounded-xl">
+                      <h3 className="font-semibold text-nude-100 dark:text-nude-100 mb-4">Detail Wirausaha</h3>
+                      <p className="text-nude-200 dark:text-nude-200 leading-relaxed">{formData.detailWirausaha}</p>
                     </div>
                   )}
 
@@ -389,24 +456,41 @@ export default function TujuanKarirForm() {
 
             {/* Step 4: Success */}
             {step === 4 && (
-              <GlassCard className="p-8 text-center">
+              <GlassCard className="p-12 text-center bg-nude-800/30 border border-nude-400/20">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20 
+                  }}
+                  className="relative w-32 h-32 mx-auto mb-8"
                 >
-                  <CheckCircle className="w-10 h-10 text-white" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-nude-400/30 to-nude-500/30 rounded-full blur-2xl" />
+                  <div className="relative w-full h-full bg-gradient-to-br from-nude-400 to-nude-600 rounded-full flex items-center justify-center shadow-lg">
+                    <CheckCircle className="w-16 h-16 text-nude-100" />
+                  </div>
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="absolute -right-4 -top-4 w-12 h-12 bg-nude-500/30 rounded-full backdrop-blur-md flex items-center justify-center"
+                  >
+                    <Target className="w-6 h-6 text-nude-100" />
+                  </motion.div>
                 </motion.div>
 
-                <h2 className="text-2xl font-bold text-nude-800 mb-4">Tujuan Karir Tersimpan!</h2>
-                <p className="text-nude-600 mb-8">
+                <h2 className="text-3xl font-bold text-nude-100 mb-4">Tujuan Karir Tersimpan!</h2>
+                <p className="text-nude-200 text-lg mb-10 max-w-2xl mx-auto">
                   Tujuan karir Anda telah berhasil disimpan. Guru BK akan menggunakan informasi ini untuk memberikan
                   bimbingan yang lebih tepat sasaran.
                 </p>
 
                 <Link href="/student/dashboard">
-                  <PremiumButton>Kembali ke Dashboard</PremiumButton>
+                  <PremiumButton className="bg-nude-500/30 hover:bg-nude-500/40 border border-nude-400/30 text-nude-100">
+                    Kembali ke Dashboard
+                  </PremiumButton>
                 </Link>
               </GlassCard>
             )}

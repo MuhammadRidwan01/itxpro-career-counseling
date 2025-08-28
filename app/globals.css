@@ -28,6 +28,7 @@
     /* Custom glassmorphism colors */
     --glass-white: 0 0% 100% / 0.1; /* White with 10% opacity */
     --glass-nude: 20 50% 90% / 0.1; /* Nude/beige with 10% opacity */
+    --glass-nude-dark: 20 50% 50% / 0.3; /* Darker nude with 30% opacity */
 
     /* Custom gradient for buttons */
     --gradient-button-start: 240 60% 50%; /* Primary color start */
@@ -81,6 +82,7 @@
     /* Custom glassmorphism colors for dark mode */
     --glass-white: 240 5% 10% / 0.2; /* Darker with 20% opacity */
     --glass-nude: 20 50% 20% / 0.2; /* Darker nude with 20% opacity */
+    --glass-nude-dark: 20 50% 10% / 0.4; /* Even darker nude with 40% opacity */
 
     /* Custom gradient for buttons dark mode */
     --gradient-button-start: 240 60% 40%;
@@ -105,6 +107,12 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.bg-grid-pattern {
+  background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 /* Custom scrollbar */

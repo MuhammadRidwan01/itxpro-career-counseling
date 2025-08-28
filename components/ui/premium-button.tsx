@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react"
 
 interface PremiumButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
-  variant?: "primary" | "secondary" | "ghost"
+  variant?: "primary" | "secondary" | "ghost" | "outline-glass"
   size?: "sm" | "md" | "lg"
   loading?: boolean
 }
@@ -25,6 +25,7 @@ export function PremiumButton({
     secondary:
       "bg-glass-white backdrop-blur-md border border-white/20 text-nude-800 hover:bg-glass-nude hover:scale-105",
     ghost: "text-nude-700 hover:bg-glass-nude hover:scale-105",
+    "outline-glass": "bg-transparent border border-white/30 text-white hover:bg-white/10 hover:scale-105",
   }
 
   const sizes = {

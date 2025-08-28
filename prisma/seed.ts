@@ -86,7 +86,7 @@ async function main() {
         hasilText: 'Siswa menunjukkan minat yang besar terhadap bidang programming dan teknologi.',
         deskripsi: 'Memiliki kemampuan logika yang baik dan kemampuan analisis yang kuat.',
         tindakLanjut: 'Direkomendasikan untuk melanjutkan ke perguruan tinggi jurusan Teknik Informatika.',
-        status: StatusKonseling.SELESAI,
+        status: StatusKonseling.SUDAH,
         kategori: 'karir',
         adminId: 'admin_001',
       },
