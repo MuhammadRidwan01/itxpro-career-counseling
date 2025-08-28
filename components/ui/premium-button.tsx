@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react"
 
 interface PremiumButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
-  variant?: "primary" | "secondary" | "ghost"
+  variant?: "primary" | "secondary" | "ghost" 
   size?: "sm" | "md" | "lg"
   loading?: boolean
 }
