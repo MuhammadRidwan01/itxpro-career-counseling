@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { GlassCard } from "@/components/ui/glass-card"
 import { PremiumButton } from "@/components/ui/premium-button"
-import { BookOpen, Users, TrendingUp, Award, ChevronRight, Sparkles } from "lucide-react"
+import { BookOpen, Users, TrendingUp, Award, ChevronRight, Sparkles, Menu } from "lucide-react"
 import Link from 'next/link';
 
 
@@ -33,6 +33,8 @@ export default function LandingPage() {
       description: "Monitor pencapaian tujuan karir siswa",
     },
   ]
+
+  const [navOpen, setNavOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-gradient-primary relative overflow-hidden">
@@ -67,10 +69,11 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
+            {/* Desktop Nav */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-4"
+              className="hidden md:flex items-center gap-4"
             >
               <Link href="/tentang">
                 <PremiumButton variant="ghost" size="sm">
@@ -83,8 +86,33 @@ export default function LandingPage() {
                 </PremiumButton>
               </Link>
             </motion.div>
+            {/* Mobile Nav */}
+            <div className="md:hidden relative">
+              <button
+                className="p-2 rounded-lg text-white focus:outline-none"
+                onClick={() => setNavOpen((v) => !v)}
+                aria-label="Menu"
+              >
+                <Menu className="w-7 h-7" />
+              </button>
+              {navOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg py-2 z-50"
+                >
+                  <Link href="/tentang" onClick={() => setNavOpen(false)}>
+                    <div className="px-4 py-2 text-nude-800 hover:bg-nude-100 cursor-pointer">Tentang</div>
+                  </Link>
+                  <Link href="/kontak" onClick={() => setNavOpen(false)}>
+                    <div className="px-4 py-2 text-nude-800 hover:bg-nude-100 cursor-pointer">Kontak</div>
+                  </Link>
+                </motion.div>
+              )}
+            </div>
           </nav>
-        </header>
+  </header>
 
         {/* Hero Section */}
         <section className="container mx-auto px-6 py-20">
