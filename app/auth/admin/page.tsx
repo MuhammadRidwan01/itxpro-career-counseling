@@ -50,8 +50,7 @@ export default function AdminLogin() {
         console.log("Admin login error:", result.error)
       } else {
         toast.success("Login berhasil!")
-        // Pengalihan dilakukan oleh useEffect di atas, atau biarkan NextAuth.js yang menanganinya
-        // router.push("/admin/dashboard") // Hapus baris ini
+        router.push("/admin/dashboard") // Alihkan secara langsung setelah login berhasil
       }
     } catch (error) {
       console.error("Admin login exception:", error)

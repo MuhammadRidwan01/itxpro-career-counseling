@@ -7,21 +7,24 @@ type Environment = 'development' | 'test' | 'production'
 
 async function createAdmin(environment: Environment) {
   const adminPassword = environment === 'production' 
-    ? process.env.ADMIN_PASSWORD || 'change_this_in_production'
+    ? process.env.ADMIN_PASSWORD || 'bushildi123'
     : 'admin123'
   
   const hash = await bcrypt.hash(adminPassword, 12)
   
   await prisma.user.upsert({
-    where: { email: 'admin@itxpro.sch.id' },
-    update: {},
-    create: {
-      id: 'admin_001',
-      email: 'admin@itxpro.sch.id',
-      password: hash,
-      role: 'ADMIN',
-    },
-  })
+  where: { email: 'admin@itxpro.sch.id' },
+  update: {
+    password: hash,
+    role: 'ADMIN',
+  },
+  create: {
+    id: 'admin_001',
+    email: 'admin@itxpro.sch.id',
+    password: hash,
+    role: 'ADMIN',
+  },
+})
 }
 
 async function main() {
