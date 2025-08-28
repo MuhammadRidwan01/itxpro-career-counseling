@@ -142,7 +142,7 @@ export default function TentangPage() {
             Tim Konselor
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
+            {[1, 2].map((i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
