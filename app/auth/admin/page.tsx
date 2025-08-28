@@ -142,7 +142,7 @@ export default function AdminLogin() {
                 </label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-sm text-gold-600 hover:text-gold-700 transition-colors"
+                  className="text-sm text-nude-600 hover:text-gold-700 transition-colors"
                 >
                   Lupa password?
                 </Link>

@@ -158,7 +158,7 @@ export default function StudentLogin() {
                 Belum punya akun?{" "}
                 <Link
                   href="/auth/student/register"
-                  className="text-white hover:text-gold-700 font-medium transition-colors"
+                  className="text-nude-800 hover:text-gold-700 font-medium transition-colors"
                 >
                   Daftar di sini
                 </Link>
