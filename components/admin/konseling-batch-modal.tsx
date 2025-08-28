@@ -87,7 +87,6 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
       }
     } catch (error) {
       console.error("Error fetching students:", error);
-      setError("Gagal memuat data siswa");
     } finally {
       setLoadingStudents(false);
     }
