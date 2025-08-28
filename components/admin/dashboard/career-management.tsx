@@ -87,7 +87,7 @@ export function CareerManagement({ tujuanKarir, fetchDashboardData, handleDelete
             </PremiumButton>
             <PremiumButton
               onClick={handleExportCareerData}
-              variant="primary"
+              variant="secondary"
               size="sm"
             >
               Export Excel

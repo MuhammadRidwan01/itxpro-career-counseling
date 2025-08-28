@@ -88,6 +88,7 @@ enum Status {
 }
 
 enum StatusKonseling {
-  SELESAI
+  SUDAH
+  BELUM
   PROSES
 }

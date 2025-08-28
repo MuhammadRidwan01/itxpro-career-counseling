@@ -200,7 +200,8 @@ exports.Status = exports.$Enums.Status = {
 };
 
 exports.StatusKonseling = exports.$Enums.StatusKonseling = {
-  SELESAI: 'SELESAI',
+  SUDAH: 'SUDAH',
+  BELUM: 'BELUM',
   PROSES: 'PROSES'
 };
 
