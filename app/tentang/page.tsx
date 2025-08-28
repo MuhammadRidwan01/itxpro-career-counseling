@@ -102,7 +102,7 @@ export default function TentangPage() {
             transition={{ duration: 0.6 }}
           >
             <GlassCard hover className="p-6 text-center h-full">
-              <h3 className="text-xl font-semibold text-gold-400 mb-4">VISI</h3>
+              <h3 className="text-xl font-semibold text-nude-400 mb-4">VISI</h3>
               <p className="text-sm md:text-base text-white/70 leading-relaxed">
                 Membentuk peserta didik yang berkarakter positif, mandiri, berprestasi, 
                 dan mampu mengambil keputusan bijak dalam kehidupan.
@@ -117,7 +117,7 @@ export default function TentangPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <GlassCard hover className="p-6 h-full">
-              <h3 className="text-xl font-semibold text-gold-400 mb-4 text-center">
+              <h3 className="text-xl font-semibold text-nude-400 mb-4 text-center">
                 MISI
               </h3>
               <ul className="text-sm md:text-base text-white/70 leading-relaxed space-y-3">
@@ -137,7 +137,7 @@ export default function TentangPage() {
           </motion.div>
         </div>
 
-       {/* Tim Konselor (opsional) */}
+{/* Tim Konselor (opsional) */}
 <div className="m-4 md:m-10">
   <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">
     Tim Konselor
@@ -148,15 +148,15 @@ export default function TentangPage() {
       {[
         {
           id: 1,
-          nama: "Konselor 1",
+          nama: "",
           spesialisasi: "Karier",
           foto: "/IMG_1227.jpg",
         },
         {
           id: 2,
-          nama: "Konselor 2",
+          nama: "",
           spesialisasi: "Karier",
-          foto: "/images/counselor2.jpg",
+          foto: "/IMG_1224.jpg",
         },
       ].map((konselor, i) => (
         <motion.div
@@ -166,7 +166,8 @@ export default function TentangPage() {
           transition={{ duration: 0.6, delay: i * 0.2 }}
         >
           <GlassCard hover className="p-6 text-center flex flex-col items-center">
-            <div className="w-full h-48 mb-4 relative">
+            {/* Foto persegi panjang (lebih besar lagi) */}
+            <div className="mb-4 relative w-80 h-44">
               <Image
                 src={konselor.foto}
                 alt={`Foto ${konselor.nama}`}
@@ -177,15 +178,16 @@ export default function TentangPage() {
             <h4 className="text-lg font-semibold text-white">
               {konselor.nama}
             </h4>
-            <p className="text-sm text-white/70">
+            {/* <p className="text-sm text-white/70">
               Spesialisasi: {konselor.spesialisasi}
-            </p>
+            </p> */}
           </GlassCard>
         </motion.div>
       ))}
     </div>
   </div>
 </div>
+
       </div>
     </div>
   );
