@@ -55,6 +55,7 @@
     "csv-parser": "^3.2.0",
     "date-fns": "^3.0.0",
     "embla-carousel-react": "latest",
+    "exceljs": "^4.4.0",
     "framer-motion": "latest",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",

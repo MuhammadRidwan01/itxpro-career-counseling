@@ -23,6 +23,7 @@ export async function PUT(
       return NextResponse.json({ success: false, message: "Semua field wajib diisi" }, { status: 400 })
     }
 
+
     // Validate siswa exists
     const siswa = await prisma.siswa.findUnique({
       where: { nis: nisSiswa },

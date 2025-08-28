@@ -31,9 +31,10 @@ interface CareerManagementProps {
   tujuanKarir: TujuanKarir[]
   fetchDashboardData: () => void
   handleDeleteTujuanKarir: (id: string) => void
+  handleExportCareerData: () => void // New prop for export function
 }
 
-export function CareerManagement({ tujuanKarir, fetchDashboardData, handleDeleteTujuanKarir }: CareerManagementProps) {
+export function CareerManagement({ tujuanKarir, fetchDashboardData, handleDeleteTujuanKarir, handleExportCareerData }: CareerManagementProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const debouncedSearchTerm = useDebounce(searchTerm, 500) // Debounce search term
   const [filterKategori, setFilterKategori] = useState("all")
@@ -83,6 +84,13 @@ export function CareerManagement({ tujuanKarir, fetchDashboardData, handleDelete
             >
               <Filter className="w-4 h-4" />
               Filter
+            </PremiumButton>
+            <PremiumButton
+              onClick={handleExportCareerData}
+              variant="primary"
+              size="sm"
+            >
+              Export Excel
             </PremiumButton>
           </div>
 

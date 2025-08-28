@@ -200,8 +200,8 @@ exports.Status = exports.$Enums.Status = {
 };
 
 exports.StatusKonseling = exports.$Enums.StatusKonseling = {
-  SUDAH: 'SUDAH',
-  BELUM: 'BELUM'
+  SELESAI: 'SELESAI',
+  PROSES: 'PROSES'
 };
 
 exports.Prisma.ModelName = {

@@ -57,8 +57,8 @@ export type Status = (typeof Status)[keyof typeof Status]
 
 
 export const StatusKonseling: {
-  SUDAH: 'SUDAH',
-  BELUM: 'BELUM'
+  SELESAI: 'SELESAI',
+  PROSES: 'PROSES'
 };
 
 export type StatusKonseling = (typeof StatusKonseling)[keyof typeof StatusKonseling]

@@ -356,13 +356,11 @@ export default function StudentDashboard() {
                         <Clock className="w-6 h-6 text-orange-500" />
                       )}
                     </div>
-                    {!siswa.tujuanKarirSubmitted && (
                       <Link href="/student/tujuan-karir">
                         <PremiumButton size="sm" className="mt-3">
-                          Isi Tujuan Karir
+                          {siswa.tujuanKarirSubmitted ? "Edit Tujuan Karir" : "Isi Tujuan Karir"}
                         </PremiumButton>
                       </Link>
-                    )}
                   </div>
 
                   <div className="p-4 bg-white/10 rounded-lg">

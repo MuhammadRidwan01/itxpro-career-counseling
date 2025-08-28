@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
@@ -17,7 +17,7 @@ export default function TujuanKarirForm() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<TujuanKarirFormData>({
     kategoriUtama: "",
     ptn1: "",
     jurusan1: "",
@@ -28,9 +28,39 @@ export default function TujuanKarirForm() {
     detailBekerja: "",
     detailWirausaha: "",
   })
+  const [isEditMode, setIsEditMode] = useState(false)
+
+  type TujuanKarirFormData = {
+    kategoriUtama: string
+    ptn1: string
+    jurusan1: string
+    ptn2: string
+    jurusan2: string
+    ptn3: string
+    jurusan3: string
+    detailBekerja: string
+    detailWirausaha: string
+  }
 
   if (status === "loading") return <div>Loading...</div>
   if (!session || session.user.role !== "STUDENT") redirect("/auth/student")
+
+  useEffect(() => {
+    const fetchTujuanKarir = async () => {
+      try {
+        const response = await fetch("/api/student/tujuan-karir")
+        const result = await response.json()
+        if (result.success && result.data) {
+          setFormData(result.data)
+          setIsEditMode(true)
+          toast.info("Tujuan karir Anda sudah ada, Anda dapat mengubahnya.")
+        }
+      } catch (error) {
+        console.error("Failed to fetch tujuan karir:", error)
+      }
+    }
+    fetchTujuanKarir()
+  }, [])
 
   const kategoriOptions = [
     {
@@ -71,15 +101,33 @@ export default function TujuanKarirForm() {
 
       if (data.success) {
         setStep(4)
-        toast.success("Tujuan karir berhasil disimpan!")
+        toast.success(isEditMode ? "Tujuan karir berhasil diperbarui!" : "Tujuan karir berhasil disimpan!")
       } else {
-        toast.error(data.message || "Gagal menyimpan tujuan karir")
+        toast.error(data.message || "Gagal " + (isEditMode ? "memperbarui" : "menyimpan") + " tujuan karir")
       }
     } catch (error) {
       toast.error("Terjadi kesalahan. Silakan coba lagi.")
     } finally {
       setLoading(false)
     }
+  }
+
+  const isFormValid = () => {
+    if (!formData.kategoriUtama) return false
+    if (formData.kategoriUtama === "kuliah") {
+      return (
+        (formData.ptn1 && formData.jurusan1) ||
+        (formData.ptn2 && formData.jurusan2) ||
+        (formData.ptn3 && formData.jurusan3)
+      )
+    }
+    if (formData.kategoriUtama === "bekerja") {
+      return !!formData.detailBekerja
+    }
+    if (formData.kategoriUtama === "wirausaha") {
+      return !!formData.detailWirausaha
+    }
+    return false
   }
 
   return (
@@ -91,17 +139,24 @@ export default function TujuanKarirForm() {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between mb-8"
         >
-          <div className="flex items-center gap-4">
-            <Link href="/student/dashboard">
-              <PremiumButton variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4" />
-                Kembali
-              </PremiumButton>
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Tujuan Karir</h1>
-              <p className="text-white/80">Tentukan tujuan Anda setelah lulus</p>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-4">
+              <Link href="/student/dashboard">
+                <PremiumButton variant="ghost" size="sm">
+                  <ArrowLeft className="w-4 h-4" />
+                  Kembali
+                </PremiumButton>
+              </Link>
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2">Tujuan Karir</h1>
+                <p className="text-white/80">Tentukan tujuan Anda setelah lulus</p>
+              </div>
             </div>
+            {isEditMode && (
+              <PremiumButton onClick={() => setStep(1)} className="ml-auto">
+                Edit Tujuan Karir
+              </PremiumButton>
+            )}
           </div>
         </motion.div>
 
@@ -179,9 +234,7 @@ export default function TujuanKarirForm() {
                 </div>
 
                 <div className="flex justify-end mt-8">
-                  <PremiumButton onClick={() => setStep(2)} disabled={!formData.kategoriUtama}>
-                    Lanjutkan
-                  </PremiumButton>
+                  <PremiumButton onClick={() => setStep(2)} disabled={!formData.kategoriUtama}>Lanjutkan</PremiumButton>
                 </div>
               </GlassCard>
             )}
@@ -266,10 +319,8 @@ export default function TujuanKarirForm() {
                 </form>
 
                 <div className="flex justify-between mt-8">
-                  <PremiumButton variant="secondary" onClick={() => setStep(1)}>
-                    Kembali
-                  </PremiumButton>
-                  <PremiumButton onClick={() => setStep(3)}>Lanjutkan</PremiumButton>
+                  <PremiumButton variant="secondary" onClick={() => setStep(1)}>Kembali</PremiumButton>
+                  <PremiumButton onClick={() => setStep(3)} disabled={!isFormValid()}>Lanjutkan</PremiumButton>
                 </div>
               </GlassCard>
             )}
@@ -325,20 +376,12 @@ export default function TujuanKarirForm() {
                     </div>
                   )}
 
-                  <div className="p-4 bg-orange-100/50 border border-orange-200 rounded-xl">
-                    <p className="text-orange-800 text-sm">
-                      <strong>Perhatian:</strong> Setelah disimpan, Anda tidak dapat mengubah tujuan karir ini. Pastikan
-                      semua data sudah benar.
-                    </p>
-                  </div>
                 </div>
 
                 <div className="flex justify-between mt-8">
-                  <PremiumButton variant="secondary" onClick={() => setStep(2)}>
-                    Kembali
-                  </PremiumButton>
+                  <PremiumButton variant="secondary" onClick={() => setStep(2)}>Kembali</PremiumButton>
                   <PremiumButton onClick={handleSubmit} loading={loading}>
-                    {loading ? "Menyimpan..." : "Simpan Tujuan Karir"}
+                    {loading ? (isEditMode ? "Memperbarui..." : "Menyimpan...") : isEditMode ? "Perbarui Tujuan Karir" : "Simpan Tujuan Karir"}
                   </PremiumButton>
                 </div>
               </GlassCard>

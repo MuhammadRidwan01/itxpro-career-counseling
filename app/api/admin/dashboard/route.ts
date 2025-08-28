@@ -26,7 +26,7 @@ export async function GET() {
       prisma.siswa.count({ where: { status: "AKTIF" } }),
       prisma.hasilKonseling.count(),
       prisma.tujuanKarir.count(),
-      prisma.hasilKonseling.count({ where: { status: "BELUM" } }), // Count unfinished counseling sessions
+      prisma.hasilKonseling.count({ where: { status: "PROSES" } }), // Count unfinished counseling sessions
     ])
 
     // Get tujuan karir distribution
