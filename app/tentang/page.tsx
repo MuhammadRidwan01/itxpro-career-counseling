@@ -8,6 +8,20 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function TentangPage() {
+  const konselorList = [
+    {
+      id: 1,
+      nama: "Bapak Dede Jamaludin, S.Pd.",
+      spesialisasi: "Karier",
+      foto: "/IMG_1227.jpg",
+    },
+    {
+      id: 2,
+      nama: "Ibu Shildi Andriani, S.Pd.",
+      spesialisasi: "Karier",
+      foto: "/IMG_1224.jpg",
+    },
+  ];
   return (
     <div className="min-h-screen bg-gradient-primary">
       <div className="container mx-auto px-6 py-8">
@@ -102,7 +116,7 @@ export default function TentangPage() {
             transition={{ duration: 0.6 }}
           >
             <GlassCard hover className="p-6 text-center h-full">
-              <h3 className="text-xl font-semibold text-nude-400 mb-4">VISI</h3>
+              <h3 className="text-xl font-semibold text-white mb-4">VISI</h3>
               <p className="text-sm md:text-base text-white/70 leading-relaxed">
                 Membentuk peserta didik yang berkarakter positif, mandiri, berprestasi, 
                 dan mampu mengambil keputusan bijak dalam kehidupan.
@@ -117,7 +131,7 @@ export default function TentangPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <GlassCard hover className="p-6 h-full">
-              <h3 className="text-xl font-semibold text-nude-400 mb-4 text-center">
+              <h3 className="text-xl font-semibold text-white mb-4 text-center">
                 MISI
               </h3>
               <ul className="text-sm md:text-base text-white/70 leading-relaxed space-y-3">
@@ -128,7 +142,7 @@ export default function TentangPage() {
                   "Mendukung terciptanya lingkungan sekolah yang harmonis dan kondusif.",
                 ].map((misi, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <ChevronRight className="w-4 h-4 text-gold-400 mt-1" />
+                    <ChevronRight className="w-4 h-4 text-gold-500 mt-1" />
                     {misi}
                   </li>
                 ))}
@@ -143,49 +157,38 @@ export default function TentangPage() {
     Tim Konselor
   </h2>
 
-  <div className="flex justify-center">
-    <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
-      {[
-        {
-          id: 1,
-          nama: "",
-          spesialisasi: "Karier",
-          foto: "/IMG_1227.jpg",
-        },
-        {
-          id: 2,
-          nama: "",
-          spesialisasi: "Karier",
-          foto: "/IMG_1224.jpg",
-        },
-      ].map((konselor, i) => (
-        <motion.div
-          key={konselor.id}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: i * 0.2 }}
-        >
-          <GlassCard hover className="p-6 text-center flex flex-col items-center">
-            {/* Foto persegi panjang (lebih besar lagi) */}
-            <div className="mb-4 relative w-80 h-44">
-              <Image
-                src={konselor.foto}
-                alt={`Foto ${konselor.nama}`}
-                fill
-                className="rounded-xl object-cover"
-              />
-            </div>
-            <h4 className="text-lg font-semibold text-white">
-              {konselor.nama}
-            </h4>
-            {/* <p className="text-sm text-white/70">
-              Spesialisasi: {konselor.spesialisasi}
-            </p> */}
-          </GlassCard>
-        </motion.div>
-      ))}
-    </div>
-  </div>
+      <div className="flex justify-center">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
+          {konselorList.map((konselor, i) => (
+            <motion.div
+              key={konselor.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: i * 0.2 }}
+            >
+              <GlassCard hover className="p-6 text-center flex flex-col items-center">
+                {/* Foto persegi panjang (lebih besar lagi) */}
+                <div className="mb-4 relative w-80 h-44">
+                  <Image
+                    src={konselor.foto}
+                    alt={`Foto ${konselor.nama}`}
+                    fill
+                    className="rounded-xl object-cover"
+                  />
+                </div>
+                <div className="mt-2">
+                  <h4 className="text-lg font-semibold text-white">
+                    {konselor.nama}
+                  </h4>
+                </div>
+                {/* <p className="text-sm text-white/70">
+                  Spesialisasi: {konselor.spesialisasi}
+                </p> */}
+              </GlassCard>
+            </motion.div>
+          ))}
+        </div>
+      </div>
 </div>
 
       </div>
