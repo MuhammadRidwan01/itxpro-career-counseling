@@ -142,7 +142,7 @@ export default function StudentLogin() {
                 </label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-sm text-gold-600 hover:text-gold-700 transition-colors"
+                  className="text-sm text-nude-700 hover:text-gold-700 transition-colors"
                 >
                   Lupa password?
                 </Link>
@@ -158,7 +158,7 @@ export default function StudentLogin() {
                 Belum punya akun?{" "}
                 <Link
                   href="/auth/student/register"
-                  className="text-gold-600 hover:text-gold-700 font-medium transition-colors"
+                  className="text-nude-800 hover:text-gold-700 font-medium transition-colors"
                 >
                   Daftar di sini
                 </Link>
