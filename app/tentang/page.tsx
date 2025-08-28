@@ -27,6 +27,7 @@ export default function TentangPage() {
 
         {/* Hero Section */}
         <motion.div
+        
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -58,7 +59,7 @@ export default function TentangPage() {
             className="flex justify-center"
           >
             <Image
-              src="/images/counseling.png"
+              src="/IMG_1329.jpg"
               alt="Ilustrasi Bimbingan Konseling"
               width={450}
               height={450}
@@ -136,37 +137,56 @@ export default function TentangPage() {
           </motion.div>
         </div>
 
-        {/* Tim Konselor (opsional) */}
-        <div className="m-4 md:m-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">
-            Tim Konselor
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[1, 2].map((i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.2 }}
-              >
-                <GlassCard hover className="p-6 text-center">
-                  <Image
-                    src={`/images/counselor${i}.jpg`}
-                    alt={`Konselor ${i}`}
-                    width={120}
-                    height={120}
-                    className="rounded-full mx-auto mb-4"
-                  />
-                  <h4 className="text-lg font-semibold text-white">
-                    Konselor {i}
-                  </h4>
-                  <p className="text-sm text-white/70">Spesialisasi: Karier</p>
-                </GlassCard>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+       {/* Tim Konselor (opsional) */}
+<div className="m-4 md:m-10">
+  <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">
+    Tim Konselor
+  </h2>
+
+  <div className="flex justify-center">
+    <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
+      {[
+        {
+          id: 1,
+          nama: "Konselor 1",
+          spesialisasi: "Karier",
+          foto: "/IMG_1227.jpg",
+        },
+        {
+          id: 2,
+          nama: "Konselor 2",
+          spesialisasi: "Karier",
+          foto: "/images/counselor2.jpg",
+        },
+      ].map((konselor, i) => (
+        <motion.div
+          key={konselor.id}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: i * 0.2 }}
+        >
+          <GlassCard hover className="p-6 text-center flex flex-col items-center">
+            <div className="w-full h-48 mb-4 relative">
+              <Image
+                src={konselor.foto}
+                alt={`Foto ${konselor.nama}`}
+                fill
+                className="rounded-xl object-cover"
+              />
+            </div>
+            <h4 className="text-lg font-semibold text-white">
+              {konselor.nama}
+            </h4>
+            <p className="text-sm text-white/70">
+              Spesialisasi: {konselor.spesialisasi}
+            </p>
+          </GlassCard>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</div>
       </div>
     </div>
   );
-}
+} 
