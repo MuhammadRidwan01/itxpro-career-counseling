@@ -16,7 +16,7 @@ interface Konseling {
   hasilText: string
   deskripsi?: string
   tindakLanjut?: string
-  status: "SUDAH" | "BELUM"
+  status: "SUDAH" | "BELUM" | "PROSES"
   kategori: string
   createdAt: string // Add createdAt
   siswa: {
@@ -102,19 +102,23 @@ export function KonselingList({ fetchDashboardData }: KonselingListProps) {
   const konselingStatuses = [
     { label: "Semua Status", value: "all" },
     { label: "Selesai", value: "SUDAH" },
+    { label: "Dalam Proses", value: "PROSES" },
     { label: "Belum Selesai", value: "BELUM" },
   ]
 
-  const renderStatusBadge = (status: "SUDAH" | "BELUM") => {
+  const renderStatusBadge = (status: "SUDAH" | "BELUM" | "PROSES") => {
+    const statusConfig = {
+      SUDAH: { bg: "bg-green-100", text: "text-green-800", border: "border-green-200", label: "✓ Selesai" },
+      PROSES: { bg: "bg-blue-100", text: "text-blue-800", border: "border-blue-200", label: "↻ Dalam Proses" },
+      BELUM: { bg: "bg-yellow-100", text: "text-yellow-800", border: "border-yellow-200", label: "⏳ Belum Selesai" }
+    }
+    const config = statusConfig[status]
+    
     return (
       <div
-        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          status === "SUDAH"
-            ? "bg-green-100 text-green-800 border border-green-200"
-            : "bg-yellow-100 text-yellow-800 border border-yellow-200"
-        }`}
+        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text} border ${config.border}`}
       >
-        {status === "SUDAH" ? "✓ Selesai" : "⏳ Belum Selesai"}
+        {config.label}
       </div>
     )
   }

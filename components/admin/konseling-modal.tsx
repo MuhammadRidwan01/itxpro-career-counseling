@@ -18,7 +18,7 @@ interface Konseling {
   hasilText: string
   deskripsi?: string // Make optional
   tindakLanjut?: string // Make optional
-  status: 'SELESAI' | 'PROSES'
+  status: 'SUDAH' | 'BELUM' | 'PROSES'
   kategori: string
   createdAt: string // Add createdAt
   siswa: {
@@ -51,7 +51,7 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
     hasilText: string
     deskripsi: string
     tindakLanjut: string
-    status: "SELESAI" | "PROSES"
+    status: "SUDAH" | "BELUM" | "PROSES"
     kategori: string
   }>({
     nisSiswa: "",
@@ -497,14 +497,15 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
                 <Label htmlFor="status">Status Konseling</Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value as "SELESAI" | "PROSES" })}
+                  onValueChange={(value) => setFormData({ ...formData, status: value as "SUDAH" | "BELUM" | "PROSES" })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="SELESAI">Selesai</SelectItem>
+                    <SelectItem value="SUDAH">Selesai</SelectItem>
                     <SelectItem value="PROSES">Proses</SelectItem>
+                    <SelectItem value="BELUM">Belum Selesai</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -563,7 +564,7 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     <span>Menyimpan...</span>
                   </div>
-                ) : isEdit && formData.status === "SELESAI" ? (
+                ) : isEdit && formData.status === "SUDAH" ? (
                   "Selesaikan Konseling"
                 ) : isEdit ? (
                   "Update Konseling"
