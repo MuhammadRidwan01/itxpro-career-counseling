@@ -98,6 +98,41 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true) // Keep this for initial dashboard load
   const [activeTab, setActiveTab] = useState("overview")
 
+  const handleExportCareerData = async () => {
+    try {
+      const response = await fetch("/api/admin/tujuan-karir/export");
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "data_tujuan_karir.xlsx";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        toast({
+          title: "Ekspor Berhasil",
+          description: "Data tujuan karir telah berhasil diekspor ke Excel.",
+        });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Ekspor Gagal",
+          description: errorData.message || "Terjadi kesalahan saat mengekspor data tujuan karir.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error exporting career data:", error);
+      toast({
+        title: "Ekspor Gagal",
+        description: "Terjadi kesalahan jaringan atau server.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // State for search and filters
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -318,6 +353,7 @@ export default function AdminDashboard() {
             filterAngkatan={filterAngkatan}
             setFilterAngkatan={setFilterAngkatan}
             loadingStudents={loading}
+            handleExportStudents={handleExportCareerData} // Re-using handleExportCareerData for student export
           />
         )}
 
@@ -332,6 +368,7 @@ export default function AdminDashboard() {
             tujuanKarir={tujuanKarir}
             fetchDashboardData={fetchDashboardData}
             handleDeleteTujuanKarir={handleDeleteTujuanKarir}
+            handleExportCareerData={handleExportCareerData} // Pass the new function
           />
         )}
 

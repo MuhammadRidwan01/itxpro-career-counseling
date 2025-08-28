@@ -35,6 +35,7 @@ interface StudentListProps {
   filterAngkatan: string; // Added
   setFilterAngkatan: (angkatan: string) => void; // Added
   loadingStudents: boolean; // Added
+  handleExportStudents: () => void; // Added
 }
 
 export function StudentList({
@@ -50,6 +51,7 @@ export function StudentList({
   filterAngkatan,
   setFilterAngkatan,
   loadingStudents,
+  handleExportStudents,
 }: StudentListProps) {
   // Removed local state for searchTerm, filterStatus, debouncedSearchTerm
   const [showMobileFilters, setShowMobileFilters] = useState(false)
@@ -101,6 +103,13 @@ export function StudentList({
               >
                 <Plus className="w-4 h-4" />
                 Tambah Siswa
+              </PremiumButton>
+              <PremiumButton
+                onClick={handleExportStudents}
+                variant="secondary"
+                size="sm"
+              >
+                Export Excel
               </PremiumButton>
             </div>
           </div>

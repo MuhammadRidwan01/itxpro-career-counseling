@@ -18,7 +18,7 @@ interface Konseling {
   hasilText: string
   deskripsi?: string // Make optional
   tindakLanjut?: string // Make optional
-  status: 'SUDAH' | 'BELUM'
+  status: 'SELESAI' | 'PROSES'
   kategori: string
   createdAt: string // Add createdAt
   siswa: {
@@ -51,7 +51,7 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
     hasilText: string
     deskripsi: string
     tindakLanjut: string
-    status: "SUDAH" | "BELUM"
+    status: "SELESAI" | "PROSES"
     kategori: string
   }>({
     nisSiswa: "",
@@ -59,7 +59,7 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
     hasilText: "",
     deskripsi: "",
     tindakLanjut: "",
-    status: "BELUM" as const,
+    status: "PROSES" as const,
     kategori: "akademik",
   })
   const [students, setStudents] = useState<Student[]>([])
@@ -177,7 +177,7 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
         hasilText: "",
         deskripsi: "",
         tindakLanjut: "",
-        status: "BELUM",
+        status: "PROSES",
         kategori: "akademik",
       })
       setShowStudentList(true) // Show student list for new entries
@@ -252,9 +252,9 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
       hasilText: "",
       deskripsi: "",
       tindakLanjut: "",
-      status: "BELUM",
+      status: "PROSES",
       kategori: "akademik",
-    })
+  })
     setError("")
     setShowStudentList(false) // Reset visibility on close
     onClose()
@@ -452,7 +452,6 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
               </div>
             )
           )}
-
           {/* Konseling Details Section */}
           <div className="bg-gray-50/50 p-6 rounded-lg border border-gray-100 space-y-4">
             <h3 className="font-medium text-lg text-gray-800 flex items-center gap-2">
@@ -490,6 +489,22 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
                     <SelectItem value="pribadi">Pribadi</SelectItem>
                     <SelectItem value="sosial">Sosial</SelectItem>
                     <SelectItem value="belajar">Belajar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status Konseling</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value as "SELESAI" | "PROSES" })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="SELESAI">Selesai</SelectItem>
+                    <SelectItem value="PROSES">Proses</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -548,7 +563,7 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     <span>Menyimpan...</span>
                   </div>
-                ) : isEdit && formData.status === "SUDAH" ? (
+                ) : isEdit && formData.status === "SELESAI" ? (
                   "Selesaikan Konseling"
                 ) : isEdit ? (
                   "Update Konseling"
@@ -558,6 +573,7 @@ export function KonselingModal({ isOpen, onClose, onSuccess, konseling }: Konsel
               </Button>
             </div>
           </div>
+
         </form>
       </DialogContent>
     </Dialog>

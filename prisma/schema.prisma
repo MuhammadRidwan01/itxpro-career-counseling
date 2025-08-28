@@ -46,7 +46,7 @@ model HasilKonseling {
   hasilText        String
   deskripsi        String?
   tindakLanjut     String?
-  status           StatusKonseling @default(BELUM)
+  status           StatusKonseling @default(PROSES)
   kategori         String?
   adminId          String
   createdAt        DateTime        @default(now())
@@ -90,4 +90,5 @@ enum Status {
 enum StatusKonseling {
   SUDAH
   BELUM
+  PROSES
 }
