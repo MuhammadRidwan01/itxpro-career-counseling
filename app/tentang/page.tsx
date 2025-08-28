@@ -26,7 +26,7 @@ export default function TentangPage() {
           <GlassCard hover className="p-6 md:p-10 m-4 md:m-10 text-center">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
               Bimbingan Konseling
-              <span className="block bg-gradient-to-r from-gold-400 to-gold-600 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                 SMK ITXPRO 2026
               </span>
             </h1>
