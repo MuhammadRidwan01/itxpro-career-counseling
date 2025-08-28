@@ -36,7 +36,7 @@ export default function TentangPage() {
           <div>
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
               Bimbingan Konseling
-              <span className="block bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-nude-400 to-nude-600 bg-clip-text text-transparent">
                 SMK ITXPRO 2026
               </span>
             </h1>
