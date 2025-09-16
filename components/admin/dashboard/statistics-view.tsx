@@ -72,6 +72,7 @@ interface StatsData {
   availableClasses: string[]
   availableKonselingCategories: string[]
   availableTujuanKarirCategories: string[]
+  availableClassesUnfiltered: string[]
   konselingStatsByClass: { [key: string]: { totalStudents: number } } // New
 }
 
@@ -86,8 +87,10 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
+  const [endDate, setEndDate] = useState<Date | undefined>(new Date())
   const [selectedClass, setSelectedClass] = useState<string | undefined>(undefined)
+  const [selectedClasses, setSelectedClasses] = useState<string[]>([])
+  const [allAvailableClasses, setAllAvailableClasses] = useState<string[]>([])
   const [selectedKonselingCategory, setSelectedKonselingCategory] = useState<string | undefined>(undefined)
   const [selectedTujuanKarirCategory, setSelectedTujuanKarirCategory] = useState<string | undefined>(undefined)
   const [dateError, setDateError] = useState<string | null>(null)
@@ -147,8 +150,10 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
         params.append("endDate", endOfDay.toISOString())
       }
 
-      if (selectedClass && selectedClass !== "all") {
-        params.append("kelasSaatIni", selectedClass)
+      if (selectedClasses.length > 0) {
+        selectedClasses.forEach(kelas => {
+          params.append("kelasSaatIni", kelas)
+        })
       }
 
       if (selectedKonselingCategory && selectedKonselingCategory !== "all") {
@@ -186,6 +191,21 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
       if (result.success) {
         if (!result.data || typeof result.data !== 'object') {
           throw new Error("Data statistik tidak valid")
+        }
+
+        // Simpan semua kelas yang tersedia untuk dropdown
+        console.log("API response data:", result.data)
+        console.log("availableClassesUnfiltered:", result.data.availableClassesUnfiltered)
+        console.log("availableClasses:", result.data.availableClasses)
+
+        if (result.data.availableClassesUnfiltered) {
+          setAllAvailableClasses(result.data.availableClassesUnfiltered)
+          console.log("Setting allAvailableClasses to unfiltered:", result.data.availableClassesUnfiltered)
+        } else if (result.data.availableClasses) {
+          setAllAvailableClasses(result.data.availableClasses)
+          console.log("Setting allAvailableClasses to filtered:", result.data.availableClasses)
+        } else {
+          console.log("No class data found in API response")
         }
 
         // Validasi struktur data yang diharapkan
@@ -231,7 +251,7 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [startDate, endDate, selectedClass, selectedKonselingCategory, selectedTujuanKarirCategory, dateError])
+  }, [startDate, endDate, selectedClasses, selectedKonselingCategory, selectedTujuanKarirCategory, dateError])
 
   const handleApplyFilters = () => {
     if (!isFilterValid()) {
@@ -316,7 +336,7 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
   }
 
   
-  const hasActiveFilters = startDate || endDate || selectedClass || selectedKonselingCategory || selectedTujuanKarirCategory
+  const hasActiveFilters = startDate || endDate || selectedClasses.length > 0 || selectedKonselingCategory || selectedTujuanKarirCategory
 
   const handleStartDateChange = (date: Date | undefined) => {
     setStartDate(date)
@@ -336,10 +356,18 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
     }
   }
 
+  const handleAddClass = (kelas: string) => {
+    if (kelas === "all") {
+      setSelectedClasses([])
+    } else if (!selectedClasses.includes(kelas)) {
+      setSelectedClasses(prev => [...prev, kelas])
+    }
+  }
+
   const clearAllFilters = () => {
     setStartDate(undefined)
-    setEndDate(undefined)
-    setSelectedClass(undefined)
+    setEndDate(new Date())
+    setSelectedClasses([])
     setSelectedKonselingCategory(undefined)
     setSelectedTujuanKarirCategory(undefined)
     setDateError(null)
@@ -434,10 +462,21 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
                     Akhir: {format(endDate, "dd/MM/yyyy")}
                   </Badge>
                 )}
-                {selectedClass && selectedClass !== "all" && (
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                    Kelas: {selectedClass}
-                  </Badge>
+                {selectedClasses.length > 0 && (
+                  selectedClasses.map(kelas => (
+                    <Badge key={kelas} variant="secondary" className="bg-blue-100 text-blue-700">
+                      Kelas: {kelas}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedClasses(prev => prev.filter(c => c !== kelas))
+                        }}
+                        className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  ))
                 )}
                 {selectedKonselingCategory && selectedKonselingCategory !== "all" && (
                   <Badge variant="secondary" className="bg-blue-100 text-blue-700">
@@ -476,7 +515,7 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
                     selected={startDate}
                     onSelect={handleStartDateChange}
                     initialFocus
-                    disabled={(date) => endDate ? date > endDate : false}
+                    disabled={(date) => date > new Date() || (endDate ? date > endDate : false)}
                   />
                 </PopoverContent>
               </Popover>
@@ -503,7 +542,7 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
                     selected={endDate}
                     onSelect={handleEndDateChange}
                     initialFocus
-                    disabled={(date) => startDate ? date < startDate : false}
+                    disabled={(date) => date > new Date() || (startDate ? date < startDate : false)}
                   />
                 </PopoverContent>
               </Popover>
@@ -511,17 +550,36 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Filter Kelas</label>
-              <Select onValueChange={setSelectedClass} value={selectedClass}>
+              <Select onValueChange={handleAddClass} value="">
                 <SelectTrigger className="bg-white/80 border-white/20 backdrop-blur-sm">
                   <SelectValue placeholder="Pilih Kelas" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Semua Kelas</SelectItem>
-                  {stats?.availableClasses?.map((kelas) => (
+                  {console.log("Rendering dropdown, allAvailableClasses:", allAvailableClasses)}
+                  {(allAvailableClasses.length > 0 ? allAvailableClasses : [
+                    "X 1", "X 2", "X 3", "XI 1", "XI 2", "XI 3",
+                    "XII DKV", "XII RPL 1", "XII TKJ", "XII RPL 2"
+                  ]).map((kelas) => (
                     <SelectItem key={kelas} value={kelas}>{kelas}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {selectedClasses.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {selectedClasses.map(kelas => (
+                    <Badge key={kelas} variant="secondary" className="bg-blue-100 text-blue-700">
+                      {kelas}
+                      <button
+                        onClick={() => setSelectedClasses(prev => prev.filter(c => c !== kelas))}
+                        className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -532,9 +590,14 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Semua Kategori</SelectItem>
-                  {stats?.availableKonselingCategories?.map((category) => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
-                  ))}
+                  {console.log("Konseling categories:", stats?.availableKonselingCategories)}
+                  {stats?.availableKonselingCategories && stats.availableKonselingCategories.length > 0 ? (
+                    stats.availableKonselingCategories.map((category) => (
+                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-data" disabled>Tidak ada kategori</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -547,9 +610,14 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Semua Kategori</SelectItem>
-                  {stats?.availableTujuanKarirCategories?.map((category) => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
-                  ))}
+                  {console.log("Karir categories:", stats?.availableTujuanKarirCategories)}
+                  {stats?.availableTujuanKarirCategories && stats.availableTujuanKarirCategories.length > 0 ? (
+                    stats.availableTujuanKarirCategories.map((category) => (
+                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-data" disabled>Tidak ada kategori</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>

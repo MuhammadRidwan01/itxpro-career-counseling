@@ -51,27 +51,53 @@ export async function GET(request: NextRequest) {
         ? { kategoriUtama: tujuanKarirCategoryParam }
         : {}
 
-    const classFilter = {
-      ...(kelasSaatIniParam && kelasSaatIniParam !== "all" ? { kelasSaatIni: kelasSaatIniParam } : {}),
-      ...(status && status !== "all" ? { status: status } : {}),
-      ...(jurusan && jurusan !== "all" ? { jurusan: jurusan } : {}),
-      ...(angkatan && angkatan !== "all" ? { angkatan: parseInt(angkatan) } : {}),
+    // Build student filters properly
+    const studentFilter: any = {}
+
+    // Add class filter
+    if (kelasSaatIniParam && kelasSaatIniParam !== "all") {
+      studentFilter.kelasSaatIni = kelasSaatIniParam
     }
 
-    const searchFilter = search
-      ? {
-          OR: [
-            { nama: { contains: search, mode: "insensitive" } },
-            { nis: { contains: search } },
-            { email: { contains: search, mode: "insensitive" } },
-          ],
-        }
-      : {}
+    // Add other filters
+    if (status && status !== "all") {
+      studentFilter.status = status
+    }
 
-    // Combine filters
-    const studentFilter = {
-      ...classFilter,
-      ...searchFilter,
+    if (jurusan && jurusan !== "all") {
+      studentFilter.jurusan = jurusan
+    }
+
+    if (angkatan && angkatan !== "all") {
+      studentFilter.angkatan = parseInt(angkatan)
+    }
+
+    // Add search filter
+    if (search) {
+      studentFilter.OR = [
+        { nama: { contains: search, mode: "insensitive" as any } },
+        { nis: { contains: search } },
+        { email: { contains: search, mode: "insensitive" as any } },
+      ]
+    }
+
+    // Base student filter for classes query (without search to avoid type conflicts)
+    const baseStudentFilter: any = {}
+    
+    if (kelasSaatIniParam && kelasSaatIniParam !== "all") {
+      baseStudentFilter.kelasSaatIni = kelasSaatIniParam
+    }
+
+    if (status && status !== "all") {
+      baseStudentFilter.status = status
+    }
+
+    if (jurusan && jurusan !== "all") {
+      baseStudentFilter.jurusan = jurusan
+    }
+
+    if (angkatan && angkatan !== "all") {
+      baseStudentFilter.angkatan = parseInt(angkatan)
     }
 
     // Comprehensive Counseling Statistics
@@ -83,9 +109,9 @@ export async function GET(request: NextRequest) {
       studentsNotSubmittedTujuanKarir,
       classesWithStudents,
       allClasses,
-      allKonselingCategories, // New
-      allTujuanKarirCategories, // New
-      konselingRecordsWithSiswa, // New: Fetch konseling records with siswa details
+      allKonselingCategories, // Fetch ALL categories without filters
+      allTujuanKarirCategories, // Fetch ALL categories without filters
+      konselingRecordsWithSiswa,
     ] = await Promise.all([
       prisma.hasilKonseling.count({
         where: {
@@ -158,29 +184,40 @@ export async function GET(request: NextRequest) {
           kelasSaatIni: {
             not: null,
           },
-          ...studentFilter,
+          // Only apply base student filter without search
+          ...baseStudentFilter,
         },
       }),
-      prisma.hasilKonseling.findMany({ // Fetch all unique konseling categories
+      // Fetch ALL konseling categories without any filters
+      prisma.hasilKonseling.findMany({
         distinct: ["kategori"],
         select: {
           kategori: true,
         },
         where: {
           kategori: {
-            not: "", // Filter out empty strings if any, or use isNot null if appropriate for your data
+            not: null,
+            not: "", // Filter out empty strings
           },
         },
+        orderBy: {
+          kategori: "asc",
+        },
       }),
-      prisma.tujuanKarir.findMany({ // Fetch all unique tujuan karir categories
+      // Fetch ALL tujuan karir categories without any filters
+      prisma.tujuanKarir.findMany({
         distinct: ["kategoriUtama"],
         select: {
           kategoriUtama: true,
         },
         where: {
           kategoriUtama: {
-            not: "", // Filter out empty strings if any, or use isNot null if appropriate for your data
+            not: null,
+            not: "", // Filter out empty strings
           },
+        },
+        orderBy: {
+          kategoriUtama: "asc",
         },
       }),
       // New query: Fetch konseling records with associated siswa details
@@ -201,8 +238,7 @@ export async function GET(request: NextRequest) {
       }),
     ])
 
-
-const konselingStatsByClass: {
+    const konselingStatsByClass: {
       [key: string]: {
         totalStudents: number;
       };
@@ -227,6 +263,7 @@ const konselingStatsByClass: {
         totalStudents: uniqueStudentsByClass[kelas].size,
       };
     }
+
     const studentsNotSubmittedByClass: {
       [key: string]: {
         students: { nis: string; nama: string }[];
@@ -267,9 +304,10 @@ const konselingStatsByClass: {
       studentsNotSubmittedDetails: studentsNotSubmittedTujuanKarir,
       studentsNotSubmittedByClass,
       availableClasses: allClasses.map((c: { kelasSaatIni: string | null }) => c.kelasSaatIni!).filter(Boolean) as string[],
+      // These will now contain ALL available categories, not filtered ones
       availableKonselingCategories: allKonselingCategories.map((c: { kategori: string | null }) => c.kategori!).filter(Boolean) as string[],
       availableTujuanKarirCategories: allTujuanKarirCategories.map((c: { kategoriUtama: string | null }) => c.kategoriUtama!).filter(Boolean) as string[],
-      konselingStatsByClass, // Add the new stats
+      konselingStatsByClass,
     }
 
     return NextResponse.json({
