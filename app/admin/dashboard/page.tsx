@@ -143,6 +143,16 @@ export default function AdminDashboard() {
   const [filterJurusan, setFilterJurusan] = useState('all');
   const [filterAngkatan, setFilterAngkatan] = useState('all');
 
+  // Reset filters when switching tabs
+  useEffect(() => {
+    if (activeTab !== 'students' && activeTab !== 'statistics') {
+      setSearchTerm('');
+      setFilterStatus('all');
+      setFilterJurusan('all');
+      setFilterAngkatan('all');
+    }
+  }, [activeTab]);
+
   // Debounced search term for API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -158,19 +168,34 @@ export default function AdminDashboard() {
     setLoadingStudents(true); // Set loading for students list
     try {
       // Construct URL for fetching students with search and filter parameters
-      const studentParams = new URLSearchParams({
-        search: debouncedSearchTerm,
-        status: filterStatus !== 'all' ? filterStatus : '', // Only append status if not 'all'
-        jurusan: filterJurusan !== 'all' ? filterJurusan : '', // Only append jurusan if not 'all'
-        angkatan: filterAngkatan !== 'all' ? filterAngkatan : '', // Only append angkatan if not 'all'
-        all: 'true', // Fetch all data to ensure search works across all students
-      });
+      const studentParams = new URLSearchParams()
+
+      // Only add search and filter parameters if we're on the students or statistics tab
+      if (activeTab === 'students' || activeTab === 'statistics') {
+        if (debouncedSearchTerm) {
+          studentParams.append('search', debouncedSearchTerm)
+        }
+        if (filterStatus !== 'all') {
+          studentParams.append('status', filterStatus)
+        }
+        if (filterJurusan !== 'all') {
+          studentParams.append('jurusan', filterJurusan)
+        }
+        if (filterAngkatan !== 'all') {
+          studentParams.append('angkatan', filterAngkatan)
+        }
+        studentParams.append('all', 'true')
+      }
 
       // Optimize by fetching only what's needed for the current tab
       const promises = [fetch('/api/admin/dashboard')]
-      
-      if (activeTab === 'students' || activeTab === 'overview') {
-        promises.push(fetch(`/api/admin/siswa?${studentParams.toString()}`))
+
+      if (activeTab === 'students' || activeTab === 'overview' || activeTab === 'statistics') {
+        const studentUrl = (activeTab === 'students' || activeTab === 'statistics')
+          ? `/api/admin/siswa?${studentParams.toString()}`
+          : '/api/admin/siswa?all=true'
+        promises.push(fetch(studentUrl))
+
         // Fetch all students for filter options (only once)
         if (allStudents.length === 0) {
           promises.push(fetch('/api/admin/siswa?all=true'))
@@ -186,7 +211,7 @@ export default function AdminDashboard() {
         promises.push(fetch('/api/admin/tujuan-karir'))
       }
       
-      if (activeTab === 'konseling' || activeTab === 'overview') {
+      if (activeTab === 'konseling' || activeTab === 'overview' || activeTab === 'statistics') {
         promises.push(fetch('/api/admin/konseling/stats'))
       }
 

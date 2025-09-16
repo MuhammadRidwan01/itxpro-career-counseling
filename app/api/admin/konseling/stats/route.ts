@@ -26,6 +26,10 @@ export async function GET(request: NextRequest) {
     const kelasSaatIniParam = searchParams.get("kelasSaatIni")
     const konselingCategoryParam = searchParams.get("konselingCategory")
     const tujuanKarirCategoryParam = searchParams.get("tujuanKarirCategory")
+    const search = searchParams.get("search")
+    const status = searchParams.get("status")
+    const jurusan = searchParams.get("jurusan")
+    const angkatan = searchParams.get("angkatan")
 
     const dateFilter =
       startDateParam && endDateParam
@@ -47,10 +51,28 @@ export async function GET(request: NextRequest) {
         ? { kategoriUtama: tujuanKarirCategoryParam }
         : {}
 
-    const classFilter =
-      kelasSaatIniParam && kelasSaatIniParam !== "all"
-        ? { kelasSaatIni: kelasSaatIniParam }
-        : {}
+    const classFilter = {
+      ...(kelasSaatIniParam && kelasSaatIniParam !== "all" ? { kelasSaatIni: kelasSaatIniParam } : {}),
+      ...(status && status !== "all" ? { status: status } : {}),
+      ...(jurusan && jurusan !== "all" ? { jurusan: jurusan } : {}),
+      ...(angkatan && angkatan !== "all" ? { angkatan: parseInt(angkatan) } : {}),
+    }
+
+    const searchFilter = search
+      ? {
+          OR: [
+            { nama: { contains: search, mode: "insensitive" } },
+            { nis: { contains: search } },
+            { email: { contains: search, mode: "insensitive" } },
+          ],
+        }
+      : {}
+
+    // Combine filters
+    const studentFilter = {
+      ...classFilter,
+      ...searchFilter,
+    }
 
     // Comprehensive Counseling Statistics
     const [
@@ -65,7 +87,13 @@ export async function GET(request: NextRequest) {
       allTujuanKarirCategories, // New
       konselingRecordsWithSiswa, // New: Fetch konseling records with siswa details
     ] = await Promise.all([
-      prisma.hasilKonseling.count({ where: { ...dateFilter, ...konselingCategoryFilter } }),
+      prisma.hasilKonseling.count({
+        where: {
+          ...dateFilter,
+          ...konselingCategoryFilter,
+          siswa: studentFilter
+        }
+      }),
       prisma.hasilKonseling.groupBy({
         by: ["kategori"],
         _count: {
@@ -76,12 +104,16 @@ export async function GET(request: NextRequest) {
             kategori: "desc",
           },
         },
-        where: { ...dateFilter, ...konselingCategoryFilter },
+        where: {
+          ...dateFilter,
+          ...konselingCategoryFilter,
+          siswa: studentFilter
+        },
       }),
       prisma.tujuanKarir.count({
         where: {
           ...tujuanKarirCategoryFilter,
-          siswa: classFilter.kelasSaatIni ? { kelasSaatIni: classFilter.kelasSaatIni } : undefined,
+          siswa: studentFilter,
         },
       }),
       prisma.tujuanKarir.groupBy({
@@ -96,13 +128,13 @@ export async function GET(request: NextRequest) {
         },
         where: {
           ...tujuanKarirCategoryFilter,
-          siswa: classFilter.kelasSaatIni ? { kelasSaatIni: classFilter.kelasSaatIni } : undefined,
+          siswa: studentFilter,
         },
       }),
       prisma.siswa.findMany({
         where: {
           tujuanKarirSubmitted: false,
-          ...classFilter,
+          ...studentFilter,
         },
         select: {
           nis: true,
@@ -115,7 +147,7 @@ export async function GET(request: NextRequest) {
         _count: {
           nis: true,
         },
-        where: classFilter,
+        where: studentFilter,
       }),
       prisma.siswa.findMany({
         distinct: ["kelasSaatIni"],
@@ -126,6 +158,7 @@ export async function GET(request: NextRequest) {
           kelasSaatIni: {
             not: null,
           },
+          ...studentFilter,
         },
       }),
       prisma.hasilKonseling.findMany({ // Fetch all unique konseling categories
@@ -152,7 +185,11 @@ export async function GET(request: NextRequest) {
       }),
       // New query: Fetch konseling records with associated siswa details
       prisma.hasilKonseling.findMany({
-        where: { ...dateFilter, ...konselingCategoryFilter },
+        where: {
+          ...dateFilter,
+          ...konselingCategoryFilter,
+          siswa: studentFilter
+        },
         select: {
           nisSiswa: true,
           siswa: {
