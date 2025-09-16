@@ -691,24 +691,43 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
             <div className="h-80">
               {stats?.tujuanKarirByCategory && stats.tujuanKarirByCategory.length > 0 ? (
                 <ChartContainer config={{}} className="h-full w-full">
-                  <PieChart>
-                    <Pie
-                      data={stats.tujuanKarirByCategory || []}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={120}
-                      paddingAngle={5}
+                  <BarChart accessibilityLayer data={stats.tujuanKarirByCategory || []}>
+                    <XAxis
+                      dataKey="category"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                      className="text-xs"
+                    />
+                    <YAxis
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                      className="text-xs"
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent />}
+                    />
+                    <Bar
                       dataKey="count"
+                      fill="url(#gradientTujuanKarir)"
+                      radius={8}
+                      fillOpacity={0.8}
+                      className="cursor-pointer"
                       onClick={(data) => handleBarClick(data, "tujuanKarir", "category")}
                     >
                       {(stats.tujuanKarirByCategory || []).map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={`hsl(${(index * 60) % 360}, 70%, 60%)`} />
                       ))}
-                    </Pie>
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend />
-                  </PieChart>
+                    </Bar>
+                    <defs>
+                      <linearGradient id="gradientTujuanKarir" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="rgba(168, 85, 247, 0.8)" />
+                        <stop offset="100%" stopColor="rgba(236, 72, 153, 0.8)" />
+                      </linearGradient>
+                    </defs>
+                  </BarChart>
                 </ChartContainer>
               ) : (
                 <div className="h-full flex items-center justify-center">
@@ -733,15 +752,15 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-slate-800">Total Konseling per Kelas</h3>
-                <p className="text-sm text-slate-600">Jumlah konseling per kelas</p>
+                <p className="text-sm text-slate-600">Jumlah konseling per kelas (berdasarkan filter)</p>
               </div>
             </div>
             <div className="h-80">
-              {konselingStatsByClass && Object.keys(konselingStatsByClass).length > 0 ? (
+              {stats?.konselingStatsByClass && Object.keys(stats.konselingStatsByClass).length > 0 ? (
                 <ChartContainer config={{}} className="h-full w-full">
                   <BarChart
                     accessibilityLayer
-                    data={Object.entries(konselingStatsByClass || {}).map(([kelas, data]) => ({
+                    data={Object.entries(stats.konselingStatsByClass || {}).map(([kelas, data]) => ({
                       kelas,
                       totalStudents: data?.totalStudents || 0,
                     }))}
@@ -771,7 +790,7 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
                       className="cursor-pointer"
                       onClick={(data) => handleKonselingClassClick(data)}
                     >
-                      {Object.entries(konselingStatsByClass || {}).map(([kelas, data], index) => (
+                      {Object.entries(stats.konselingStatsByClass || {}).map(([kelas, data], index) => (
                         <Cell key={`cell-${index}`} fill={`hsl(${(index * 60) % 360}, 70%, 60%)`} />
                       ))}
                     </Bar>
@@ -785,7 +804,7 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
                 </ChartContainer>
               ) : (
                 <div className="h-full flex items-center justify-center">
-                  <p className="text-slate-500 text-center">Tidak ada data konseling per kelas</p>
+                  <p className="text-slate-500 text-center">Tidak ada data konseling per kelas dengan filter yang dipilih</p>
                 </div>
               )}
             </div>

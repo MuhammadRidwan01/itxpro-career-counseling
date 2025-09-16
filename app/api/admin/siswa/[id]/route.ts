@@ -20,14 +20,21 @@ export async function PUT(
     }
 
     const data = await request.json()
-    const { status, tahunLulusTarget } = data
+    const { nama, kelasSaatIni, jurusan, status, tahunLulusTarget } = data
+
+    const updateData: any = {}
+
+    if (nama !== undefined) updateData.nama = nama
+    if (kelasSaatIni !== undefined) updateData.kelasSaatIni = kelasSaatIni
+    if (jurusan !== undefined) updateData.jurusan = jurusan
+    if (status !== undefined) updateData.status = status
+    if (tahunLulusTarget !== undefined) {
+      updateData.tahunLulusTarget = tahunLulusTarget ? Number.parseInt(tahunLulusTarget) : null
+    }
 
     const updatedSiswa = await prisma.siswa.update({
       where: { nis: id },
-      data: {
-        status: status,
-        tahunLulusTarget: tahunLulusTarget ? Number.parseInt(tahunLulusTarget) : null,
-      },
+      data: updateData,
     })
 
     return NextResponse.json({ success: true, data: updatedSiswa })

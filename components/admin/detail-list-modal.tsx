@@ -15,6 +15,7 @@ import { format } from "date-fns"
 import { id } from "date-fns/locale"
 import { Badge } from "@/components/ui/badge"
 import { KonselingDetailModal } from "@/components/admin/konseling-detail-modal"
+import { CareerDetailModal } from "@/components/admin/career-detail-modal"
 
 interface Student {
   nis: string
@@ -78,6 +79,8 @@ export function DetailListModal({ isOpen, onClose, dataType, filterParams }: Det
   const [error, setError] = useState<string | null>(null)
   const [showKonselingModal, setShowKonselingModal] = useState(false)
   const [selectedKonseling, setSelectedKonseling] = useState<Konseling | null>(null)
+  const [showCareerModal, setShowCareerModal] = useState(false)
+  const [selectedCareer, setSelectedCareer] = useState<TujuanKarir | null>(null)
 
   useEffect(() => {
     if (!isOpen) return
@@ -207,8 +210,17 @@ export function DetailListModal({ isOpen, onClose, dataType, filterParams }: Det
         ))
       case "tujuanKarir":
         return (data as TujuanKarir[]).map((item) => (
-          <TableRow key={item.id}>
-            <TableCell>{item.siswa.nama} ({item.siswa.kelasSaatIni})</TableCell>
+          <TableRow
+            key={item.id}
+            className="cursor-pointer hover:bg-gray-100"
+            onClick={() => {
+              setSelectedCareer(item)
+              setShowCareerModal(true)
+            }}
+          >
+            <TableCell className="font-medium text-blue-600 hover:text-blue-800 underline">
+              {item.siswa.nama} ({item.siswa.kelasSaatIni})
+            </TableCell>
             <TableCell><Badge>{item.kategoriUtama}</Badge></TableCell>
             <TableCell className="max-w-xs truncate">
               {(filterParams.category === "Kuliah" || filterParams.category === "melanjutkan" || !filterParams.category) && item.kategoriUtama === "melanjutkan" && (item.ptn1 || item.jurusan1)}
@@ -261,6 +273,16 @@ export function DetailListModal({ isOpen, onClose, dataType, filterParams }: Det
             setSelectedKonseling(null) // Clear selected konseling when modal closes
           }}
           konseling={selectedKonseling}
+        />
+      )}
+      {showCareerModal && (
+        <CareerDetailModal
+          isOpen={showCareerModal}
+          onClose={() => {
+            setShowCareerModal(false)
+            setSelectedCareer(null) // Clear selected career when modal closes
+          }}
+          tujuanKarir={selectedCareer}
         />
       )}
     </>

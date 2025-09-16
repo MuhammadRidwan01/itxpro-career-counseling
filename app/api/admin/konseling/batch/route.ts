@@ -23,13 +23,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { siswaList, tanggalKonseling, hasilText, deskripsi, tindakLanjut, kategori } = body as {
+    const { siswaList, tanggalKonseling, hasilText, deskripsi, tindakLanjut, kategori, status } = body as {
       siswaList: string[]
       tanggalKonseling: string
       hasilText: string
       deskripsi?: string
       tindakLanjut?: string
       kategori: string
+      status: "SUDAH" | "BELUM" | "PROSES"
     }
 
     // Validasi input
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: "Daftar siswa tidak boleh kosong" }, { status: 400 })
     }
 
-    if (!tanggalKonseling || !hasilText || !kategori) {
+    if (!tanggalKonseling || !hasilText || !kategori || !status) {
       return NextResponse.json({ success: false, message: "Semua field wajib diisi" }, { status: 400 })
     }
 
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
       hasilText,
       kategori,
       adminId: session.user.id,
-      status: "BELUM", // Set default status as per model
+      status,
       ...(deskripsi ? { deskripsi } : {}),
       ...(tindakLanjut ? { tindakLanjut } : {}),
     }))

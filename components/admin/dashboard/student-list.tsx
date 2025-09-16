@@ -25,6 +25,7 @@ interface Student {
 
 interface StudentListProps {
   students: Student[]
+  allStudents: Student[] // Added for filter options
   fetchDashboardData: () => void // This will now trigger parent's fetch
   handleDeleteStudent: (nis: string) => void
   // New props for search and filters
@@ -42,6 +43,7 @@ interface StudentListProps {
 
 export const StudentList = React.memo(function StudentList({
   students,
+  allStudents,
   fetchDashboardData,
   handleDeleteStudent,
   searchTerm,
@@ -72,14 +74,14 @@ export const StudentList = React.memo(function StudentList({
   ], []);
   
   // Memoize unique jurusan and angkatan to prevent recalculation
-  const uniqueJurusan = useMemo(() => 
-    [...new Set(students.map((s) => s.jurusan))].filter(jurusan => jurusan && jurusan.trim() !== ''), 
-    [students]
+  const uniqueJurusan = useMemo(() =>
+    [...new Set((allStudents.length > 0 ? allStudents : students).map((s) => s.jurusan))].filter(jurusan => jurusan && jurusan.trim() !== ''),
+    [allStudents, students]
   );
-  
-  const uniqueAngkatan = useMemo(() => 
-    [...new Set(students.map((s) => s.angkatan))].sort((a, b) => b - a), 
-    [students]
+
+  const uniqueAngkatan = useMemo(() =>
+    [...new Set((allStudents.length > 0 ? allStudents : students).map((s) => s.angkatan))].sort((a, b) => b - a),
+    [allStudents, students]
   );
 
   // Memoize event handlers
@@ -179,8 +181,8 @@ export const StudentList = React.memo(function StudentList({
               </div>
               {/* Jurusan and Angkatan Filters (New) */}
               <Select value={filterJurusan} onValueChange={handleJurusanFilterChange}>
-                <SelectTrigger className='w-full sm:w-[180px]'>
-                  <SelectValue placeholder='Semua Jurusan' />
+                <SelectTrigger className='w-full sm:w-[160px]'>
+                  <SelectValue placeholder={filterJurusan === 'all' ? 'Semua Jurusan' : filterJurusan} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>Semua Jurusan</SelectItem>
@@ -192,8 +194,8 @@ export const StudentList = React.memo(function StudentList({
                 </SelectContent>
               </Select>
               <Select value={filterAngkatan} onValueChange={handleAngkatanFilterChange}>
-                <SelectTrigger className='w-full sm:w-[180px]'>
-                  <SelectValue placeholder='Semua Angkatan' />
+                <SelectTrigger className='w-full sm:w-[140px]'>
+                  <SelectValue placeholder={filterAngkatan === 'all' ? 'Semua Angkatan' : filterAngkatan} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>Semua Angkatan</SelectItem>
