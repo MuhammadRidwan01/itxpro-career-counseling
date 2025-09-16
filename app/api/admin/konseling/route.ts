@@ -80,7 +80,18 @@ export async function GET(request: NextRequest) {
     const [konseling, total] = await Promise.all([
       prisma.hasilKonseling.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          nisSiswa: true,
+          tanggalKonseling: true,
+          hasilText: true,
+          deskripsi: true,
+          tindakLanjut: true,
+          status: true,
+          kategori: true,
+          adminId: true,
+          createdAt: true,
+          updatedAt: true,
           siswa: {
             select: {
               nis: true,

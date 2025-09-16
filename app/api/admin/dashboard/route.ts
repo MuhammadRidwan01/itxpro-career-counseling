@@ -23,7 +23,7 @@ export async function GET() {
     // Get statistics
     const [totalSiswa, siswaAktif, totalKonseling, totalTujuanKarir, totalKonselingBelumSelesai] = await Promise.all([
       prisma.siswa.count(),
-      prisma.siswa.count({ where: { status: "AKTIF" } }),
+      prisma.siswa.count({ where: { user: { isNot: null } } }), // Siswa aktif = siswa yang sudah membuat akun
       prisma.hasilKonseling.count(),
       prisma.tujuanKarir.count(),
       prisma.hasilKonseling.count({ where: { status: "PROSES" } }), // Count unfinished counseling sessions

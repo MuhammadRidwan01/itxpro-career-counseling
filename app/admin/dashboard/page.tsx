@@ -1,26 +1,27 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { useSession, signOut } from "next-auth/react"
-import { redirect, useRouter } from "next/navigation"
-import Link from "next/link"
-import { motion } from "framer-motion"
+import { useState, useEffect, useCallback } from 'react'
+import { useSession, signOut } from 'next-auth/react'
+import { redirect, useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
 import {
   ArrowLeft,
   LogOut,
   BarChart3,
-} from "lucide-react"
-import { PremiumButton } from "@/components/ui/premium-button"
-import { StatsCards } from "@/components/admin/dashboard/stats-cards"
-import { TabNavigation } from "@/components/admin/dashboard/tab-navigation"
-import { QuickActions } from "@/components/admin/dashboard/quick-actions"
-import { RecentActivity } from "@/components/admin/dashboard/recent-activity"
-import { StudentList } from "@/components/admin/dashboard/student-list"
-import { KonselingList } from "@/components/admin/dashboard/konseling-list"
-import { CareerManagement } from "@/components/admin/dashboard/career-management"
-import { StatisticsView } from "@/components/admin/dashboard/statistics-view"
-import { useToast } from "@/components/ui/use-toast"
-import { useDebounce } from "@/hooks/use-debounce" // Import useDebounce
+} from 'lucide-react'
+import { PremiumButton } from '@/components/ui/premium-button'
+import { StatsCards } from '@/components/admin/dashboard/stats-cards'
+import { TabNavigation } from '@/components/admin/dashboard/tab-navigation'
+import { QuickActions } from '@/components/admin/dashboard/quick-actions'
+import { RecentActivity } from '@/components/admin/dashboard/recent-activity'
+import { StudentList } from '@/components/admin/dashboard/student-list'
+import { KonselingList } from '@/components/admin/dashboard/konseling-list'
+import { CareerManagement } from '@/components/admin/dashboard/career-management'
+import { StatisticsView } from '@/components/admin/dashboard/statistics-view'
+import { useToast } from '@/components/ui/use-toast'
+import { useDebounce } from '@/hooks/use-debounce' // Import useDebounce
+import { RefreshControls } from '@/components/ui/refresh-controls'
 
 interface DashboardStats {
   totalSiswa: number
@@ -51,7 +52,7 @@ interface Konseling {
   hasilText: string
   deskripsi?: string
   tindakLanjut?: string
-  status: "SUDAH" | "BELUM"
+  status: 'SUDAH' | 'BELUM'
   kategori: string
   createdAt: string // Add createdAt
   siswa: {
@@ -92,52 +93,55 @@ export default function AdminDashboard() {
     konselingStatsByClass: {}, // Initialize with an empty object
   })
   const [students, setStudents] = useState<Student[]>([])
+  const [allStudents, setAllStudents] = useState<Student[]>([]) // For filter options
   const [recentKonseling, setRecentKonseling] = useState<Konseling[]>([])
   const [recentTujuanKarir, setRecentTujuanKarir] = useState<TujuanKarir[]>([]) // New state for recent tujuan karir
   const [tujuanKarir, setTujuanKarir] = useState<TujuanKarir[]>([])
   const [loading, setLoading] = useState(true) // Keep this for initial dashboard load
-  const [activeTab, setActiveTab] = useState("overview")
-
-  const handleExportCareerData = async () => {
+  const [activeTab, setActiveTab] = useState('overview')
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  
+  const handleExportCareerData = useCallback(async () => {
     try {
-      const response = await fetch("/api/admin/tujuan-karir/export");
+      const response = await fetch('/api/admin/tujuan-karir/export');
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
-        a.download = "data_tujuan_karir.xlsx";
+        a.download = 'data_tujuan_karir.xlsx';
         document.body.appendChild(a);
         a.click();
         a.remove();
         window.URL.revokeObjectURL(url);
         toast({
-          title: "Ekspor Berhasil",
-          description: "Data tujuan karir telah berhasil diekspor ke Excel.",
+          title: 'Ekspor Berhasil',
+          description: 'Data tujuan karir telah berhasil diekspor ke Excel.',
         });
       } else {
         const errorData = await response.json();
         toast({
-          title: "Ekspor Gagal",
-          description: errorData.message || "Terjadi kesalahan saat mengekspor data tujuan karir.",
-          variant: "destructive",
+          title: 'Ekspor Gagal',
+          description: errorData.message || 'Terjadi kesalahan saat mengekspor data tujuan karir.',
+          variant: 'destructive',
         });
       }
     } catch (error) {
-      console.error("Error exporting career data:", error);
+      console.error('Error exporting career data:', error);
       toast({
-        title: "Ekspor Gagal",
-        description: "Terjadi kesalahan jaringan atau server.",
-        variant: "destructive",
+        title: 'Ekspor Gagal',
+        description: 'Terjadi kesalahan jaringan atau server.',
+        variant: 'destructive',
       });
     }
-  };
+  }, [toast]);
 
   // State for search and filters
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [filterJurusan, setFilterJurusan] = useState("all");
-  const [filterAngkatan, setFilterAngkatan] = useState("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterJurusan, setFilterJurusan] = useState('all');
+  const [filterAngkatan, setFilterAngkatan] = useState('all');
 
   // Debounced search term for API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -145,178 +149,246 @@ export default function AdminDashboard() {
   // Separate loading state for students list
   const [loadingStudents, setLoadingStudents] = useState(false);
 
-  const fetchDashboardData = async () => {
-    setLoading(true) // Keep for overall dashboard loading
+  const fetchDashboardData = useCallback(async (isManualRefresh = false) => {
+    if (isManualRefresh) {
+      setIsRefreshing(true)
+    } else {
+      setLoading(true) // Keep for overall dashboard loading
+    }
     setLoadingStudents(true); // Set loading for students list
     try {
       // Construct URL for fetching students with search and filter parameters
       const studentParams = new URLSearchParams({
         search: debouncedSearchTerm,
-        status: filterStatus !== "all" ? filterStatus : "", // Only append status if not "all"
-        jurusan: filterJurusan !== "all" ? filterJurusan : "", // Only append jurusan if not "all"
-        angkatan: filterAngkatan !== "all" ? filterAngkatan : "", // Only append angkatan if not "all"
-        all: "true", // Fetch all data to ensure search works across all students
+        status: filterStatus !== 'all' ? filterStatus : '', // Only append status if not 'all'
+        jurusan: filterJurusan !== 'all' ? filterJurusan : '', // Only append jurusan if not 'all'
+        angkatan: filterAngkatan !== 'all' ? filterAngkatan : '', // Only append angkatan if not 'all'
+        all: 'true', // Fetch all data to ensure search works across all students
       });
 
-      const [statsRes, studentsRes, recentKonselingRes, recentTujuanKarirRes, tujuanKarirRes, konselingStatsRes] = await Promise.all([
-        fetch("/api/admin/dashboard"),
-        fetch(`/api/admin/siswa?${studentParams.toString()}`), // Pass search and filter params
-        fetch("/api/admin/konseling?limit=5&orderBy=tanggalKonseling:desc"),
-        fetch("/api/admin/tujuan-karir?limit=5&orderBy=createdAt:desc"), // Fetch recent tujuan karir
-        fetch("/api/admin/tujuan-karir"),
-        fetch("/api/admin/konseling/stats"), // Fetch new konseling stats
-      ])
+      // Optimize by fetching only what's needed for the current tab
+      const promises = [fetch('/api/admin/dashboard')]
+      
+      if (activeTab === 'students' || activeTab === 'overview') {
+        promises.push(fetch(`/api/admin/siswa?${studentParams.toString()}`))
+        // Fetch all students for filter options (only once)
+        if (allStudents.length === 0) {
+          promises.push(fetch('/api/admin/siswa?all=true'))
+        }
+      }
+      
+      if (activeTab === 'overview') {
+        promises.push(fetch('/api/admin/konseling?limit=5&orderBy=tanggalKonseling:desc'))
+        promises.push(fetch('/api/admin/tujuan-karir?limit=5&orderBy=createdAt:desc'))
+      }
+      
+      if (activeTab === 'career') {
+        promises.push(fetch('/api/admin/tujuan-karir'))
+      }
+      
+      if (activeTab === 'konseling' || activeTab === 'overview') {
+        promises.push(fetch('/api/admin/konseling/stats'))
+      }
 
-      const [statsData, studentsData, recentKonselingData, recentTujuanKarirData, tujuanKarirData, konselingStatsData] = await Promise.all([
-        statsRes.json(),
-        studentsRes.json(),
-        recentKonselingRes.json(),
-        recentTujuanKarirRes.json(),
-        tujuanKarirRes.json(),
-        konselingStatsRes.json(), // Parse new konseling stats
-      ])
+      const responses = await Promise.all(promises)
+      
+      // Parse responses based on what was fetched
+      let statsData, studentsData, allStudentsData, recentKonselingData, recentTujuanKarirData, tujuanKarirData, konselingStatsData
+      
+      statsData = await responses[0].json()
+      
+      let responseIndex = 1
+      if (activeTab === 'students' || activeTab === 'overview') {
+        studentsData = await responses[responseIndex++].json()
+        if (allStudents.length === 0) {
+          allStudentsData = await responses[responseIndex++].json()
+        }
+      }
+      
+      if (activeTab === 'overview') {
+        recentKonselingData = await responses[responseIndex++].json()
+        recentTujuanKarirData = await responses[responseIndex++].json()
+      }
+      
+      if (activeTab === 'career') {
+        tujuanKarirData = await responses[responseIndex++].json()
+      }
+      
+      if (activeTab === 'konseling' || activeTab === 'overview') {
+        konselingStatsData = await responses[responseIndex++].json()
+      }
 
       if (statsData.success) {
         setStats(prevStats => ({
           ...prevStats,
           ...statsData.data.stats,
-          konselingStatsByClass: konselingStatsData.success ? konselingStatsData.data.konselingStatsByClass : {},
+          konselingStatsByClass: konselingStatsData?.success ? konselingStatsData.data.konselingStatsByClass : {},
         }));
       }
-      if (studentsData.success) setStudents(studentsData.data.siswa)
-      if (recentKonselingData.success) setRecentKonseling(recentKonselingData.data.konseling)
-      if (recentTujuanKarirData.success) setRecentTujuanKarir(recentTujuanKarirData.data) // Set recent tujuan karir
-      if (tujuanKarirData.success) setTujuanKarir(tujuanKarirData.data)
+      if (studentsData?.success) setStudents(studentsData.data.siswa)
+      if (allStudentsData?.success) setAllStudents(allStudentsData.data.siswa)
+      if (recentKonselingData?.success) setRecentKonseling(recentKonselingData.data.konseling)
+      if (recentTujuanKarirData?.success) setRecentTujuanKarir(recentTujuanKarirData.data)
+      if (tujuanKarirData?.success) setTujuanKarir(tujuanKarirData.data)
+      
+      // Update last refreshed time
+      setLastUpdated(new Date())
+
+      // Show success toast for manual refresh
+      if (isManualRefresh) {
+        toast({
+          title: 'Refresh Berhasil',
+          description: 'Data berhasil diperbarui.',
+          variant: 'default',
+        })
+      }
     } catch (error) {
-      console.error("Error fetching dashboard data:", error)
+      console.error('Error fetching dashboard data:', error)
+
+      // Show error toast for refresh failures
+      if (isManualRefresh) {
+        toast({
+          title: 'Refresh Gagal',
+          description: 'Terjadi kesalahan saat memperbarui data. Silakan coba lagi.',
+          variant: 'destructive',
+        })
+      }
     } finally {
       setLoading(false) // Set overall dashboard loading to false
       setLoadingStudents(false); // Set students list loading to false
+      setIsRefreshing(false)
     }
-  }
+  }, [toast])
 
   useEffect(() => {
-    if (status === "loading") return
+    if (status === 'loading') return
     fetchDashboardData()
-  }, [session, status]); // Removed fetchDashboardData from dependency array to avoid infinite loop
+  }, [session, status]); // Removed fetchDashboardData to prevent infinite loop
 
   useEffect(() => {
     if (!loading && stats.totalKonselingBelumSelesai > 0) {
       toast({
-        title: "Pemberitahuan Konseling",
+        title: 'Pemberitahuan Konseling',
         description: `Ada ${stats.totalKonselingBelumSelesai} konseling yang belum selesai.`,
-        variant: "destructive",
+        variant: 'destructive',
       })
     }
   }, [loading, stats.totalKonselingBelumSelesai, toast]);
 
-  // Effect to re-fetch data when search/filter parameters change
+  // Effect to re-fetch data when search/filter parameters change or tab changes
   useEffect(() => {
-    if (activeTab === "students") { // Only fetch students if on the students tab
+    // Only fetch if we're not already loading/refreshing and there's an actual change
+    if (!loading && !isRefreshing) {
       const debounceFetch = setTimeout(() => {
         fetchDashboardData();
-      }, 500); // Debounce fetch to avoid too many API calls
+      }, 300); // Reduced debounce time for faster response
 
       return () => clearTimeout(debounceFetch);
     }
-  }, [debouncedSearchTerm, filterStatus, filterJurusan, filterAngkatan, activeTab]); // Added activeTab to dependency array
+  }, [debouncedSearchTerm, filterStatus, filterJurusan, filterAngkatan, activeTab]);
 
-  const handleDeleteStudent = async (nis: string) => {
-    if (!confirm("Yakin ingin menghapus siswa ini?")) return;
+  
+  const handleDeleteStudent = useCallback(async (nis: string) => {
+    if (!confirm('Yakin ingin menghapus siswa ini?')) return;
 
     try {
       const response = await fetch(`/api/admin/siswa/${nis}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
       const data = await response.json();
 
       if (data.success) {
         fetchDashboardData();
       } else {
-        alert(data.message || "Gagal menghapus siswa");
+        alert(data.message || 'Gagal menghapus siswa');
       }
     } catch (error) {
-      console.error("Error deleting student:", error);
-      alert("Terjadi kesalahan");
+      console.error('Error deleting student:', error);
+      alert('Terjadi kesalahan');
     }
-  };
+  }, [fetchDashboardData]);
 
-  const handleDeleteKonseling = async (id: string) => {
-    if (!confirm("Yakin ingin menghapus konseling ini?")) return;
+  const handleDeleteKonseling = useCallback(async (id: string) => {
+    if (!confirm('Yakin ingin menghapus konseling ini?')) return;
 
     try {
       const response = await fetch(`/api/admin/konseling/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
       const data = await response.json();
 
       if (data.success) {
         fetchDashboardData();
       } else {
-        alert(data.message || "Gagal menghapus konseling");
+        alert(data.message || 'Gagal menghapus konseling');
       }
     } catch (error) {
-      console.error("Error deleting konseling:", error);
-      alert("Terjadi kesalahan");
+      console.error('Error deleting konseling:', error);
+      alert('Terjadi kesalahan');
     }
-  };
+  }, [fetchDashboardData]);
 
-  const handleDeleteTujuanKarir = async (id: string) => {
-    if (!confirm("Yakin ingin menghapus tujuan karir ini?")) return;
+  const handleDeleteTujuanKarir = useCallback(async (id: string) => {
+    if (!confirm('Yakin ingin menghapus tujuan karir ini?')) return;
 
     try {
       const response = await fetch(`/api/admin/tujuan-karir?id=${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
       const data = await response.json();
 
       if (data.success) {
         fetchDashboardData();
       } else {
-        alert(data.message || "Gagal menghapus tujuan karir");
+        alert(data.message || 'Gagal menghapus tujuan karir');
       }
     } catch (error) {
-      console.error("Error deleting career goal:", error);
-      alert("Terjadi kesalahan");
+      console.error('Error deleting career goal:', error);
+      alert('Terjadi kesalahan');
     }
-  };
+  }, [fetchDashboardData]);
  
-  if (loading && activeTab === "overview") { // Only show full page loading for overview tab
+  if (loading && activeTab === 'overview') { // Only show full page loading for overview tab
     return (
-      <div className="min-h-screen bg-gradient-primary flex items-center justify-center px-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-slate-600 text-sm">Memuat dashboard...</p>
+      <div className='min-h-screen bg-gradient-primary flex items-center justify-center px-4'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4'></div>
+          <p className='text-slate-600 text-sm'>Memuat dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-primary">
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+    <div className='min-h-screen bg-gradient-primary'>
+      <div className='container mx-auto px-4 py-6 max-w-7xl'>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
+          className='flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8'
         >
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-white" />
+            <div className='flex items-center gap-3 mb-2'>
+              <div className='w-8 h-8 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-lg flex items-center justify-center'>
+                <BarChart3 className='w-5 h-5 text-white' />
               </div>
-              <h1 className="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
+              <h1 className='text-2xl font-bold text-slate-800'>Admin Dashboard</h1>
             </div>
-            <p className="text-slate-600 text-sm">Kelola sistem konseling karir SMK ITXPRO</p>
+            <p className='text-slate-600 text-sm'>Kelola sistem konseling karir SMK ITXPRO</p>
           </div>
-          <div className="flex flex-col md:flex-row gap-2">
-            <PremiumButton onClick={() => router.push('/')} variant="secondary" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+          <div className='flex flex-col sm:flex-row gap-3 lg:max-h-14'>
+            <RefreshControls
+              onRefresh={() => fetchDashboardData(true)}
+              isRefreshing={isRefreshing}
+              lastUpdated={lastUpdated}
+            />
+            <PremiumButton onClick={() => router.push('/')} variant='secondary' size='sm'>
+              <ArrowLeft className='w-4 h-4 mr-2' />
               Kembali
             </PremiumButton>
-            <PremiumButton onClick={() => signOut({ callbackUrl: "/auth/admin" })} variant="secondary" size="sm" className="w-full md:w-auto">
-              <LogOut className="w-4 h-4 mr-2" />
+            <PremiumButton onClick={() => signOut({ callbackUrl: '/auth/admin' })} variant='secondary' size='sm' className='w-full sm:w-auto'>
+              <LogOut className='w-4 h-4 mr-2' />
               Logout
             </PremiumButton>
           </div>
@@ -329,8 +401,8 @@ export default function AdminDashboard() {
         <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* Tab Content */}
-        {activeTab === "overview" && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {activeTab === 'overview' && (
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             {/* Quick Actions */}
             <QuickActions fetchDashboardData={fetchDashboardData} />
 
@@ -339,9 +411,10 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {activeTab === "students" && (
+        {activeTab === 'students' && (
           <StudentList
             students={students}
+            allStudents={allStudents.length > 0 ? allStudents : students} // Use allStudents for filter options
             fetchDashboardData={fetchDashboardData}
             handleDeleteStudent={handleDeleteStudent}
             searchTerm={searchTerm}
@@ -357,13 +430,13 @@ export default function AdminDashboard() {
           />
         )}
 
-        {activeTab === "konseling" && (
+        {activeTab === 'konseling' && (
           <KonselingList
             fetchDashboardData={fetchDashboardData}
           />
         )}
 
-        {activeTab === "career" && (
+        {activeTab === 'career' && (
           <CareerManagement
             tujuanKarir={tujuanKarir}
             fetchDashboardData={fetchDashboardData}
@@ -372,7 +445,7 @@ export default function AdminDashboard() {
           />
         )}
 
-        {activeTab === "statistics" && (
+        {activeTab === 'statistics' && (
           <StatisticsView konselingStatsByClass={stats.konselingStatsByClass} />
         )}
       </div>

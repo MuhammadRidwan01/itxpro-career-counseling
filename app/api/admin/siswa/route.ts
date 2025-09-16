@@ -53,7 +53,17 @@ export async function GET(request: Request) {
     const findManyOptions: any = {
       where,
       orderBy: { createdAt: "desc" },
-      include: {
+      select: {
+        nis: true,
+        nama: true,
+        email: true,
+        kelasSaatIni: true,
+        angkatan: true,
+        jurusan: true,
+        status: true,
+        tujuanKarirSubmitted: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: {
             id: true,

@@ -36,3 +36,30 @@ export async function PUT(
     return NextResponse.json({ success: false, message: "Terjadi kesalahan server" }, { status: 500 })
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = await params
+    const session = await getServerSession(authOptions)
+
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
+    }
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: "Student ID is required" }, { status: 400 })
+    }
+
+    await prisma.siswa.delete({
+      where: { nis: id },
+    })
+
+    return NextResponse.json({ success: true, message: "Siswa berhasil dihapus" })
+  } catch (error) {
+    console.error("Delete siswa error:", error)
+    return NextResponse.json({ success: false, message: "Terjadi kesalahan server" }, { status: 500 })
+  }
+}
