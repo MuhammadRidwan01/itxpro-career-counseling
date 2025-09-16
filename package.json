@@ -16,6 +16,10 @@
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
+  "engines": {
+    "node": "20.x",
+    "npm": "9.x"
+  },
   "dependencies": {
     "@auth/core": "latest",
     "@emotion/is-prop-valid": "latest",
