@@ -119,8 +119,7 @@ export async function GET(request: Request) {
     }
 
     const [siswa, total] = await Promise.all([
-      prisma.siswa.findMany(findManyOptions),
-      prisma.siswa.count({ where }),
+      prisma.siswa.findMany(findManyOptions), prisma.siswa.count({ where }),
     ])
 
     return NextResponse.json({

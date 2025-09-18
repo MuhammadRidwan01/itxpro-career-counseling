@@ -161,6 +161,56 @@ export default function AdminDashboard() {
     }
   }, [toast]);
 
+  const handleExportStudents = useCallback(async () => {
+    try {
+      // Build query parameters with current filters
+      const params = new URLSearchParams();
+      if (searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
+      }
+      if (filterStatus !== 'all') {
+        params.append('status', filterStatus);
+      }
+      if (filterJurusan !== 'all') {
+        params.append('jurusan', filterJurusan);
+      }
+      if (filterAngkatan !== 'all') {
+        params.append('angkatan', filterAngkatan);
+      }
+
+      const response = await fetch(`/api/admin/siswa/export?${params.toString()}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data_siswa.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        toast({
+          title: 'Ekspor Berhasil',
+          description: 'Data siswa telah berhasil diekspor ke Excel.',
+        });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: 'Ekspor Gagal',
+          description: errorData.message || 'Terjadi kesalahan saat mengekspor data siswa.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error exporting students:', error);
+      toast({
+        title: 'Ekspor Gagal',
+        description: 'Terjadi kesalahan jaringan atau server.',
+        variant: 'destructive',
+      });
+    }
+  }, [toast, searchTerm, filterStatus, filterJurusan, filterAngkatan]);
+
   // Reset filters when switching tabs
   useEffect(() => {
     if (activeTab !== 'students' && activeTab !== 'statistics') {
@@ -327,6 +377,19 @@ export default function AdminDashboard() {
       fetchDashboardData()
     }
   }, [activeTab, filterParams])
+
+  // Auto refresh data every 1.5 minutes (90,000ms)
+  useEffect(() => {
+    if (status !== 'authenticated' || loading) return
+
+    const intervalId = setInterval(() => {
+      if (!isRefreshing) {
+        fetchDashboardData()
+      }
+    }, 90000) // 1.5 minutes
+
+    return () => clearInterval(intervalId)
+  }, [status, loading, isRefreshing, fetchDashboardData])
 
   // Show notification for pending konseling
   useEffect(() => {
@@ -511,7 +574,7 @@ export default function AdminDashboard() {
             filterAngkatan={filterAngkatan}
             setFilterAngkatan={setFilterAngkatan}
             loadingStudents={loadingStudents}
-            handleExportStudents={handleExportCareerData}
+            handleExportStudents={handleExportStudents}
           />
         )}
 
