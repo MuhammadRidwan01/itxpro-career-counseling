@@ -165,6 +165,7 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
       }
 
       console.log("Filter params:", params.toString()) // Debug log
+      console.log("Selected classes:", selectedClasses) // Debug log
 
       const response = await fetch(`/api/admin/konseling/stats?${params.toString()}`)
 
@@ -560,7 +561,9 @@ export function StatisticsView({ konselingStatsByClass }: StatisticsViewProps) {
                   {(allAvailableClasses.length > 0 ? allAvailableClasses : [
                     "X 1", "X 2", "X 3", "XI 1", "XI 2", "XI 3",
                     "XII DKV", "XII RPL 1", "XII TKJ", "XII RPL 2"
-                  ]).map((kelas) => (
+                  ])
+                  .filter(kelas => !selectedClasses.includes(kelas))
+                  .map((kelas) => (
                     <SelectItem key={kelas} value={kelas}>{kelas}</SelectItem>
                   ))}
                 </SelectContent>

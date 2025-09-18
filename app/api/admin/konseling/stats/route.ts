@@ -23,13 +23,15 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const startDateParam = searchParams.get("startDate")
     const endDateParam = searchParams.get("endDate")
-    const kelasSaatIniParam = searchParams.get("kelasSaatIni")
+    const kelasSaatIniParams = searchParams.getAll("kelasSaatIni")
     const konselingCategoryParam = searchParams.get("konselingCategory")
     const tujuanKarirCategoryParam = searchParams.get("tujuanKarirCategory")
     const search = searchParams.get("search")
     const status = searchParams.get("status")
     const jurusan = searchParams.get("jurusan")
     const angkatan = searchParams.get("angkatan")
+
+    console.log("API - kelasSaatIniParams:", kelasSaatIniParams) // Debug log
 
     const dateFilter =
       startDateParam && endDateParam
@@ -54,9 +56,12 @@ export async function GET(request: NextRequest) {
     // Build student filters properly
     const studentFilter: any = {}
 
-    // Add class filter
-    if (kelasSaatIniParam && kelasSaatIniParam !== "all") {
-      studentFilter.kelasSaatIni = kelasSaatIniParam
+    // Add class filter - support multiple classes
+    if (kelasSaatIniParams.length > 0 && !kelasSaatIniParams.includes("all")) {
+      studentFilter.kelasSaatIni = {
+        in: kelasSaatIniParams
+      }
+      console.log("Applying class filter:", studentFilter.kelasSaatIni) // Debug log
     }
 
     // Add other filters
@@ -83,9 +88,11 @@ export async function GET(request: NextRequest) {
 
     // Base student filter for classes query (without search to avoid type conflicts)
     const baseStudentFilter: any = {}
-    
-    if (kelasSaatIniParam && kelasSaatIniParam !== "all") {
-      baseStudentFilter.kelasSaatIni = kelasSaatIniParam
+
+    if (kelasSaatIniParams.length > 0 && !kelasSaatIniParams.includes("all")) {
+      baseStudentFilter.kelasSaatIni = {
+        in: kelasSaatIniParams
+      }
     }
 
     if (status && status !== "all") {
@@ -99,6 +106,19 @@ export async function GET(request: NextRequest) {
     if (angkatan && angkatan !== "all") {
       baseStudentFilter.angkatan = parseInt(angkatan)
     }
+
+    // Get all classes without filter for dropdown
+    const allClassesUnfiltered = await prisma.siswa.findMany({
+      distinct: ["kelasSaatIni"],
+      select: {
+        kelasSaatIni: true,
+      },
+      where: {
+        kelasSaatIni: {
+          not: null,
+        },
+      },
+    })
 
     // Comprehensive Counseling Statistics
     const [
@@ -304,6 +324,7 @@ export async function GET(request: NextRequest) {
       studentsNotSubmittedDetails: studentsNotSubmittedTujuanKarir,
       studentsNotSubmittedByClass,
       availableClasses: allClasses.map((c: { kelasSaatIni: string | null }) => c.kelasSaatIni!).filter(Boolean) as string[],
+      availableClassesUnfiltered: allClassesUnfiltered.map((c: { kelasSaatIni: string | null }) => c.kelasSaatIni!).filter(Boolean) as string[],
       // These will now contain ALL available categories, not filtered ones
       availableKonselingCategories: allKonselingCategories.map((c: { kategori: string | null }) => c.kategori!).filter(Boolean) as string[],
       availableTujuanKarirCategories: allTujuanKarirCategories.map((c: { kategoriUtama: string | null }) => c.kategoriUtama!).filter(Boolean) as string[],
