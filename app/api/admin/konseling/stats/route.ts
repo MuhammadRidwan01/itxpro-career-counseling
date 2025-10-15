@@ -23,9 +23,15 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const startDateParam = searchParams.get("startDate")
     const endDateParam = searchParams.get("endDate")
-    const kelasSaatIniParam = searchParams.get("kelasSaatIni")
+    const kelasSaatIniParams = searchParams.getAll("kelasSaatIni")
     const konselingCategoryParam = searchParams.get("konselingCategory")
     const tujuanKarirCategoryParam = searchParams.get("tujuanKarirCategory")
+    const search = searchParams.get("search")
+    const status = searchParams.get("status")
+    const jurusan = searchParams.get("jurusan")
+    const angkatan = searchParams.get("angkatan")
+
+    console.log("API - kelasSaatIniParams:", kelasSaatIniParams) // Debug log
 
     const dateFilter =
       startDateParam && endDateParam
@@ -47,10 +53,72 @@ export async function GET(request: NextRequest) {
         ? { kategoriUtama: tujuanKarirCategoryParam }
         : {}
 
-    const classFilter =
-      kelasSaatIniParam && kelasSaatIniParam !== "all"
-        ? { kelasSaatIni: kelasSaatIniParam }
-        : {}
+    // Build student filters properly
+    const studentFilter: any = {}
+
+    // Add class filter - support multiple classes
+    if (kelasSaatIniParams.length > 0 && !kelasSaatIniParams.includes("all")) {
+      studentFilter.kelasSaatIni = {
+        in: kelasSaatIniParams
+      }
+      console.log("Applying class filter:", studentFilter.kelasSaatIni) // Debug log
+    }
+
+    // Add other filters
+    if (status && status !== "all") {
+      studentFilter.status = status
+    }
+
+    if (jurusan && jurusan !== "all") {
+      studentFilter.jurusan = jurusan
+    }
+
+    if (angkatan && angkatan !== "all") {
+      studentFilter.angkatan = parseInt(angkatan)
+    }
+
+    // Add search filter
+    if (search) {
+      studentFilter.OR = [
+        { nama: { contains: search, mode: "insensitive" as any } },
+        { nis: { contains: search } },
+        { email: { contains: search, mode: "insensitive" as any } },
+      ]
+    }
+
+    // Base student filter for classes query (without search to avoid type conflicts)
+    const baseStudentFilter: any = {}
+
+    if (kelasSaatIniParams.length > 0 && !kelasSaatIniParams.includes("all")) {
+      baseStudentFilter.kelasSaatIni = {
+        in: kelasSaatIniParams
+      }
+    }
+
+    if (status && status !== "all") {
+      baseStudentFilter.status = status
+    }
+
+    if (jurusan && jurusan !== "all") {
+      baseStudentFilter.jurusan = jurusan
+    }
+
+    if (angkatan && angkatan !== "all") {
+      baseStudentFilter.angkatan = parseInt(angkatan)
+    }
+
+    // Get all classes without filter for dropdown
+    const allClassesUnfiltered = await prisma.siswa.findMany({
+      distinct: ["kelasSaatIni"],
+      select: {
+        kelasSaatIni: true,
+      },
+      where: {
+        kelasSaatIni: {
+          not: null,
+        },
+      },
+    })
 
     // Comprehensive Counseling Statistics
     const [
@@ -61,11 +129,17 @@ export async function GET(request: NextRequest) {
       studentsNotSubmittedTujuanKarir,
       classesWithStudents,
       allClasses,
-      allKonselingCategories, // New
-      allTujuanKarirCategories, // New
-      konselingRecordsWithSiswa, // New: Fetch konseling records with siswa details
+      allKonselingCategories, // Fetch ALL categories without filters
+      allTujuanKarirCategories, // Fetch ALL categories without filters
+      konselingRecordsWithSiswa,
     ] = await Promise.all([
-      prisma.hasilKonseling.count({ where: { ...dateFilter, ...konselingCategoryFilter } }),
+      prisma.hasilKonseling.count({
+        where: {
+          ...dateFilter,
+          ...konselingCategoryFilter,
+          siswa: studentFilter
+        }
+      }),
       prisma.hasilKonseling.groupBy({
         by: ["kategori"],
         _count: {
@@ -76,12 +150,16 @@ export async function GET(request: NextRequest) {
             kategori: "desc",
           },
         },
-        where: { ...dateFilter, ...konselingCategoryFilter },
+        where: {
+          ...dateFilter,
+          ...konselingCategoryFilter,
+          siswa: studentFilter
+        },
       }),
       prisma.tujuanKarir.count({
         where: {
           ...tujuanKarirCategoryFilter,
-          siswa: classFilter.kelasSaatIni ? { kelasSaatIni: classFilter.kelasSaatIni } : undefined,
+          siswa: studentFilter,
         },
       }),
       prisma.tujuanKarir.groupBy({
@@ -96,13 +174,13 @@ export async function GET(request: NextRequest) {
         },
         where: {
           ...tujuanKarirCategoryFilter,
-          siswa: classFilter.kelasSaatIni ? { kelasSaatIni: classFilter.kelasSaatIni } : undefined,
+          siswa: studentFilter,
         },
       }),
       prisma.siswa.findMany({
         where: {
           tujuanKarirSubmitted: false,
-          ...classFilter,
+          ...studentFilter,
         },
         select: {
           nis: true,
@@ -115,7 +193,7 @@ export async function GET(request: NextRequest) {
         _count: {
           nis: true,
         },
-        where: classFilter,
+        where: studentFilter,
       }),
       prisma.siswa.findMany({
         distinct: ["kelasSaatIni"],
@@ -126,33 +204,49 @@ export async function GET(request: NextRequest) {
           kelasSaatIni: {
             not: null,
           },
+          // Only apply base student filter without search
+          ...baseStudentFilter,
         },
       }),
-      prisma.hasilKonseling.findMany({ // Fetch all unique konseling categories
+      // Fetch ALL konseling categories without any filters
+      prisma.hasilKonseling.findMany({
         distinct: ["kategori"],
         select: {
           kategori: true,
         },
         where: {
           kategori: {
-            not: "", // Filter out empty strings if any, or use isNot null if appropriate for your data
+            not: null,
+            not: "", // Filter out empty strings
           },
         },
+        orderBy: {
+          kategori: "asc",
+        },
       }),
-      prisma.tujuanKarir.findMany({ // Fetch all unique tujuan karir categories
+      // Fetch ALL tujuan karir categories without any filters
+      prisma.tujuanKarir.findMany({
         distinct: ["kategoriUtama"],
         select: {
           kategoriUtama: true,
         },
         where: {
           kategoriUtama: {
-            not: "", // Filter out empty strings if any, or use isNot null if appropriate for your data
+            not: null,
+            not: "", // Filter out empty strings
           },
+        },
+        orderBy: {
+          kategoriUtama: "asc",
         },
       }),
       // New query: Fetch konseling records with associated siswa details
       prisma.hasilKonseling.findMany({
-        where: { ...dateFilter, ...konselingCategoryFilter },
+        where: {
+          ...dateFilter,
+          ...konselingCategoryFilter,
+          siswa: studentFilter
+        },
         select: {
           nisSiswa: true,
           siswa: {
@@ -164,8 +258,7 @@ export async function GET(request: NextRequest) {
       }),
     ])
 
-
-const konselingStatsByClass: {
+    const konselingStatsByClass: {
       [key: string]: {
         totalStudents: number;
       };
@@ -190,6 +283,7 @@ const konselingStatsByClass: {
         totalStudents: uniqueStudentsByClass[kelas].size,
       };
     }
+
     const studentsNotSubmittedByClass: {
       [key: string]: {
         students: { nis: string; nama: string }[];
@@ -230,9 +324,11 @@ const konselingStatsByClass: {
       studentsNotSubmittedDetails: studentsNotSubmittedTujuanKarir,
       studentsNotSubmittedByClass,
       availableClasses: allClasses.map((c: { kelasSaatIni: string | null }) => c.kelasSaatIni!).filter(Boolean) as string[],
+      availableClassesUnfiltered: allClassesUnfiltered.map((c: { kelasSaatIni: string | null }) => c.kelasSaatIni!).filter(Boolean) as string[],
+      // These will now contain ALL available categories, not filtered ones
       availableKonselingCategories: allKonselingCategories.map((c: { kategori: string | null }) => c.kategori!).filter(Boolean) as string[],
       availableTujuanKarirCategories: allTujuanKarirCategories.map((c: { kategoriUtama: string | null }) => c.kategoriUtama!).filter(Boolean) as string[],
-      konselingStatsByClass, // Add the new stats
+      konselingStatsByClass,
     }
 
     return NextResponse.json({

@@ -19,41 +19,76 @@ export async function GET(request: Request) {
     const limit = getAllData ? undefined : (limitParam ? Number.parseInt(limitParam) : undefined)
     const status = searchParams.get("status")
     const angkatan = searchParams.get("angkatan")
-    const jurusan = searchParams.get("jurusan") // Add jurusan parameter
+    const jurusan = searchParams.get("jurusan")
     const hasKonseling = searchParams.get("hasKonseling")
 
-    const where: any = {}
+    // Build where clause
+    const whereConditions: any[] = []
 
-    if (search) {
-      where.OR = [
-        { nama: { contains: search, mode: "insensitive" } },
-        { nis: { contains: search } },
-        { email: { contains: search, mode: "insensitive" } },
-      ]
+    // Search condition
+    if (search.trim()) {
+      whereConditions.push({
+        OR: [
+          { nama: { contains: search.trim(), mode: "insensitive" } },
+          { nis: { contains: search.trim() } },
+          { email: { contains: search.trim(), mode: "insensitive" } },
+        ]
+      })
     }
 
-    if (status) {
-      where.status = status
+    // Status filter
+    if (status && status !== 'all') {
+      whereConditions.push({
+        status: { equals: status }
+      })
     }
 
-    if (angkatan) {
-      where.angkatan = Number.parseInt(angkatan)
+    // Jurusan filter
+    if (jurusan && jurusan !== 'all') {
+      whereConditions.push({
+        jurusan: { equals: jurusan }
+      })
     }
 
-    if (jurusan) { // Add jurusan filter
-      where.jurusan = jurusan
+    // Angkatan filter
+    if (angkatan && angkatan !== 'all') {
+      whereConditions.push({
+        angkatan: { equals: Number.parseInt(angkatan) }
+      })
     }
 
+    // HasKonseling filter
     if (hasKonseling === "true") {
-      where.hasilKonseling = {
-        some: {}, // Ensures the student has at least one konseling record
-      }
+      whereConditions.push({
+        hasilKonseling: {
+          some: {}
+        }
+      })
+    } else if (hasKonseling === "false") {
+      whereConditions.push({
+        hasilKonseling: {
+          none: {}
+        }
+      })
     }
+
+    // Combine all conditions
+    const where = whereConditions.length > 0 ? { AND: whereConditions } : {}
 
     const findManyOptions: any = {
       where,
       orderBy: { createdAt: "desc" },
-      include: {
+      select: {
+        nis: true,
+        nama: true,
+        email: true,
+        kelasSaatIni: true,
+        angkatan: true,
+        jurusan: true,
+        status: true,
+        tujuanKarirSubmitted: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: {
             id: true,
@@ -70,6 +105,7 @@ export async function GET(request: Request) {
           select: {
             id: true,
             tanggalKonseling: true,
+            status: true,
           },
           orderBy: { tanggalKonseling: "desc" },
           take: 1,
@@ -83,15 +119,14 @@ export async function GET(request: Request) {
     }
 
     const [siswa, total] = await Promise.all([
-      prisma.siswa.findMany(findManyOptions),
-      prisma.siswa.count({ where }),
+      prisma.siswa.findMany(findManyOptions), prisma.siswa.count({ where }),
     ])
 
     return NextResponse.json({
       success: true,
       data: {
         siswa,
-        ...(getAllData || limit === undefined ? {} : { // Only show pagination if not getting all data and limit is defined
+        ...(getAllData || limit === undefined ? {} : {
           pagination: {
             page,
             limit: limit,
@@ -103,7 +138,11 @@ export async function GET(request: Request) {
     })
   } catch (error) {
     console.error("Get siswa error:", error)
-    return NextResponse.json({ success: false, message: "Terjadi kesalahan server" })
+    return NextResponse.json({ 
+      success: false, 
+      message: "Terjadi kesalahan server",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    })
   }
 }
 
@@ -118,7 +157,27 @@ export async function POST(request: Request) {
     const data = await request.json()
     const { nis, nama, email, kelasSaatIni, jurusan, tahunLulusTarget } = data
 
-    // Extract angkatan from NIS
+    // Validate required fields
+    if (!nis || !nama || !kelasSaatIni || !jurusan) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "NIS, nama, kelas, dan jurusan wajib diisi" 
+      }, { status: 400 })
+    }
+
+    // Check if NIS already exists
+    const existingSiswa = await prisma.siswa.findUnique({
+      where: { nis }
+    })
+
+    if (existingSiswa) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "NIS sudah terdaftar" 
+      }, { status: 400 })
+    }
+
+    // Extract angkatan from NIS (assuming first 2 digits represent year)
     const angkatan = Number.parseInt(nis.substring(0, 2)) + 2000
 
     const siswa = await prisma.siswa.create({
@@ -128,14 +187,18 @@ export async function POST(request: Request) {
         kelasSaatIni,
         angkatan,
         jurusan,
-        tahunLulusTarget: tahunLulusTarget || angkatan,
-        user: undefined // Make the user relation optional
+        tahunLulusTarget: tahunLulusTarget || angkatan + 3, // Default 3 years study
+        email: email || null, // Make email optional
       },
     })
 
     return NextResponse.json({ success: true, data: siswa })
   } catch (error) {
     console.error("Create siswa error:", error)
-    return NextResponse.json({ success: false, message: "Terjadi kesalahan server" })
+    return NextResponse.json({ 
+      success: false, 
+      message: "Terjadi kesalahan server",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    })
   }
 }

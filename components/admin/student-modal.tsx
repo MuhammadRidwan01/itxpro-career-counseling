@@ -212,7 +212,6 @@ export function StudentModal({ isOpen, onClose, onSuccess, student }: StudentMod
                   <SelectItem value="AKTIF">Aktif</SelectItem>
                   <SelectItem value="ALUMNI">Alumni</SelectItem>
                   <SelectItem value="PINDAH">Pindah</SelectItem>
-                  <SelectItem value="KELUAR">Keluar</SelectItem>
                 </SelectContent>
               </Select>
             </div>

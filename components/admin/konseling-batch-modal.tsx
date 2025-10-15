@@ -44,6 +44,7 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
     deskripsi: "",
     tindakLanjut: "",
     kategori: "akademik",
+    status: "PROSES" as const,
   });
 
   const [loading, setLoading] = useState(false);
@@ -132,6 +133,7 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
         deskripsi: "",
         tindakLanjut: "",
         kategori: "akademik",
+        status: "PROSES",
       });
       setError("");
     }
@@ -433,7 +435,7 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
               </Alert>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="tanggalKonseling" className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
@@ -463,6 +465,23 @@ export function KonselingBatchModal({ isOpen, onClose, onSuccess }: KonselingBat
                     <SelectItem value="pribadi">Pribadi</SelectItem>
                     <SelectItem value="sosial">Sosial</SelectItem>
                     <SelectItem value="belajar">Belajar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status Konseling</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value as "SUDAH" | "BELUM" | "PROSES" })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PROSES">Dalam Proses</SelectItem>
+                    <SelectItem value="SUDAH">Selesai</SelectItem>
+                    <SelectItem value="BELUM">Belum Selesai</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

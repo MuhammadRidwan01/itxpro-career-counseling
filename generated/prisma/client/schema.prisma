@@ -36,6 +36,11 @@ model Siswa {
   user                 User?            @relation(fields: [email], references: [email])
   tujuanKarir          TujuanKarir?
 
+  @@index([status])
+  @@index([angkatan])
+  @@index([jurusan])
+  @@index([createdAt])
+  @@index([kelasSaatIni])
   @@map("siswa")
 }
 
@@ -53,6 +58,11 @@ model HasilKonseling {
   updatedAt        DateTime        @updatedAt
   siswa            Siswa           @relation(fields: [nisSiswa], references: [nis])
 
+  @@index([nisSiswa])
+  @@index([tanggalKonseling])
+  @@index([status])
+  @@index([kategori])
+  @@index([createdAt])
   @@map("hasil_konseling")
 }
 
@@ -72,6 +82,8 @@ model TujuanKarir {
   updatedAt       DateTime @updatedAt
   siswa           Siswa    @relation(fields: [nisSiswa], references: [nis])
 
+  @@index([kategoriUtama])
+  @@index([createdAt])
   @@map("tujuan_karir")
 }
 

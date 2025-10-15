@@ -37,6 +37,11 @@ model Siswa {
   tujuanKarir          TujuanKarir?
 
   @@map("siswa")
+  @@index([status])
+  @@index([angkatan])
+  @@index([jurusan])
+  @@index([createdAt])
+  @@index([kelasSaatIni])
 }
 
 model HasilKonseling {
@@ -54,6 +59,11 @@ model HasilKonseling {
   siswa            Siswa           @relation(fields: [nisSiswa], references: [nis])
 
   @@map("hasil_konseling")
+  @@index([nisSiswa])
+  @@index([tanggalKonseling])
+  @@index([status])
+  @@index([kategori])
+  @@index([createdAt])
 }
 
 model TujuanKarir {
@@ -73,6 +83,8 @@ model TujuanKarir {
   siswa           Siswa    @relation(fields: [nisSiswa], references: [nis])
 
   @@map("tujuan_karir")
+  @@index([kategoriUtama])
+  @@index([createdAt])
 }
 
 enum Role {
